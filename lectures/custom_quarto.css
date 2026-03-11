@@ -1,0 +1,76 @@
+/*-- scss:defaults --*/
+
+/*-- scss:rules --*/
+/* custom_quarto.css: Quarto revealjs theme for 161.324 lectures */
+
+/* Two-column layouts (ported from xaringan custom.css) */
+.left-code {
+  width: 38%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 60%;
+  float: right;
+  padding-left: 1%;
+}
+.left-code-wide {
+  width: 58%;
+  height: 92%;
+  float: left;
+}
+.right-plot-narrow {
+  width: 40%;
+  float: right;
+  padding-left: 1%;
+}
+
+/* Code font sizing */
+.small-font code {
+  font-size: 70% !important;
+}
+
+/* Scroll helpers */
+.scroll-output {
+  height: 90%;
+  overflow-y: scroll;
+}
+
+/* Widget containers */
+.reveal .ojs-widget {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  background: #fafbfc;
+}
+
+/* Callout refinements for dark slide backgrounds */
+.reveal .callout {
+  font-size: 0.85em;
+}
+
+/* Slide title styling */
+.reveal h2 {
+  color: #2c3e50;
+  border-bottom: 2px solid #4e79a7;
+  padding-bottom: 8px;
+}
+
+/* Table styling in slides */
+.reveal table {
+  font-size: 0.85em;
+}
+.reveal th {
+  background-color: #4e79a7;
+  color: white;
+  padding: 6px 12px;
+}
+.reveal td {
+  padding: 6px 12px;
+}
+
+/* Progress bar at bottom */
+.reveal .progress {
+  height: 4px;
+  color: #e45756;
+}

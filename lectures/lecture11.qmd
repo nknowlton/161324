@@ -1,0 +1,605 @@
+---
+title: "Lecture 11"
+subtitle: "Association Rule Mining"
+format:
+  revealjs:
+    theme: [default, custom_quarto.css]
+    slide-number: true
+    progress: true
+    hash: true
+    navigation-mode: linear
+    transition: fade
+    width: 1600
+    height: 900
+    fig-retina: 2
+    code-line-numbers: false
+    highlight-style: github
+    self-contained: true
+resources:
+  - lecture11_widgets
+execute:
+  echo: true
+  warning: false
+  message: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(arules)
+library(arulesViz)
+knitr::opts_chunk$set(
+  echo = TRUE,
+  fig.dim = c(4.8, 4.5),
+  fig.retina = 2,
+  out.width = "100%",
+  comment = "#>"
+)
+theme_set(theme_minimal(base_size = 14))
+```
+
+## What are Association Rules?
+
+Discovering **interesting relationships** among items in large collections of transactions.
+
+:::: {.columns}
+::: {.column width="50%" .fragment}
+**Classic framing**: market basket analysis
+
+- Supermarket receipts
+- Online shopping carts
+
+**But also**:
+
+- Recipe ingredients 🍕
+- Medical symptoms → diagnoses
+- Web page visits → next click
+- Survey question response patterns
+:::
+::: {.column width="50%" .fragment}
+**The question**:
+
+> *"If a recipe uses garlic and olive oil, what other ingredients does it tend to include?"*
+
+An **association rule** has the form:
+
+$$\{garlic, olive\_oil\} \Rightarrow \{parmesan\}$$
+
+- **Antecedent** (left-hand side): condition
+- **Consequent** (right-hand side): associated item
+:::
+::::
+
+---
+
+## Transactions as a Binary Matrix
+
+Each **transaction** is a set of items. We represent the data as a binary matrix:
+
+- Rows = transactions (recipes, shopping trips, patients)
+- Columns = items
+- Cell = 1 if item present, 0 otherwise
+
+. . .
+
+::: {.callout-tip}
+## Key insight
+Association rules work on **presence/absence** data — no quantities, no order. Just "was it in the basket or not?"
+:::
+
+. . .
+
+Let's build one interactively...
+
+---
+
+## Widget 1: Transaction Builder {.scrollable}
+
+Toggle pizza toppings on and off to build a transaction database. Watch the binary matrix and item frequencies update in real time.
+
+```{ojs}
+//| echo: false
+import { transactionBuilderWidget } from "./lecture11_widgets/transaction-builder-widget.js"
+viewof pizzaToggles = transactionBuilderWidget()
+```
+
+---
+
+## Support, Confidence, and Lift
+
+The three key metrics for evaluating association rules:
+
+::: {style="font-size: 85%;"}
+:::: {.columns}
+::: {.column width="33%" .fragment}
+### Support
+How **frequently** the itemset appears:
+
+$$\text{supp}(A \Rightarrow B) = \frac{|A \cup B|}{N}$$
+
+*"How common is this combination?"*
+:::
+::: {.column width="33%" .fragment}
+### Confidence
+How **reliable** the rule is:
+
+$$\text{conf}(A \Rightarrow B) = \frac{\text{supp}(A \cup B)}{\text{supp}(A)}$$
+
+*"Given A, how often does B also appear?"*
+
+This is $P(B | A)$ — **conditional probability**.
+:::
+::: {.column width="34%" .fragment}
+### Lift
+How much **more** likely B is given A than expected by chance:
+
+$$\text{lift}(A \Rightarrow B) = \frac{\text{supp}(A \cup B)}{\text{supp}(A) \cdot \text{supp}(B)}$$
+
+- Lift $> 1$: positive association ✓
+- Lift $= 1$: independent (no association)
+- Lift $< 1$: negative association
+:::
+::::
+:::
+
+---
+
+## Widget 2: Metric Calculator {.scrollable}
+
+Select items for the antecedent (A) and consequent (B) from the pizza data above, and see support, confidence, and lift computed in real time with a Venn diagram.
+
+```{ojs}
+//| echo: false
+import { metricCalculatorWidget } from "./lecture11_widgets/metric-calculator-widget.js"
+viewof metricInputs = metricCalculatorWidget(pizzaToggles)
+```
+
+---
+
+## The Pitfall of High Confidence
+
+::: {.callout-warning}
+## High confidence ≠ interesting rule
+A rule can have **high confidence** simply because the consequent is extremely common — not because of any real association.
+:::
+
+. . .
+
+**Example from our pizza data** — pepperoni appears in ~6–7 out of 8 transactions:
+
+| Rule | Confidence | Lift | Verdict |
+|:--|:--|:--|:--|
+| {Mushrooms} → {Pepperoni} | ≈ 0.80 | ≈ **1.0** | ❌ Useless — pepperoni is on nearly every pizza anyway |
+| {Mushrooms} → {Olives} | ≈ 0.50 | ≈ **2.5** | ✓ Interesting — olives appear *much more* with mushrooms |
+
+. . .
+
+> **Lift corrects for popularity.** It asks: "Is B *more* likely given A than it would be by chance?"
+> 
+> Lift = 1.0 means A tells us nothing new about B. Lift > 1 means a genuine association.
+
+**Try it** in Widget 2 — select Mushrooms → Pepperoni, then swap to Mushrooms → Olives.
+
+---
+
+## Mining Algorithms: Apriori
+
+The **Apriori algorithm** efficiently discovers association rules by exploiting a key property:
+
+::: {.callout-note}
+## The Apriori principle
+If an itemset is **infrequent**, all its **supersets** must also be infrequent.
+
+Equivalently: every subset of a frequent itemset must also be frequent.
+:::
+
+. . .
+
+**Algorithm outline:**
+
+1. Count support of individual items → keep those above minimum support
+2. Generate candidate pairs from frequent singles → count → prune
+3. Generate candidate triples from frequent pairs → count → prune
+4. Continue until no more frequent itemsets
+5. Generate rules from frequent itemsets, filter by minimum confidence
+
+. . .
+
+Let's watch this happen step by step...
+
+---
+
+## Widget 3: Apriori Step-Through
+
+Watch the Apriori algorithm work on the pizza transaction data. Adjust the minimum support threshold and step through each level of candidate generation and pruning.
+
+```{ojs}
+//| echo: false
+import { aprioriWidget } from "./lecture11_widgets/apriori-widget.js"
+viewof aprioriSim = aprioriWidget(pizzaToggles)
+```
+
+---
+
+## Apriori vs Eclat
+
+Two popular algorithms — same goal, different data representation:
+
+:::: {.columns}
+::: {.column width="50%" .fragment}
+### Apriori
+- **Horizontal** layout: each row = transaction with item list
+- Breadth-first: generates candidates level by level
+- Multiple passes over the database
+- Easy to understand and implement
+- Used in R's `arules::apriori()`
+:::
+::: {.column width="50%" .fragment}
+### Eclat
+- **Vertical** layout: each column = item with transaction ID list
+- Uses **set intersection** of transaction ID lists to count support
+- Often faster — fewer database passes
+- Depth-first search through itemset lattice
+- Used in R's `arules::eclat()`
+:::
+::::
+
+. . .
+
+Both produce the same frequent itemsets. Apriori is easier to teach; Eclat is often faster in practice. R's `arules` package supports both.
+
+---
+
+## Real Data: Recipe Ingredient Mining {.smaller}
+
+Let's apply association rules to **real data** — 2,218 recipes from [Allrecipes](https://www.allrecipes.com), categorised by cuisine (TidyTuesday 2025-09-16).
+
+Each recipe is a **transaction**; each ingredient is an **item**.
+
+```{r load-recipes, cache=TRUE}
+cuisines_raw <- read_csv(
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-09-16/cuisines.csv",
+  show_col_types = FALSE
+)
+glimpse(cuisines_raw)
+```
+
+---
+
+## Parsing Ingredients into Transactions
+
+The `ingredients` column is a comma-separated string. We need to extract base ingredient names.
+
+```{r parse-ingredients}
+# Words/phrases that are preparation descriptors, not ingredients.
+# These appear as standalone tokens after comma-splitting
+# (e.g. "garlic, minced" → "garlic" + "minced").
+not_ingredients <- c(
+  # preparation methods
+  "chopped", "minced", "diced", "sliced", "grated", "shredded", "crushed",
+  "julienned", "cubed", "halved", "quartered", "peeled", "seeded", "stemmed",
+  "trimmed", "cleaned", "rinsed", "drained", "thawed", "softened", "melted",
+  "beaten", "divided", "separated", "sifted", "crumbled", "toasted",
+  "mashed", "pureed", "blanched", "boiled", "roasted", "juiced",
+  "thinly sliced", "finely chopped", "coarsely chopped",
+  "finely", "coarsely", "thinly",
+  # usage / quantity phrases
+  "to taste", "as needed", "or to taste", "or as needed",
+  "or more", "or more to taste", "or more as needed",
+  "salt to taste", "salt and pepper to taste",
+  "salt and ground black pepper to taste",
+  "salt and ground black pepper",
+  "salt and pepper", "if desired", "for garnish",
+  # too generic / ubiquitous to be informative
+  "salt", "pepper", "kosher salt", "ground black pepper",
+  "freshly ground black pepper",
+  # other non-ingredients
+  "skinless", "cooking spray", "room temperature", "needed", "taste"
+)
+
+# Unit regex: strips leading quantity + measurement word
+unit_rx <- regex(
+  paste0("^(cups?|tablespoons?|tbsp|teaspoons?|tsp|pounds?|lbs?|ounces?|oz|",
+         "cans?|packages?|pkgs?|envelopes?|pinch(es)?|cloves?|slices?|",
+         "stalks?|heads?|bunche?s?|pieces?|strips?|sprigs?)\\s+(of\\s+)?"),
+  ignore_case = TRUE
+)
+
+recipe_items <- cuisines_raw |>
+  select(name, country, ingredients) |>
+  mutate(recipe_id = row_number()) |>
+  separate_longer_delim(ingredients, delim = ", ") |>
+  mutate(
+    ingredient = ingredients |>
+      str_to_lower() |>
+      str_trim() |>
+      str_remove_all("\\(.*?\\)") |>                          # remove parentheticals
+      str_remove("^[0-9½¼¾⅓⅔⅛⅜⅝⅞/\\. ]+") |>               # remove quantities inc. Unicode fractions
+      str_remove(unit_rx) |>                                   # remove measurement unit
+      str_remove(regex("^(large|medium|small|extra-?large)\\s+", ignore_case = TRUE)) |>
+      str_remove(regex("\\s+(to taste|as needed|if desired|or more to taste|or more)$",
+                        ignore_case = TRUE)) |>
+      str_remove(regex(",\\s*(divided|optional|drained|thawed|softened|melted|beaten)$",
+                        ignore_case = TRUE)) |>
+      str_trim() |>
+      # Normalise variants → canonical form
+      str_replace_all("^unsalted butter$", "butter") |>
+      str_replace_all("^garlic powder$",   "garlic") |>
+      str_replace_all("^minced garlic$",   "garlic") |>
+      # Normalise plurals → singular
+      str_replace_all("^eggs$",         "egg") |>
+      str_replace_all("^onions$",       "onion") |>
+      str_replace_all("^potatoes$",     "potato") |>
+      str_replace_all("^tomatoes$",     "tomato") |>
+      str_replace_all("^carrots$",      "carrot") |>
+      str_replace_all("^lemons$",       "lemon") |>
+      str_replace_all("^limes$",        "lime") |>
+      str_replace_all("^mushrooms$",    "mushroom") |>
+      str_replace_all("^bananas$",      "banana") |>
+      str_replace_all("^green onions$", "green onion") |>
+      str_replace_all("^cloves$",       "clove")
+  ) |>
+  filter(
+    nchar(ingredient) > 2,
+    !ingredient %in% not_ingredients
+  )
+
+# Keep the most common ingredients for interpretable rules
+top_ingredients <- recipe_items |>
+  count(ingredient, sort = TRUE) |>
+  slice_head(n = 75) |>
+  pull(ingredient)
+
+recipe_items_filtered <- recipe_items |>
+  filter(ingredient %in% top_ingredients)
+```
+
+---
+
+## Converting to Transactions
+
+```{r to-transactions}
+# Create transaction format for arules
+recipe_trans <- recipe_items_filtered |>
+  select(recipe_id, ingredient) |>
+  distinct() |>
+  mutate(present = TRUE) |>
+  pivot_wider(
+    names_from = ingredient,
+    values_from = present,
+    values_fill = FALSE
+  ) |>
+  select(-recipe_id) |>
+  as.matrix() |>
+  as("transactions")
+
+recipe_trans
+```
+
+---
+
+## Item Frequency Plot
+
+```{r item-freq-plot, fig.dim=c(12, 5)}
+itemFrequencyPlot(recipe_trans, topN = 25, type = "relative",
+                  col = "#4e79a7", main = "Top 25 Ingredients by Support")
+```
+
+---
+
+## Mining Rules
+
+```{r mine-rules}
+recipe_rules <- apriori(
+  recipe_trans,
+  parameter = list(support = 0.05, confidence = 0.4, minlen = 2, maxlen = 4),
+  control = list(verbose = FALSE)
+)
+recipe_rules
+```
+
+. . .
+
+```{r top-rules}
+# Top rules by lift
+inspect(head(sort(recipe_rules, by = "lift"), n = 10))
+```
+
+---
+
+## Filtering Rules by Ingredient
+
+```{r filter-rules}
+# What goes with garlic?
+garlic_rules <- subset(recipe_rules, subset = lhs %in% "garlic" & lift > 1.2)
+inspect(head(sort(garlic_rules, by = "confidence"), n = 10))
+```
+
+---
+
+
+```{r rules-to-ojs}
+#| echo: false
+# Extract rules as a data frame for OJS
+rules_df <- DATAFRAME(recipe_rules) |>
+  as_tibble() |>
+  mutate(
+    lhs = as.character(LHS),
+    rhs = as.character(RHS)
+  ) |>
+  select(lhs, rhs, support, confidence, coverage, lift, count) |>
+  arrange(desc(lift))
+
+ojs_define(rules_data = rules_df)
+```
+
+---
+
+## Widget 4: Rule Explorer {.scrollable}
+
+Explore all mined recipe rules interactively. Brush the scatterplot, adjust thresholds, or search for specific ingredients.
+
+```{ojs}
+//| echo: false
+import { ruleExplorerWidget } from "./lecture11_widgets/rule-explorer-widget.js"
+viewof ruleExplorer = ruleExplorerWidget(transpose(rules_data))
+```
+
+---
+
+## Where Does Association Rule Mining Fit?
+
+Association rules share ideas with many techniques you already know:
+
+:::: {.columns}
+::: {.column width="50%" .fragment}
+### Direct Connections
+
+**Conditional Probability** (STAT courses)
+
+$$\text{confidence}(A \Rightarrow B) = P(B \mid A)$$
+
+Confidence *is* conditional probability, estimated from data.
+
+. . .
+
+**Bayesian Reasoning**
+
+$$\text{lift}(A \Rightarrow B) = \frac{P(B \mid A)}{P(B)}$$
+
+Lift measures how much A changes our belief about B — like a likelihood ratio.
+:::
+::: {.column width="50%" .fragment}
+### Unsupervised Discovery Family
+
+**Clustering** (Week 10)
+
+- Both discover structure without labels
+- Clustering groups **observations** (rows)
+- Association rules group **items** (columns)
+
+**Decision Trees** (Week 9)
+
+- Both produce interpretable IF→THEN rules
+- Trees *partition* the feature space
+- Association rules find *co-occurrence* patterns
+:::
+::::
+
+---
+
+## Collaborative Filtering: The Famous Application
+
+> *"Customers who bought X also bought Y"*
+
+This is **literally** association rule mining applied to recommendation systems.
+
+:::: {.columns}
+::: {.column width="50%" .fragment}
+### Market Basket → Recommendations
+
+| Market Basket | Recommendation |
+|:--|:--|
+| Transaction = shopping cart | Transaction = user purchase history |
+| Item = product | Item = product |
+| Rule: {A} → {B} | Recommendation: "You might also like B" |
+| High lift = genuine association | High lift = personalised recommendation |
+:::
+::: {.column width="50%" .fragment}
+### Key difference
+
+Association rules find rules from **all transactions** together.
+
+Modern recommender systems (Netflix, Spotify) use more sophisticated collaborative filtering (matrix factorisation, deep learning), but the **core intuition** is the same:
+
+> Find patterns of co-occurrence across many users/transactions.
+:::
+::::
+
+---
+
+## Widget 5: Technique Comparison {.scrollable}
+
+Click any cell to expand the explanation. See how association rules compare with other methods you've learned.
+
+```{ojs}
+//| echo: false
+import { techniqueComparisonWidget } from "./lecture11_widgets/technique-comparison-widget.js"
+viewof techComparison = techniqueComparisonWidget()
+```
+
+---
+
+## Practical Tips
+
+:::: {.columns}
+::: {.column width="50%"}
+### When to Use Association Rules
+
+✅ Transactional data (baskets, carts, records)
+
+✅ Binary/categorical variables
+
+✅ Exploratory discovery — "what goes with what?"
+
+✅ Large number of items with sparse transactions
+
+✅ Business applications: cross-selling, layout optimisation, recommendations
+:::
+::: {.column width="50%"}
+### When NOT to Use
+
+❌ Small datasets (< 100 transactions) — rules will be unreliable
+
+❌ Continuous data without discretisation
+
+❌ When you need **causal** claims (rules show co-occurrence, not causation)
+
+❌ When you have a specific target variable (use classification instead)
+
+❌ Very dense data (every item in every transaction)
+:::
+::::
+
+. . .
+
+### Choosing Thresholds
+
+| Parameter | Too low | Too high |
+|:--|:--|:--|
+| **min support** | Millions of rules, most rare & unreliable | Only obvious, uninteresting patterns |
+| **min confidence** | Many weak associations | Miss rules where consequent is rare |
+
+> **Start with** support ≥ 0.01, confidence ≥ 0.5, then adjust based on domain knowledge and the number of rules produced.
+
+---
+
+## Summary
+
+:::: {.columns}
+::: {.column width="60%"}
+### Key Takeaways
+
+1. **Association rules** discover co-occurrence patterns in transactional data
+2. **Support** = how common, **Confidence** = how reliable, **Lift** = how interesting
+3. High confidence alone is misleading — always check **lift**
+4. **Apriori** prunes the search space using the antimonotone property
+5. Association rules are the foundation of **recommendation systems**
+6. Related to conditional probability, Bayes, clustering, and decision trees
+:::
+::: {.column width="40%"}
+### Coming Up: Lab 11
+
+In the lab you'll practice with:
+
+- The built-in `Groceries` dataset (9,835 transactions)
+- The `bank-rules.csv` dataset (banking service cross-selling)
+- Mining, inspecting, and filtering rules
+- Using `inspectDT()` for interactive exploration
+
+### Study Guide
+
+Chapter 8 of the course notes covers the same concepts with different examples and more mathematical detail.
+:::
+::::

@@ -5,3 +5,12 @@
 .DS_Store
 *.html
 *_files/
+.Rlib/
+.cache/
+.npm-cache/
+.playwright-cli/
+.quarto-user/
+.vscode/
+.server.pid
+lectures/*_cache/
+lectures/preview_*.txt

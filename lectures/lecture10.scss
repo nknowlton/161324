@@ -1,0 +1,112 @@
+/*-- scss:defaults --*/
+$body-bg: #f6f1e7;
+$body-color: #1f2a33;
+$link-color: #0b6b6f;
+$presentation-heading-color: #8a3324;
+$font-family-sans-serif: "Aptos", "Segoe UI", sans-serif;
+$presentation-font-size-root: 30px;
+$code-block-font-size: 0.72em;
+$code-color: #16313d;
+
+/*-- scss:rules --*/
+.reveal .slides {
+  text-align: left;
+}
+
+.reveal h1,
+.reveal h2,
+.reveal h3 {
+  letter-spacing: 0.01em;
+}
+
+.reveal .progress {
+  color: #cf5d2e;
+  height: 6px;
+}
+
+.reveal .slide-number {
+  right: 16px;
+  bottom: 14px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(31, 42, 51, 0.86);
+  color: #f6f1e7;
+  font-size: 0.48em;
+}
+
+.left-code,
+.left-code-wide,
+.right-plot,
+.right-plot-narrow {
+  box-sizing: border-box;
+}
+
+.left-code {
+  width: 40%;
+  float: left;
+}
+
+.right-plot {
+  width: 58%;
+  float: right;
+}
+
+.left-code-wide {
+  width: 58%;
+  float: left;
+}
+
+.right-plot-narrow {
+  width: 40%;
+  float: right;
+}
+
+.small-code pre code {
+  font-size: 0.78em;
+}
+
+.tight-table table {
+  font-size: 0.66em;
+}
+
+.widget-note {
+  margin-top: 0.7rem;
+  font-size: 0.68em;
+  color: #425565;
+}
+
+.widget-shell {
+  padding: 0.85rem 1rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(31, 42, 51, 0.12);
+  box-shadow: 0 10px 26px rgba(31, 42, 51, 0.08);
+}
+
+.widget-cell .code-copy-outer-scaffold {
+  display: none;
+}
+
+.highlight-box {
+  padding: 0.55rem 0.8rem;
+  border-left: 6px solid #cf5d2e;
+  background: rgba(255, 255, 255, 0.72);
+  border-radius: 12px;
+}
+
+.muted {
+  color: #5a6a77;
+}
+
+.reveal pre code {
+  line-height: 1.25;
+}
+
+.reveal table {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.reveal .columns {
+  gap: 1rem;
+}
