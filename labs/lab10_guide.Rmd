@@ -1,19 +1,223 @@
 ---
-title: 'Workshop 10: Clustering'
+title: "Workshop 10 Guide: Clustering"
 output: html_document
 ---
 
-We'll be looking at clustering today, including:
+This guide works through one complete clustering analysis using the same
+flow as `lab10.Rmd`. There is still room for judgment, especially when
+choosing the number of clusters, but the code below gives one sensible
+solution path.
 
-- Hierarchical clustering
-- k-means clustering
-- Partitioning around Medioids
-- Silhouttes
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(broom)
+library(cluster)
 
-We'll utilise data from the New Zealand General Election in 2020 along with a synthetic dataset to demonstrate some key concepts with clustering.
+theme_set(theme_minimal())
 
-Start by downloading lab10.Rmd and load it into RStudio:
+read_tidytuesday_data <- function(url, local_parquet = NULL) {
+  if (!is.null(local_parquet) &&
+      file.exists(local_parquet) &&
+      requireNamespace("arrow", quietly = TRUE)) {
+    return(arrow::read_parquet(local_parquet) |> as_tibble())
+  }
 
-https://www.massey.ac.nz/~jcmarsha/161324/labs/lab10.Rmd
+  read_csv(url, show_col_types = FALSE)
+}
 
-**Ensure the document knits correctly, then work your way through the R Markdown worksheet.**
+qatar_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-12-09/qatarcars.csv"
+monster_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-05-27/monsters.csv"
+
+qatarcars <- read_tidytuesday_data(qatar_url, "../data/qatarcars.parquet")
+monsters <- read_tidytuesday_data(monster_url, "../data/monsters.parquet")
+```
+
+## 1. Warm-up: scaling matters
+
+```{r}
+car_vars <- c(
+  "length", "width", "height", "mass", "horsepower",
+  "price", "performance", "economy", "trunk", "seating"
+)
+
+cars <- qatarcars |>
+  select(type, enginetype, all_of(car_vars)) |>
+  drop_na() |>
+  mutate(car_id = row_number(), .before = 1)
+
+cars_raw <- cars |>
+  select(all_of(car_vars))
+
+cars_scaled <- cars_raw |>
+  mutate(across(everything(), ~ as.numeric(scale(.x))))
+
+summary(cars_raw)
+```
+
+The raw summaries show that variables such as `price`, `mass`, and
+`horsepower` are on much larger scales than `seating` or `height`. If
+we use Euclidean distance directly, those larger-scale variables will
+dominate the dissimilarities.
+
+```{r}
+round(as.matrix(dist(cars_raw |> slice(1:6))), 2)
+round(as.matrix(dist(cars_scaled |> slice(1:6))), 2)
+```
+
+The scaled distance matrix is the more appropriate input for the
+clustering methods used below.
+
+## 2. Hierarchical clustering
+
+```{r}
+cars_dist <- dist(cars_scaled, method = "euclidean")
+cars_hc <- hclust(cars_dist, method = "complete")
+
+plot(cars_hc, labels = FALSE, hang = -1, main = "Complete-linkage dendrogram for Qatar Cars")
+```
+
+```{r}
+cars_hc4 <- cars |>
+  mutate(cluster = factor(cutree(cars_hc, k = 4)))
+
+cars_hc5 <- cars |>
+  mutate(cluster = factor(cutree(cars_hc, k = 5)))
+
+cars_hc4 |>
+  count(cluster, type, sort = TRUE)
+
+cars_hc4 |>
+  count(cluster, enginetype, sort = TRUE)
+```
+
+There is no unique correct cut, but `k = 4` is a reasonable working
+choice because it keeps the interpretation manageable while still
+separating noticeably different car groups.
+
+## 3. $K$-means and the elbow plot
+
+```{r}
+set.seed(161324)
+car_elbow <- tibble(k = 1:8) |>
+  mutate(
+    model = map(k, ~ kmeans(cars_scaled, centers = .x, nstart = 20)),
+    fit = map(model, glance)
+  ) |>
+  unnest(fit)
+
+car_elbow
+```
+
+```{r}
+ggplot(car_elbow, aes(x = k, y = tot.withinss)) +
+  geom_line() +
+  geom_point(size = 2)
+```
+
+One reasonable reading of the elbow plot is that the main gains occur by
+about `k = 4`, so we continue with that choice.
+
+```{r}
+set.seed(161324)
+cars_km4 <- kmeans(cars_scaled, centers = 4, nstart = 25)
+
+cars |>
+  mutate(cluster = factor(cars_km4$cluster)) |>
+  count(cluster, type, sort = TRUE)
+```
+
+```{r}
+cars |>
+  mutate(cluster = factor(cars_km4$cluster)) |>
+  group_by(cluster) |>
+  summarise(across(all_of(car_vars), mean), n = n())
+```
+
+The cluster summaries on the original scale are usually easier to
+interpret than the scaled cluster centres.
+
+## 4. PAM and silhouette widths
+
+```{r}
+cars_pam4 <- pam(cars_scaled, k = 4)
+plot(silhouette(cars_pam4), border = NA, do.clus.stat = FALSE, do.n.k = FALSE)
+```
+
+```{r}
+cars_pam_sil <- cars_pam4 |>
+  pluck("silinfo", "widths") |>
+  as_tibble()
+
+cars_pam_sil |>
+  group_by(cluster) |>
+  summarise(avg_sil = mean(sil_width), n = n())
+```
+
+High average silhouette widths indicate that the cluster is reasonably
+well separated from the others. Low or negative widths would suggest a
+poor fit or an artificial split.
+
+## 5. Comparison with D&D Monsters
+
+```{r}
+monster_vars <- c(
+  "str", "dex", "con", "int", "wis", "cha",
+  "hp_number", "cr", "speed_base_number"
+)
+
+monster_data <- monsters |>
+  select(type, all_of(monster_vars)) |>
+  drop_na()
+
+monster_scaled <- monster_data |>
+  select(all_of(monster_vars)) |>
+  mutate(across(everything(), ~ as.numeric(scale(.x))))
+
+monster_hc <- monster_scaled |>
+  dist(method = "euclidean") |>
+  hclust(method = "complete")
+
+monster_groups <- cutree(monster_hc, k = 5)
+
+monster_data |>
+  mutate(cluster = factor(monster_groups)) |>
+  count(cluster, type, sort = TRUE)
+```
+
+This remains an unsupervised problem. The known `type` values are used
+only after fitting, to help interpret whether the clustering has picked
+up recognizable structure.
+
+## 6. Optional DBSCAN extension
+
+```{r, eval=FALSE}
+library(dbscan)
+
+cars_2d <- cars |>
+  select(price, horsepower) |>
+  drop_na() |>
+  mutate(across(everything(), ~ as.numeric(scale(.x))))
+
+dbscan::kNNdistplot(as.matrix(cars_2d), k = 4)
+abline(h = 0.6, lty = 2, col = 2)
+
+cars_db <- dbscan::dbscan(as.matrix(cars_2d), eps = 0.6, minPts = 5)
+
+bind_cols(cars_2d, cluster = factor(cars_db$cluster)) |>
+  ggplot(aes(x = price, y = horsepower, colour = cluster)) +
+  geom_point(alpha = 0.8, size = 2)
+```
+
+The DBSCAN extension is mainly about parameter choice and recognising
+that density-based clustering answers a different question from
+hierarchical clustering or $K$-means.
+
+## Wrap-up
+
+One defensible conclusion is:
+
+- scaling is essential before Euclidean clustering on the Qatar Cars data
+- `k = 4` gives a practical working partition across several methods
+- hierarchical clustering is useful for exploration
+- $K$-means and PAM give clearer fixed partitions once a candidate `K`
+  is on the table

@@ -1,182 +1,281 @@
 ---
-title: 'Workshop 10: Clustering'
+title: "Workshop 10: Clustering"
 output: html_document
 ---
 
-In this workshop we'll be looking at clustering data. Clustering is an unsupervised
-learning technique - there is no known truth, and we're instead trying to group the
-observations into a fairly small number of clusters such that all observations in a
-clusters are closely related, while observations from different clusters differ.
+In this workshop we follow the lecture workflow for clustering:
 
-The techniques we'll cover include:
+- build a dissimilarity matrix
+- check the effect of scaling
+- compare hierarchical clustering, $K$-means, and PAM
+- use silhouette widths to defend a choice of $K$
+- compare the final results with a second dataset
 
-- Hierarchical clustering
-- k-means clustering
-- Partitioning around Medioids
-- Silhouttes
+The main dataset is the Qatar Cars TidyTuesday data. The D&D Monsters
+data are used later as a shorter comparison exercise. The chunks below
+first try to read the local parquet backups from `../data/`; if `arrow`
+is not installed they fall back to the online CSV files used in the
+lecture.
 
-## The 2020 New Zealand General Election
-
-In this exercise we'll look at the results from the 2020 New Zealand general election,
-and look at how the 72 electorates (regions) cluster together based on the party
-and candidate votes, or both combined.
-
-In New Zealand general elections there are 65 'General' electorates (regions) and 7
-Maori electorates. Each voters is assigned to one of these electorates, and has two
-votes: they vote for the political party they wish to represent them in parliament,
-and in addition vote for the person (candidate) they wish to represent them in their
-electorate.
-
-Generally, the candidate they vote for in an electorate is also in a political party,
-but there is no need for an individual to vote for the same party across both their
-votes - indeed, vote splitting, where one votes for a person from a party other than
-the one you vote for is common and encouraged in some electorates.
-
-For more information about voting in New Zealand see here:
-
-https://elections.nz/democracy-in-nz/what-is-new-zealands-system-of-government/
-
-We'll be usig data from the 2020 general election, which we read in below.
-
-```{r, message=FALSE}
+```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(broom)
-library(ggdendro)
 library(cluster)
-library(recipes)
 
-party  <- read_csv("https://www.massey.ac.nz/~jcmarsha/data/nzelect/2020_party.csv")
-candidate <- read_csv("https://www.massey.ac.nz/~jcmarsha/data/nzelect/2020_candidate.csv")
+theme_set(theme_minimal())
+
+read_tidytuesday_data <- function(url, local_parquet = NULL) {
+  if (!is.null(local_parquet) &&
+      file.exists(local_parquet) &&
+      requireNamespace("arrow", quietly = TRUE)) {
+    return(arrow::read_parquet(local_parquet) |> as_tibble())
+  }
+
+  read_csv(url, show_col_types = FALSE)
+}
+
+qatar_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-12-09/qatarcars.csv"
+monster_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-05-27/monsters.csv"
+
+qatarcars <- read_tidytuesday_data(qatar_url, "../data/qatarcars.parquet")
+monsters <- read_tidytuesday_data(monster_url, "../data/monsters.parquet")
 ```
 
-### Try yourself
+## 1. Warm-up: distances and scaling
 
-1. Take a look at the `party` data. You should notice you have the percentage vote for each party (in separate columns) by the electorate (in rows). Summarise how each party does on average across the electorates.
-
-2. Produce a long-form dataset `party_long` by pivoting the vote columns into `Party` and `PartyVote` columns. Use this to produce boxplots of the `PartyVote` by `Party` to show the variation across the electorates.
-
-3. Produce a long-form version of the `candidate` data, and combine both into a `all_long` dataset. Use this to do a scatterplot of the person vote versus the party vote, coloured by Party.
-
-
-We'll next look at clustering the `party` data using hierarchical clustering:
+For the clustering analysis we will use the following numeric variables:
 
 ```{r}
-party.hc1 <- party |>
-  column_to_rownames("Electorate") |>
-  dist() |>
-  hclust(method='single')
+car_vars <- c(
+  "length", "width", "height", "mass", "horsepower",
+  "price", "performance", "economy", "trunk", "seating"
+)
 
-ggdendrogram(party.hc1)
+cars <- qatarcars |>
+  select(type, enginetype, all_of(car_vars)) |>
+  drop_na() |>
+  mutate(car_id = row_number(), .before = 1)
+
+cars_raw <- cars |>
+  select(all_of(car_vars))
+
+cars_scaled <- cars_raw |>
+  mutate(across(everything(), ~ as.numeric(scale(.x))))
+
+cars |> glimpse()
 ```
 
 ### Try yourself
 
-1. Try performing hierarchical clustering with average or complete linkage.
+1. Use `summary()` on `cars_raw`. Which variables appear to be on very
+   different scales?
 
-2. Which electorates tend to cluster together?
+2. Compute the Euclidean distance matrix for the first six cars before
+   scaling and after scaling.
 
-Let's now look into the clustering a little more, by using `cutree` to break things down into (say) 5
-clusters:
+3. Which variables do you expect to dominate the unscaled distances?
 
 ```{r}
-party.cl1 <- party |> 
-  mutate(Cluster = party.hc1 |> cutree(k=5))
-
-party.cl1 |>
-  group_by(Cluster) |>
-  summarise(across(-Electorate, mean), size=n())
+round(as.matrix(dist(cars_raw |> slice(1:6))), 2)
+round(as.matrix(dist(cars_scaled |> slice(1:6))), 2)
 ```
 
-We can see that cluster 5 (The Maori electorates) all teend to have a much higher vote for the Maori and Other parties and a lower vote for National, while cluster 1 tends to vote more for National. Cluster 3 are South Auckland electorates that vote very strongly for Labour, while Cluster 2 and 4 vote more strongly for the Greens (two Wellington electorates and Dunedin).
+## 2. Hierarchical clustering on Qatar Cars
 
-### Try yourself
-
-1. Do the other linkage methods result in the same clustering?
-
-2. Do the same analysis of the `candidate` vote. How do the electorates cluster? Choose a suitable number of clusters based on the dendogram and then look into which electorates fall in each cluster.
-
-We'll now combine the two datasets so we can look at them together:
+We start with complete-linkage hierarchical clustering on the scaled
+data.
 
 ```{r}
-all <- party |> rename_with(~ paste("Party", ., sep=":"), .cols=-Electorate) |>
-  left_join(
-    candidate |> rename_with(~ paste("Cand", ., sep=":"), .cols=-Electorate),
-    by = 'Electorate'
-  )
+cars_dist <- dist(cars_scaled, method = "euclidean")
+cars_hc <- hclust(cars_dist, method = "complete")
+
+plot(cars_hc, labels = FALSE, hang = -1, main = "Complete-linkage dendrogram for Qatar Cars")
 ```
 
 ### Try yourself
 
-Using the combined voting data `all`, perform hierarchical clustering and investigate which
-electorates tend to vote similarly when both party and candidate votes are considered.
+1. Cut the dendrogram into `k = 4` and `k = 5` clusters.
 
+2. For each choice of `k`, compare the resulting clusters with `type`
+   and `enginetype`.
 
-## Clustering synthetic data
-
-In this exercise we have 9 numerical measurements (labelled A through I)
-from a synthetic data set. Our goal is to group the observations with
-common characteristics together.
-
-```{r, message=FALSE}
-synth <- read_csv("https://www.massey.ac.nz/~jcmarsha/data/syn-cluster.csv")
-```
-
-### Try yourself
-
-1. Start by using hierarchical clustering to look at this data. How many clusters look sensible?
-
-
-We'll next try using k-means clustering, with the following code fitting k-means for k=1 through 10:
+3. Which value of `k` looks more interpretable? There is no unique
+   answer here, but for the rest of the worksheet continue with
+   `k = 4` unless you have a strong case for another value.
 
 ```{r}
-set.seed(1234)
-km_all <- tibble(k = 1:10) |>
+cars_hc4 <- cars |>
+  mutate(cluster = factor(cutree(cars_hc, k = 4)))
+
+cars_hc5 <- cars |>
+  mutate(cluster = factor(cutree(cars_hc, k = 5)))
+
+cars_hc4 |>
+  count(cluster, type, sort = TRUE)
+
+cars_hc5 |>
+  count(cluster, type, sort = TRUE)
+```
+
+## 3. $K$-means and the elbow heuristic
+
+Next fit $K$-means for several values of $K$ and inspect the total
+within-cluster sum of squares.
+
+```{r}
+set.seed(161324)
+car_elbow <- tibble(k = 1:8) |>
   mutate(
-    model = map(k, ~ kmeans(synth, centers = ., nstart = 20)),
-    tidied = map(model, glance)
+    model = map(k, ~ kmeans(cars_scaled, centers = .x, nstart = 20)),
+    fit = map(model, glance)
   ) |>
-  unnest(tidied)
-km_all
+  unnest(fit)
+
+car_elbow
 ```
 
 ### Try yourself
 
-1. Produce a plot of the within sum of squares against k. How many are clusters do you think
-are optimal?
+1. Produce an elbow plot of `tot.withinss` against `k`.
 
-2. Check the scales on each of the variables in `synth`. You should notice they are different!
+2. Where does the main drop occur?
 
-We can rescale the data using a `recipe` as usual:
+3. Fit a final $K$-means model with `K = 4` and compare the clusters
+   with `type` and `enginetype`.
 
 ```{r}
-scaling <- recipe(synth) |>
-  step_normalize(everything()) |>
-  prep(synth)
-
-synth.scale <- bake(scaling, synth)
+ggplot(car_elbow, aes(x = k, y = tot.withinss)) +
+  geom_line() +
+  geom_point(size = 2)
 ```
-
-### Try yourself
-
-1. Repeat the clustering procedure. How many clusters make sense now?
-
-
-You should notice that 6 clusters seems sensible. We can confirm this by looking at the silhouettes of 6 and 7 clusters. If 6 clusters is best, then by asking for 7 clusters we will likely split one of the clusters artificially, which should result in at least two clusters with poor silhouette widths.
-
-We can extract the silhouette information by re-fitting using `pam`:
 
 ```{r}
-clust6 <- pam(synth, k=6)
-clust6.sil <- clust6 |> pluck('silinfo', 'widths') |> as_tibble()
+set.seed(161324)
+cars_km4 <- kmeans(cars_scaled, centers = 4, nstart = 25)
+
+cars |>
+  mutate(cluster = factor(cars_km4$cluster)) |>
+  count(cluster, type, sort = TRUE)
 ```
 
 ### Try yourself
 
-1. Create boxplots of the silhouette width by cluster using `clust6.sil`.
+1. Summarise the original car variables within each $K$-means cluster.
 
-2. Repeat this for k=7. You might wish to combine the plots into one by using `bind_rows()` to 
-produce a single plot.
+2. Which variables seem to separate the clusters most clearly?
 
-3. Look at the results of your preferred clustering by using `augment()` from `broom`
-to append the cluster number to the data. With these data, just doing boxplots for each variable
-by the cluster will be enough to see how clear things are!
+3. Do the $K$-means clusters tell a similar story to the hierarchical
+   clusters?
+
+```{r}
+cars |>
+  mutate(cluster = factor(cars_km4$cluster)) |>
+  group_by(cluster) |>
+  summarise(across(all_of(car_vars), mean), n = n())
+```
+
+## 4. PAM and silhouette widths
+
+PAM lets us keep the clustering on the same scaled variables, but with a
+medoid rather than a centroid.
+
+```{r}
+cars_pam4 <- pam(cars_scaled, k = 4)
+plot(silhouette(cars_pam4), border = NA, do.clus.stat = FALSE, do.n.k = FALSE)
+```
+
+### Try yourself
+
+1. Extract the silhouette widths from `cars_pam4`.
+
+2. Compute the average silhouette width in each cluster.
+
+3. Compare the overall clustering quality from PAM with your earlier
+   interpretation of the hierarchical and $K$-means fits.
+
+```{r}
+cars_pam_sil <- cars_pam4 |>
+  pluck("silinfo", "widths") |>
+  as_tibble()
+
+cars_pam_sil |>
+  group_by(cluster) |>
+  summarise(avg_sil = mean(sil_width), n = n())
+```
+
+## 5. Short comparison: D&D Monsters
+
+The lecture used the D&D Monsters data as a second example because the
+known `type` variable gives us a rough truth signal after clustering.
+
+```{r}
+monster_vars <- c(
+  "str", "dex", "con", "int", "wis", "cha",
+  "hp_number", "cr", "speed_base_number"
+)
+
+monster_data <- monsters |>
+  select(type, all_of(monster_vars)) |>
+  drop_na()
+
+monster_scaled <- monster_data |>
+  select(all_of(monster_vars)) |>
+  mutate(across(everything(), ~ as.numeric(scale(.x))))
+
+monster_hc <- monster_scaled |>
+  dist(method = "euclidean") |>
+  hclust(method = "complete")
+
+monster_groups <- cutree(monster_hc, k = 5)
+```
+
+### Try yourself
+
+1. Tabulate the 5-cluster monster solution against `type`.
+
+2. Which monster types are concentrated in one cluster, and which are
+   spread across several clusters?
+
+3. Why is this still an unsupervised task even though we are using
+   `type` for interpretation afterwards?
+
+```{r}
+monster_data |>
+  mutate(cluster = factor(monster_groups)) |>
+  count(cluster, type, sort = TRUE)
+```
+
+## 6. Optional challenge: DBSCAN on a two-variable view
+
+If you have the `dbscan` package available, try a density-based
+clustering on two scaled variables. This is only a low-dimensional
+projection, so do not expect it to match the earlier results exactly.
+
+```{r, eval=FALSE}
+library(dbscan)
+
+cars_2d <- cars |>
+  select(price, horsepower) |>
+  drop_na() |>
+  mutate(across(everything(), ~ as.numeric(scale(.x))))
+
+dbscan::kNNdistplot(as.matrix(cars_2d), k = 4)
+abline(h = 0.6, lty = 2, col = 2)
+
+cars_db <- dbscan::dbscan(as.matrix(cars_2d), eps = 0.6, minPts = 5)
+
+bind_cols(cars_2d, cluster = factor(cars_db$cluster)) |>
+  ggplot(aes(x = price, y = horsepower, colour = cluster)) +
+  geom_point(alpha = 0.8, size = 2)
+```
+
+### Final questions
+
+1. Which clustering method gave the most interpretable segmentation of
+   the Qatar Cars data?
+
+2. How important was scaling for this problem?
+
+3. If you had to explain your final clustering to a non-technical
+   audience, which output would you show: a dendrogram, cluster means,
+   medoids, or silhouette widths?

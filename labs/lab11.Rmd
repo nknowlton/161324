@@ -1,165 +1,333 @@
 ---
-title: 'Workshop 11: Association rule mining'
+title: "Workshop 11: Association Rule Mining"
 output: html_document
 ---
 
-In this workshop we'll be looking at association rule mining, or market basket analysis.
+In this workshop we build association rules from a TidyTuesday recipe
+dataset, then finish with a shorter extension on the local bank-service
+data. The main goals are to:
 
-## Going grocery shopping
+- turn text data into transactions
+- inspect item frequencies
+- mine rules with `apriori()`
+- interpret support, confidence, and lift
+- filter rules using `subset()`
 
-In this exercise we look at association rule mining of grocery data which comes with the `arules` package.
+The recipe data are loaded online to match the lecture.
 
-```{r, message=FALSE}
+```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(arules)
+
+theme_set(theme_minimal())
+```
+
+## 1. Recipe ingredients as transactions
+
+The lecture used a TidyTuesday dataset of recipes grouped by cuisine.
+Each recipe will be treated as one transaction, and each ingredient as
+an item.
+
+```{r}
+cuisines_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-09-16/cuisines.csv"
+cuisines_raw <- read_csv(cuisines_url, show_col_types = FALSE)
+
+cuisines_raw |> glimpse()
+```
+
+The `ingredients` column is a comma-separated string, so we need to turn
+it into one ingredient per row before creating the transaction matrix.
+
+```{r}
+not_ingredients <- c(
+  "chopped", "minced", "diced", "sliced", "grated", "shredded", "crushed",
+  "julienned", "cubed", "halved", "quartered", "peeled", "seeded", "stemmed",
+  "trimmed", "cleaned", "rinsed", "drained", "thawed", "softened", "melted",
+  "beaten", "divided", "separated", "sifted", "crumbled", "toasted",
+  "mashed", "pureed", "blanched", "boiled", "roasted", "juiced",
+  "thinly sliced", "finely chopped", "coarsely chopped",
+  "finely", "coarsely", "thinly",
+  "to taste", "as needed", "or to taste", "or as needed",
+  "or more", "or more to taste", "or more as needed",
+  "salt to taste", "salt and pepper to taste",
+  "salt and ground black pepper to taste",
+  "salt and ground black pepper",
+  "salt and pepper", "if desired", "for garnish",
+  "salt", "pepper", "kosher salt", "ground black pepper",
+  "freshly ground black pepper",
+  "skinless", "cooking spray", "room temperature", "needed", "taste"
+)
+
+unit_rx <- regex(
+  paste0(
+    "^(cups?|tablespoons?|tbsp|teaspoons?|tsp|pounds?|lbs?|ounces?|oz|",
+    "cans?|packages?|pkgs?|envelopes?|pinch(es)?|cloves?|slices?|",
+    "stalks?|heads?|bunche?s?|pieces?|strips?|sprigs?)\\s+(of\\s+)?"
+  ),
+  ignore_case = TRUE
+)
+
+recipe_items <- cuisines_raw |>
+  select(name, country, ingredients) |>
+  mutate(recipe_id = row_number()) |>
+  separate_longer_delim(ingredients, delim = ", ") |>
+  mutate(
+    ingredient = ingredients |>
+      str_to_lower() |>
+      str_trim() |>
+      str_remove_all("\\(.*?\\)") |>
+      str_remove("^[0-9\\u00bd\\u00bc\\u00be\\u2153\\u2154\\u215b\\u215c\\u215d\\u215e/\\. ]+") |>
+      str_remove(unit_rx) |>
+      str_remove(regex("^(large|medium|small|extra-?large)\\s+", ignore_case = TRUE)) |>
+      str_remove(regex("\\s+(to taste|as needed|if desired|or more to taste|or more)$",
+                       ignore_case = TRUE)) |>
+      str_remove(regex(",\\s*(divided|optional|drained|thawed|softened|melted|beaten)$",
+                       ignore_case = TRUE)) |>
+      str_trim() |>
+      str_replace_all("^unsalted butter$", "butter") |>
+      str_replace_all("^garlic powder$", "garlic") |>
+      str_replace_all("^minced garlic$", "garlic") |>
+      str_replace_all("^eggs$", "egg") |>
+      str_replace_all("^onions$", "onion") |>
+      str_replace_all("^potatoes$", "potato") |>
+      str_replace_all("^tomatoes$", "tomato") |>
+      str_replace_all("^carrots$", "carrot") |>
+      str_replace_all("^lemons$", "lemon") |>
+      str_replace_all("^limes$", "lime") |>
+      str_replace_all("^mushrooms$", "mushroom") |>
+      str_replace_all("^bananas$", "banana") |>
+      str_replace_all("^green onions$", "green onion") |>
+      str_replace_all("^cloves$", "clove")
+  ) |>
+  filter(
+    nchar(ingredient) > 2,
+    !ingredient %in% not_ingredients
+  )
+```
+
+### Try yourself
+
+1. Count the most common ingredients in `recipe_items`.
+
+2. Do the common ingredients seem globally useful, or are some likely to
+   inflate confidence without being especially informative?
+
+3. How might that affect your later interpretation of lift?
+
+```{r}
+recipe_items |>
+  count(ingredient, sort = TRUE) |>
+  slice_head(n = 20)
+```
+
+## 2. Converting to a transaction database
+
+To keep the rules interpretable, we restrict attention to the 75 most
+common ingredients.
+
+```{r}
+top_ingredients <- recipe_items |>
+  count(ingredient, sort = TRUE) |>
+  slice_head(n = 75) |>
+  pull(ingredient)
+
+recipe_items_filtered <- recipe_items |>
+  filter(ingredient %in% top_ingredients)
+
+recipe_trans <- recipe_items_filtered |>
+  select(recipe_id, ingredient) |>
+  distinct() |>
+  mutate(present = TRUE) |>
+  pivot_wider(
+    names_from = ingredient,
+    values_from = present,
+    values_fill = FALSE
+  ) |>
+  select(-recipe_id) |>
+  as.matrix() |>
+  as("transactions")
+
+recipe_trans
+```
+
+### Try yourself
+
+1. Inspect the first ten transactions using `inspect()`.
+
+2. Compare `inspect()` with `DATAFRAME()`. Which would you use for
+   exploratory work?
+
+```{r}
+recipe_trans |>
+  head(n = 10) |>
+  inspect()
+```
+
+## 3. Item frequencies
+
+```{r}
+itemFrequencyPlot(recipe_trans, topN = 25, type = "relative")
+```
+
+### Try yourself
+
+1. Recreate the item-frequency plot using `ggplot2`.
+
+2. Which ingredients are common enough that a high-confidence rule with
+   that ingredient on the right-hand side might still be uninteresting?
+
+```{r}
+recipe_trans |>
+  itemFrequency() |>
+  enframe(name = "ingredient", value = "support") |>
+  arrange(desc(support)) |>
+  slice_head(n = 25) |>
+  ggplot(aes(x = support, y = fct_reorder(ingredient, support))) +
+  geom_col()
+```
+
+## 4. Mining rules with Apriori
+
+We now mine rules with moderate support and confidence thresholds.
+
+```{r}
+recipe_rules <- apriori(
+  recipe_trans,
+  parameter = list(support = 0.05, confidence = 0.40, minlen = 2, maxlen = 4),
+  control = list(verbose = FALSE)
+)
+
+recipe_rules
+summary(recipe_rules)
+```
+
+### Try yourself
+
+1. How many rules were found?
+
+2. Inspect the top ten rules by support, by confidence, and by lift.
+
+3. Which ranking would you use first if the goal is to find genuinely
+   informative associations rather than merely common ones?
+
+```{r}
+recipe_rules |>
+  sort(by = "support") |>
+  head(n = 10) |>
+  inspect()
+
+recipe_rules |>
+  sort(by = "confidence") |>
+  head(n = 10) |>
+  inspect()
+
+recipe_rules |>
+  sort(by = "lift") |>
+  head(n = 10) |>
+  inspect()
+```
+
+## 5. Misleading high-confidence rules
+
+High confidence on its own can be misleading when the consequent is very
+common. The code below looks for rules with high confidence but lift
+close to one.
+
+```{r}
+recipe_rules |>
+  subset(confidence >= 0.75 & lift <= 1.05) |>
+  sort(by = "confidence") |>
+  head(n = 10) |>
+  inspect()
+```
+
+### Try yourself
+
+1. Pick one rule from the output above and explain why it is not very
+   interesting despite its high confidence.
+
+2. Compare it with a rule that has slightly lower confidence but much
+   higher lift.
+
+## 6. Filtering rules
+
+Use `subset()` together with `%in%`, `%ain%`, and `%pin%` to focus on a
+particular ingredient or collection of ingredients.
+
+```{r}
+garlic_rules <- recipe_rules |>
+  subset(lhs %in% "garlic" & lift > 1.1)
+
+garlic_rules |>
+  sort(by = "lift") |>
+  head(n = 10) |>
+  inspect()
+```
+
+### Try yourself
+
+1. Find rules with `olive oil` on the left-hand side.
+
+2. Find rules where both `garlic` and `onion` appear on the left-hand
+   side.
+
+3. Find one ingredient whose rules look cuisine-specific rather than
+   globally common.
+
+## 7. Optional interactive inspection
+
+If you have `arulesViz` available, interactive inspection is useful once
+you have reduced the rule set to something manageable.
+
+```{r, eval=FALSE}
 library(arulesViz)
 
-data("Groceries")
-Groceries
+recipe_rules |>
+  sort(by = "lift") |>
+  head(n = 100) |>
+  inspectDT()
 ```
 
-Notice that this is a `transactions` data set which comes with 9,835 transactions (rows) of 169 possible items (columns). We can look at the first few transactions by first using `head()` to limit the number of transactions, then utilising `inspect()`:
+## 8. Extension: bank-service rules
+
+The bank dataset is already stored locally in `../data/bank-rules.csv`.
+Each row is one account-service combination.
 
 ```{r}
-Groceries |> head(n=15) |> inspect()
-```
+bank <- read_csv("../data/bank-rules.csv", show_col_types = FALSE) |>
+  transactions(format = "long", cols = c("ACCOUNT", "SERVICE"))
 
-A slightly more compact option is utilising `DATAFRAME()`:
-
-```{r}
-Groceries |> head(n=15) |> DATAFRAME()
-```
-
-The `itemFrequency` function summarises the frequencies of each item across transactions:
-
-```{r}
-Groceries |> itemFrequency()
+bank_rules <- apriori(
+  bank,
+  parameter = list(support = 0.005, confidence = 0.4),
+  control = list(verbose = FALSE)
+)
 ```
 
 ### Try yourself
 
-1. `itemFrequencyPlot()` can be used to produce a plot of the above frequencies. Explore this function, e.g. you may wish to play with the `support` parameter to limit which items are on the plot.
+1. Find rules with `CCRD` on the right-hand side. Which services look
+   useful for cross-selling a credit card?
 
-2. Try producing this plot in `ggplot` instead. The `enframe()` function is useful for coercing the output from `itemFrequency()` into a `tibble()` for plotting.
+2. Find rules that contain both `MTG` and `HMEQLC`.
 
-
-Let's now mine the association rules using `apriori`:
-
-```{r}
-groc <- apriori(Groceries, parameter=list(support=0.001, confidence=0.5))
-```
-
-### Try yourself
-
-1. How many rules are produced?
-
-2. Try using `inspectDT()` on `groc` to inspect the rules interactively.
-
-
-We can sort the rules via `sort()`, which can then be inspected by limiting the results with `head()` and then utilising `inspect()`. e.g. to find the top 5 rules by support, we could use:
+3. Compare the bank rules with the recipe rules. Which dataset gives
+   more obviously actionable associations?
 
 ```{r}
-groc |> sort(by="support") |> head(n=5) |> inspect()
+bank_rules |>
+  subset(rhs %in% "CCRD") |>
+  sort(by = "lift") |>
+  head(n = 10) |>
+  inspect()
 ```
 
-### Try yourself
+### Final questions
 
-1. Considering the top 5 rules by support above, what are your interpretations of their confidence and lift?
+1. In the recipe data, what kinds of items produce high confidence but
+   uninformative rules?
 
-2. Find the top 5 rules by confidence or by lift. Again, what are your interpretation of the confidence and lift in each case?
+2. Which filtering tools in `arules` did you find most useful?
 
-
-We can use the `subset` command to filter rules. e.g. to find rules where the left hand side contains "mustard" we could use:
-
-```{r}
-groc |> subset(lhs %in% "mustard") |> inspect()
-```
-
-### Try yourself
-
-1. Take a look at the rule with mustard in the left hand side that has highest lift. You should notice it has the lowest confidence. Considering the formulas for confidence and lift, explain how this happens.
-
-
-Both red and white wine are included as separate items in the database. To find all types of wine we could use `%pin%` to partially match items on the left hand side:
-
-```{r}
-groc |> subset(lhs %pin% "wine") |> inspect()
-```
-
-### Try yourself
-
-We will investigate itemsets that contain `beer` and `liquor`. Note that some of these will be on the `lhs` and some may be on the `rhs` of the rules.
-
-1. Start by just finding out how many rules contain `beer` on either the left hand side or the right hand side, then repeat this for `liquor`.
-
-2. If we want both `beer` and `liquor` in the same rule, at most how many do we need to consider based on your ansewr to number 1?
-
-3. Consider how you might find these rules directly by combining multiple logical expressions in `subset()`.
-
-
-To find rules that contain multiple items, we can use the `%ain%` operator:
-
-```{r}
-groc |> subset(lhs %ain% c("whole milk", "white bread")) |> inspect()
-```
-
-### Try yourself
-
-1. Which items are also likely to be purchased if the transaction contains both waffles and candy? Start by finding rules where both waffles and candy are on the left hand side.
-
-2. Are waffles or candy ever on the right hand side?
-
-
-## Rule mining of bank accounts
-
-This example demonstrates association rule mining in a dataset on bank accounts. The bank data set has over 32,000 rows. Each row of the data set represents a customer-service combination. Therefore, a single customer can have multiple rows in the data set, each row representing one of the services they utilise. The median number of products per customer is three. There are three variables in the data set including `ACCOUNT`(Account Number), `SERVICE`(Type of Service) and `VISIT` (Order of Product Purchase). These data contain information on 7,991 bank customers. There are 13 different services available, and each customer may utilise one or more services. The 13 products (described by the `SERVICE` variable) are represented in the data set using the following abbreviations:
-
-1. `ATM`: automated teller machine debit card,
-2. `AUTO`: automobile installment loan,
-3. `CCRD`: credit card,
-4. `CD`: certificate of deposit,
-5. `CKCRD`: check/debit card,
-6. `CKING`: checking account,
-7. `HMEQLC`: home equity line of credit,
-8. `IRA`: individual retirement account,
-9. `MMDA`: money market deposit account,
-10. `MTG`: mortgage,
-11. `PLOAN`: personal/consumer installment loan,
-12. `SVG`: saving account,
-13. `TRUST`: personal trust account.
-
-The bank is interested on looking at rules that establish which service types are associated with each other so they can advise customers (or upsell!).
-
-We read in the data and convert to a transactions database as follows:
-
-```{r}
-bank <- read_csv("https://www.massey.ac.nz/~jcmarsha/data/bank-rules.csv") |>
-  transactions(format='long', cols=c("ACCOUNT", "SERVICE"))
-```
-
-There are 7,991 bank accounts representing by row and 13 services representing by columns:
-
-```{r}
-bank |> head(n=10) |> DATAFRAME()
-bank
-```
-
-Let's now mine the association rules from the bank data set.
-
-```{r}
-bank_rules <- apriori(bank, parameter=list(support=0.001, confidence=0.5))
-```
-
-### Try yourself
-
-1. How many rules are produced?
-
-2. Try using `inspectDT()` sorting by `lift` to assess which rules are important. Which services are utilised?
-
-3. The bank is interested in identifying customers that they can upsell credit cards (`CCRD`) to. Find rules with this on the right hand side, to identify which other services those with credit cards use.
-
-4. The home equity line of credit (`HMEQLC`) is an emergency source of funds that mortgage customers (`MTG`) can borrow at anytime, e.g. if they lose their job or need it for home improvement. The bank is interested in which other services that mortgage customers that take out the home equity line of credit use. Find rules containing both `MTG` and `HMEQLC` to identify these other services.
-
-5. Find rules identifying the services that customers that take out an automobile service (`AUTO`) utilise.
-
-6. Now, try yourself, investigate this dataset further. For example, investigate retirement accounts or trust accounts. What rules can you find out? What are the implication of the rules?
+3. If you had to recommend one metric for ranking candidate rules in an
+   exploratory analysis, would you choose support, confidence, or lift?

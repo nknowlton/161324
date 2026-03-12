@@ -1,14 +1,286 @@
 ---
-title: 'Workshop 11: Association rule mining'
+title: "Workshop 11 Guide: Association Rule Mining"
 output: html_document
 ---
 
-We'll be looking at association rule mining or market basket analysis today.
+This guide follows the same structure as `lab11.Rmd` and fills in one
+complete solution path. The exact rules you focus on can vary, but the
+workflow below is the intended one.
 
-We'll utilise some data on grocery purchases and data on which bank customers use various services to demonstrate some key concepts with association rules mining.
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(arules)
 
-Start by downloading lab11.Rmd and load it into RStudio:
+theme_set(theme_minimal())
+```
 
-https://www.massey.ac.nz/~jcmarsha/161324/labs/lab11.Rmd
+## 1. Load and clean the recipe data
 
-**Ensure the document knits correctly, then work your way through the R Markdown worksheet.**
+```{r}
+cuisines_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-09-16/cuisines.csv"
+cuisines_raw <- read_csv(cuisines_url, show_col_types = FALSE)
+
+cuisines_raw |> glimpse()
+```
+
+```{r}
+not_ingredients <- c(
+  "chopped", "minced", "diced", "sliced", "grated", "shredded", "crushed",
+  "julienned", "cubed", "halved", "quartered", "peeled", "seeded", "stemmed",
+  "trimmed", "cleaned", "rinsed", "drained", "thawed", "softened", "melted",
+  "beaten", "divided", "separated", "sifted", "crumbled", "toasted",
+  "mashed", "pureed", "blanched", "boiled", "roasted", "juiced",
+  "thinly sliced", "finely chopped", "coarsely chopped",
+  "finely", "coarsely", "thinly",
+  "to taste", "as needed", "or to taste", "or as needed",
+  "or more", "or more to taste", "or more as needed",
+  "salt to taste", "salt and pepper to taste",
+  "salt and ground black pepper to taste",
+  "salt and ground black pepper",
+  "salt and pepper", "if desired", "for garnish",
+  "salt", "pepper", "kosher salt", "ground black pepper",
+  "freshly ground black pepper",
+  "skinless", "cooking spray", "room temperature", "needed", "taste"
+)
+
+unit_rx <- regex(
+  paste0(
+    "^(cups?|tablespoons?|tbsp|teaspoons?|tsp|pounds?|lbs?|ounces?|oz|",
+    "cans?|packages?|pkgs?|envelopes?|pinch(es)?|cloves?|slices?|",
+    "stalks?|heads?|bunche?s?|pieces?|strips?|sprigs?)\\s+(of\\s+)?"
+  ),
+  ignore_case = TRUE
+)
+
+recipe_items <- cuisines_raw |>
+  select(name, country, ingredients) |>
+  mutate(recipe_id = row_number()) |>
+  separate_longer_delim(ingredients, delim = ", ") |>
+  mutate(
+    ingredient = ingredients |>
+      str_to_lower() |>
+      str_trim() |>
+      str_remove_all("\\(.*?\\)") |>
+      str_remove("^[0-9\\u00bd\\u00bc\\u00be\\u2153\\u2154\\u215b\\u215c\\u215d\\u215e/\\. ]+") |>
+      str_remove(unit_rx) |>
+      str_remove(regex("^(large|medium|small|extra-?large)\\s+", ignore_case = TRUE)) |>
+      str_remove(regex("\\s+(to taste|as needed|if desired|or more to taste|or more)$",
+                       ignore_case = TRUE)) |>
+      str_remove(regex(",\\s*(divided|optional|drained|thawed|softened|melted|beaten)$",
+                       ignore_case = TRUE)) |>
+      str_trim() |>
+      str_replace_all("^unsalted butter$", "butter") |>
+      str_replace_all("^garlic powder$", "garlic") |>
+      str_replace_all("^minced garlic$", "garlic") |>
+      str_replace_all("^eggs$", "egg") |>
+      str_replace_all("^onions$", "onion") |>
+      str_replace_all("^potatoes$", "potato") |>
+      str_replace_all("^tomatoes$", "tomato") |>
+      str_replace_all("^carrots$", "carrot") |>
+      str_replace_all("^lemons$", "lemon") |>
+      str_replace_all("^limes$", "lime") |>
+      str_replace_all("^mushrooms$", "mushroom") |>
+      str_replace_all("^bananas$", "banana") |>
+      str_replace_all("^green onions$", "green onion") |>
+      str_replace_all("^cloves$", "clove")
+  ) |>
+  filter(
+    nchar(ingredient) > 2,
+    !ingredient %in% not_ingredients
+  )
+
+recipe_items |>
+  count(ingredient, sort = TRUE) |>
+  slice_head(n = 20)
+```
+
+Very common ingredients deserve caution later, because they can produce
+high-confidence rules with lift near one.
+
+## 2. Create the transaction object
+
+```{r}
+top_ingredients <- recipe_items |>
+  count(ingredient, sort = TRUE) |>
+  slice_head(n = 75) |>
+  pull(ingredient)
+
+recipe_items_filtered <- recipe_items |>
+  filter(ingredient %in% top_ingredients)
+
+recipe_trans <- recipe_items_filtered |>
+  select(recipe_id, ingredient) |>
+  distinct() |>
+  mutate(present = TRUE) |>
+  pivot_wider(
+    names_from = ingredient,
+    values_from = present,
+    values_fill = FALSE
+  ) |>
+  select(-recipe_id) |>
+  as.matrix() |>
+  as("transactions")
+
+recipe_trans
+```
+
+```{r}
+recipe_trans |>
+  head(n = 10) |>
+  inspect()
+```
+
+`inspect()` is usually the better first tool for transactions because it
+keeps the basket structure visible.
+
+## 3. Item frequencies
+
+```{r}
+itemFrequencyPlot(recipe_trans, topN = 25, type = "relative")
+```
+
+```{r}
+recipe_trans |>
+  itemFrequency() |>
+  enframe(name = "ingredient", value = "support") |>
+  arrange(desc(support)) |>
+  slice_head(n = 25) |>
+  ggplot(aes(x = support, y = fct_reorder(ingredient, support))) +
+  geom_col()
+```
+
+The top-frequency items are exactly the ones that can make confidence
+look large even when the rule tells us little that is new.
+
+## 4. Mine rules with Apriori
+
+```{r}
+recipe_rules <- apriori(
+  recipe_trans,
+  parameter = list(support = 0.05, confidence = 0.40, minlen = 2, maxlen = 4),
+  control = list(verbose = FALSE)
+)
+
+recipe_rules
+summary(recipe_rules)
+```
+
+```{r}
+recipe_rules |>
+  sort(by = "support") |>
+  head(n = 10) |>
+  inspect()
+
+recipe_rules |>
+  sort(by = "confidence") |>
+  head(n = 10) |>
+  inspect()
+
+recipe_rules |>
+  sort(by = "lift") |>
+  head(n = 10) |>
+  inspect()
+```
+
+For exploratory work, lift is usually the more informative ranking
+because it discounts consequents that are common everywhere.
+
+## 5. High confidence versus high lift
+
+```{r}
+recipe_rules |>
+  subset(confidence >= 0.75 & lift <= 1.05) |>
+  sort(by = "confidence") |>
+  head(n = 10) |>
+  inspect()
+```
+
+These are the classic misleading rules: the consequent is so common that
+high confidence does not necessarily indicate a strong association.
+
+## 6. Filter rules
+
+```{r}
+garlic_rules <- recipe_rules |>
+  subset(lhs %in% "garlic" & lift > 1.1)
+
+garlic_rules |>
+  sort(by = "lift") |>
+  head(n = 10) |>
+  inspect()
+```
+
+```{r}
+recipe_rules |>
+  subset(lhs %in% "olive oil") |>
+  sort(by = "lift") |>
+  head(n = 10) |>
+  inspect()
+```
+
+```{r}
+recipe_rules |>
+  subset(lhs %ain% c("garlic", "onion")) |>
+  sort(by = "lift") |>
+  head(n = 10) |>
+  inspect()
+```
+
+This is where `subset()` becomes useful: once the full rule set has been
+generated, the main challenge is reducing it to the part that matches
+your substantive question.
+
+## 7. Optional interactive view
+
+```{r, eval=FALSE}
+library(arulesViz)
+
+recipe_rules |>
+  sort(by = "lift") |>
+  head(n = 100) |>
+  inspectDT()
+```
+
+## 8. Bank-service extension
+
+```{r}
+bank <- read_csv("../data/bank-rules.csv", show_col_types = FALSE) |>
+  transactions(format = "long", cols = c("ACCOUNT", "SERVICE"))
+
+bank_rules <- apriori(
+  bank,
+  parameter = list(support = 0.005, confidence = 0.4),
+  control = list(verbose = FALSE)
+)
+```
+
+```{r}
+bank_rules |>
+  subset(rhs %in% "CCRD") |>
+  sort(by = "lift") |>
+  head(n = 10) |>
+  inspect()
+```
+
+```{r}
+bank_rules |>
+  subset((lhs %in% "MTG" | rhs %in% "MTG") &
+         (lhs %in% "HMEQLC" | rhs %in% "HMEQLC")) |>
+  sort(by = "lift") |>
+  head(n = 10) |>
+  inspect()
+```
+
+Compared with the recipe data, the bank rules are often easier to read
+as action items because the services already have a direct cross-selling
+interpretation.
+
+## Wrap-up
+
+One defensible summary is:
+
+- support tells us how common a pattern is
+- confidence tells us how often the rhs appears once the lhs is present
+- lift is usually the best first check for whether a rule is genuinely
+  more informative than baseline item popularity
+- `subset()` is essential once the rule set gets large

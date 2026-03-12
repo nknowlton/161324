@@ -106,6 +106,18 @@ where
 
     -   `binary` -- the Jaccard *dissimilarity* coefficient.
 
+When Euclidean or Manhattan distance is applied directly to variables
+with very different scales, the variables with the largest units can
+dominate the dissimilarity calculation. A common remedy is to
+standardise each numeric variable before computing distances:
+$$z_{ij} = \frac{x_{ij} - \bar x_j}{s_j}, \qquad j=1,\ldots,p,$$ where
+$\bar x_j$ and $s_j$ are the sample mean and sample standard deviation
+of the $j$th variable. Euclidean clustering methods applied to the
+standardised observations $z_i = (z_{i1}, \ldots, z_{ip})$ then treat a
+one-standard-deviation change in any variable as being of comparable
+size. This is particularly important for methods such as $K$-means and
+DBSCAN when they are used with Euclidean distance.
+
 ## Hierarchical Clustering
 
 Cluster analysis in statistics is a procedure for detecting groupings in
@@ -955,6 +967,209 @@ Plots are given in Figure \@ref(fig:silhouettepeng). Points to note:
     centroid versus average dissimilarity to other points in the
     cluster) may give different results, in the same way that single and
     complete linkage give different results in heirarchical clustering.
+
+## Bootstrap stability and the adjusted Rand index
+
+The output of a clustering algorithm is only one partition of the data.
+It is natural to ask whether that partition is *stable*: if the data
+were perturbed slightly, would essentially the same clusters be found
+again? One common approach is to use bootstrap resampling.
+
+Suppose that a baseline clustering gives a partition
+$C = \{C_1, \ldots, C_K\}$, and a bootstrap resample gives another
+partition $D = \{D_1, \ldots, D_L\}$. Let
+$$n_{ij} = |C_i \cap D_j|, \qquad
+  a_i = \sum_{j=1}^L n_{ij}, \qquad
+  b_j = \sum_{i=1}^K n_{ij},$$ and let
+$n = \sum_{i=1}^K \sum_{j=1}^L n_{ij}$ be the number of observations
+common to the two partitions. The *adjusted Rand index* is
+$$\mathop{\mathrm{ARI}}(C,D) =
+\frac{\sum_{i=1}^K \sum_{j=1}^L \dbinom{n_{ij}}{2}
+ - \frac{1}{\dbinom{n}{2}}
+   \left(\sum_{i=1}^K \dbinom{a_i}{2}\right)
+   \left(\sum_{j=1}^L \dbinom{b_j}{2}\right)}
+{\frac{1}{2}
+ \left[\sum_{i=1}^K \dbinom{a_i}{2} + \sum_{j=1}^L \dbinom{b_j}{2}\right]
+ - \frac{1}{\dbinom{n}{2}}
+   \left(\sum_{i=1}^K \dbinom{a_i}{2}\right)
+   \left(\sum_{j=1}^L \dbinom{b_j}{2}\right)}.$$
+
+This index compares all pairs of observations and asks whether they are
+placed together, or kept apart, in both clusterings. The adjustment
+removes the agreement that would be expected purely by chance. An ARI of
+1 indicates perfect agreement, an ARI near 0 indicates agreement no
+better than random assignment, and a negative ARI indicates worse than
+random agreement.
+
+A simple bootstrap stability study proceeds as follows.
+
+1.  Fit the clustering to the original data to obtain a baseline
+    partition.
+
+2.  Resample the observations with replacement.
+
+3.  Refit the clustering method to the resampled data.
+
+4.  Compare the new clustering with the baseline clustering using ARI.
+
+5.  Repeat steps 2--4 many times.
+
+If the resulting ARI values are consistently high, then the clustering
+is relatively stable under sampling variation. If they are often small
+or highly variable, then the clustering should be treated with caution.
+
+## Density-based clustering
+
+Hierarchical clustering, $K$-means and PAM all attempt to partition the
+observations into groups, but they are not designed specifically for
+clusters with irregular shape or for data sets containing genuine noise
+points. Density-based methods address this by looking for regions where
+the observations are concentrated.
+
+For a point $x_i$, define its $\varepsilon$-neighbourhood by
+$$N_\varepsilon(x_i) = \{x_j : d(x_i, x_j) \leq \varepsilon\}.$$
+Given a minimum neighbourhood size `MinPts`, we classify points as
+follows.
+
+-   $x_i$ is a *core point* if $|N_\varepsilon(x_i)| \geq \text{MinPts}$.
+
+-   $x_i$ is a *border point* if it is not core, but lies in the
+    $\varepsilon$-neighbourhood of a core point.
+
+-   $x_i$ is a *noise point* if it is neither core nor border.
+
+To formalise the DBSCAN algorithm, suppose $x_j \in N_\varepsilon(x_i)$.
+Then:
+
+-   $x_j$ is *directly density reachable* from $x_i$ if $x_i$ is a core
+    point.
+
+-   $x_j$ is *density reachable* from $x_i$ if there exists a sequence
+    of points
+    $x_i = z_0, z_1, \ldots, z_m = x_j$ such that each $z_{r+1}$ is
+    directly density reachable from $z_r$.
+
+-   Two points are *density connected* if they are both density
+    reachable from the same point.
+
+A DBSCAN cluster is then a maximal set of density connected points. A
+point that is not assigned to any such set is labelled as noise.
+
+The DBSCAN algorithm is:
+
+1.  Pick an unvisited point $x_i$.
+
+2.  Compute $N_\varepsilon(x_i)$.
+
+3.  If $x_i$ is not core, temporarily label it as noise and move on.
+
+4.  If $x_i$ is core, start a new cluster and recursively add all points
+    density reachable from $x_i$.
+
+5.  Repeat until every point has been visited.
+
+Unlike $K$-means or PAM, DBSCAN does not require the number of clusters
+to be fixed in advance. It can also identify non-convex cluster shapes,
+and it may leave some observations unclustered.
+
+## Choosing $\varepsilon$ using a $k$-distance plot
+
+DBSCAN requires the user to choose both $\varepsilon$ and `MinPts`. One
+practical heuristic is the *$k$-distance plot*. If `MinPts = m`, then a
+point becomes core once it has at least $m-1$ other points inside its
+$\varepsilon$-neighbourhood (the point itself is counted in `MinPts`).
+Hence we compute, for each observation, the distance to its $(m-1)$st
+nearest *other* point. If we denote this by $d_{m-1}(x_i)$, then we
+sort the values
+$$d_{m-1}(x_{(1)}) \leq d_{m-1}(x_{(2)}) \leq \cdots \leq d_{m-1}(x_{(n)}).$$
+
+For points deep inside dense clusters these distances are small. For
+border and noise points they increase much more quickly. A visible
+"kink" or elbow in the ordered plot therefore provides a rough guide to
+a sensible choice of $\varepsilon$.
+
+::: {.example}
+**DBSCAN on a non-convex synthetic data set**
+
+DBSCAN is particularly useful when the clusters are curved or ring-like,
+since methods such as $K$-means would tend to split such shapes into
+artificial convex pieces. A typical workflow is:
+
+```{r, eval=FALSE}
+library(dbscan)
+
+nonconvex <- tibble(
+  x = c(...),
+  y = c(...)
+)
+
+dbscan::kNNdistplot(as.matrix(nonconvex), k = 4)
+db <- dbscan(nonconvex, eps = 0.25, minPts = 5)
+
+bind_cols(nonconvex, cluster = factor(db$cluster)) |>
+  ggplot() +
+  geom_point(mapping = aes(x = x, y = y, colour = cluster))
+```
+
+The `kNNdistplot()` call is used to choose a plausible value of
+$\varepsilon$. The fitted DBSCAN model then labels dense groups of
+points and leaves isolated observations as noise.
+:::
+
+::: {.example}
+**High-dimensional clustering in practice**
+
+In the lecture, clustering of the Qatar Cars data was based on the
+variables
+`length`, `width`, `height`, `mass`, `horsepower`, `price`,
+`performance`, `economy`, `trunk`, and `seating`, with `type` and
+`enginetype` used only after fitting for interpretation. A simple
+workflow is:
+
+```{r, eval=FALSE}
+qatarcars |>
+  select(type, enginetype, length, width, height, mass,
+         horsepower, price, performance, economy, trunk, seating) |>
+  drop_na() |>
+  mutate(across(length:seating, ~ as.numeric(scale(.x))))
+```
+
+The key point is that the clustering is fit only on the numeric
+variables that define similarity; the categorical labels are retained
+for interpretation, not for training the clustering itself.
+:::
+
+## HDBSCAN and UMAP
+
+DBSCAN uses a single value of $\varepsilon$, so it can struggle when a
+dataset contains both sparse and dense clusters. HDBSCAN (Hierarchical
+DBSCAN) addresses this by considering a whole range of density
+thresholds and constructing a hierarchy of density-based clusters. The
+final clusters are then extracted from those parts of the hierarchy that
+are most stable across density levels. Conceptually this makes HDBSCAN
+closer to hierarchical clustering than to the fixed-threshold DBSCAN
+algorithm.
+
+When the data are high-dimensional, it is often useful to first produce
+a low-dimensional display. UMAP (Uniform Manifold Approximation and
+Projection) is not itself a clustering method. Rather, it constructs a
+low-dimensional map that attempts to preserve local neighbourhood
+relationships from the original feature space. In the notation of the
+lecture, if $y_i$ are low-dimensional coordinates and $w_{ij}$ are
+weights describing neighbourhood strength in the original data, then the
+low-dimensional affinities may be written as
+$$v_{ij} = \left(1 + a \| y_i - y_j \|^{2b} \right)^{-1},$$ and the
+coordinates are chosen to minimise a cross-entropy objective of the form
+$$\mathcal{L} =
+\sum_{i \neq j}
+\left[
+w_{ij}\log\frac{w_{ij}}{v_{ij}}
+ + (1-w_{ij})\log\frac{1-w_{ij}}{1-v_{ij}}
+\right].$$
+The resulting `UMAP 1` and `UMAP 2` axes are therefore display
+coordinates rather than original variables. This is useful for plotting
+clusters, but the clustering itself should still be fit in the original
+feature space unless dimension reduction is itself part of the model.
 
 [^supervised]: In fields such as computer science and image analysis, cluster
     analysis is referred to as *unsupervised learning* and discriminant

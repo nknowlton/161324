@@ -167,6 +167,16 @@ The lift of the rule $\{\textrm{coffee}\}\Rightarrow\{\textrm{tea}\}$ is
 $\frac{0.15}{(0.2)(0.8)} = 0.9375$, indicating a slight negative
 correlation.
 
+Using the definition of confidence, lift may also be written as
+$$\mathop{\mathrm{lift}}(A \Rightarrow B)
+  = \frac{\mathop{\mathrm{conf}}(A \Rightarrow B)}{\mathop{\mathrm{supp}}(B)}
+  = \frac{P(B|A)}{P(B)}.$$
+Thus lift measures how much the knowledge that $A$ has occurred changes
+the probability of observing $B$, relative to the baseline probability
+of $B$. In that sense it behaves like a likelihood ratio: lift above 1
+indicates positive association, lift equal to 1 corresponds to
+independence, and lift below 1 indicates negative association.
+
 While the former statistical criteria for interesting-ness of
 association rules is important, often subjective measures may be of more
 interest to the data-miner. An association might be considered
@@ -181,6 +191,98 @@ is interesting!
 There have been several algorithms developed for mining association
 rules, with the *Apriori* and *Eclat* algorithms being two of the more
 popular techniques. The R package `arules` implements both algorithms.
+
+## Transaction data as a binary matrix
+
+Suppose that the database contains $N$ transactions and that there are
+$d$ distinct possible items. Let
+$$z_{ir} = {\bf 1}[\mbox{transaction $i$ contains item $r$}],
+\qquad i = 1,\ldots,N,\; r = 1,\ldots,d.$$
+Then the transaction database may be represented as an $N \times d$
+binary matrix $Z = (z_{ir})$. If $A$ is an itemset, then transaction
+$i$ contains $A$ precisely when $z_{ir}=1$ for every item $r \in A$.
+Thus the support of $A$ may be written as
+$$\mathop{\mathrm{supp}}(A)
+  = \frac{1}{N}\sum_{i=1}^N {\bf 1}[A \subseteq T_i]
+  = \frac{1}{N}\sum_{i=1}^N \prod_{r \in A} z_{ir},$$
+where $T_i$ denotes the set of items in transaction $i$.
+
+This binary representation is conceptually useful even when the data are
+stored in a sparse format, since it makes clear that association rule
+mining is fundamentally about the co-occurrence structure of the items.
+
+## The Apriori principle
+
+The support measure satisfies an antimonotonicity property: if
+$A \subseteq B$, then every transaction containing $B$ must also contain
+$A$, and hence
+$$\mathop{\mathrm{supp}}(B) \leq \mathop{\mathrm{supp}}(A).$$
+This is known as the *Apriori principle*. It is the key fact that makes
+large-scale rule mining possible. If an itemset fails the minimum
+support threshold, then all supersets of that itemset must also fail,
+and they may be discarded without ever having their support counted.
+
+This principle applies only to support, not to confidence or lift. In
+practice one therefore first mines the frequent itemsets using a support
+threshold, and only afterwards generates the rules and filters them by
+confidence, lift or other measures of interest.
+
+## The Apriori algorithm
+
+The Apriori algorithm works level-by-level through the itemset lattice.
+
+1.  Count the support of all 1-itemsets and retain those exceeding the
+    minimum support threshold.
+
+2.  Generate candidate 2-itemsets from the surviving 1-itemsets, count
+    their support, and discard those that are infrequent.
+
+3.  Generate candidate 3-itemsets from the surviving 2-itemsets, again
+    pruning any candidate whose subsets are not all frequent.
+
+4.  Continue until no new frequent itemsets remain.
+
+5.  For each frequent itemset $F$, generate rules
+    $A \Rightarrow F \setminus A$ for non-empty proper subsets $A$ of
+    $F$, and retain those meeting the confidence requirement.
+
+Although this is still a combinatorial problem, the support-based
+pruning means that the overwhelming majority of impossible or
+uninteresting candidates are never counted.
+
+## Apriori and Eclat
+
+Apriori uses a *horizontal* representation of the data: the algorithm
+repeatedly scans through the transactions and counts how many contain
+each candidate itemset. Eclat instead uses a *vertical* representation.
+For each item $r$, we store the transaction identifiers
+$$I_r = \{i : z_{ir} = 1\}.$$
+The support of an itemset may then be obtained by set intersection. For
+example,
+$$\mathop{\mathrm{supp}}(\{r,s,t\}) = \frac{|I_r \cap I_s \cap I_t|}{N}.$$
+Eclat is often faster in practice because intersections of transaction
+identifier sets can be cheaper than repeated scans through the full
+database.
+
+## Inspecting and filtering rules in `arules`
+
+Once rules have been mined, the main task is usually to sort and filter
+them. The `arules` package returns an object of class `rules`, which may
+be inspected using
+
+```{r, eval=FALSE}
+rules |> inspect()
+rules |> sort(by = "lift") |> head(n = 10) |> inspect()
+rules |> subset(lhs %in% "garlic")
+rules |> subset(lhs %ain% c("garlic", "onion"))
+rules |> subset(lhs %pin% "wine")
+```
+
+The `%in%` operator matches complete item names, `%ain%` requires all
+specified items to be present, and `%pin%` performs a partial match. In
+practice these tools are often more useful than the original mining
+step, because even moderate support thresholds can still produce a large
+number of candidate rules.
 
 ::: {.example}
 **Household incomes and demographic information**
@@ -317,6 +419,68 @@ With small numbers, one shouldn't read too much into this, but it is
 interesting that the military occupation comes up in the top 5
 association rules.
 :::
+
+::: {.example}
+**Recipe ingredients and recommendation-style rules**
+
+The lecture used a TidyTuesday dataset of recipes grouped by cuisine.
+Each recipe may be treated as a transaction and each ingredient as an
+item. After some string cleaning of the `ingredients` variable, the data
+may be converted to a `transactions` object and mined in exactly the
+same way as any supermarket basket dataset:
+
+```{r, eval=FALSE}
+library(arules)
+library(tidyverse)
+
+cuisines_raw <- read_csv(
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-09-16/cuisines.csv",
+  show_col_types = FALSE
+)
+
+recipe_trans <- cuisines_raw |>
+  ... # clean ingredients, keep one ingredient per row
+  as("transactions")
+
+recipe_rules <- recipe_trans |>
+  apriori(parameter = list(support = 0.05, confidence = 0.4,
+                           minlen = 2, maxlen = 4))
+
+recipe_rules |>
+  subset(lhs %in% "garlic" & lift > 1.1) |>
+  sort(by = "lift") |>
+  head(n = 10) |>
+  inspect()
+```
+
+The same interpretive issues arise as before. Ingredients that appear in
+many cuisines may lead to high-confidence but uninteresting rules,
+whereas large lift values tend to indicate more distinctive cuisine or
+technique pairings. This is very close in spirit to the recommender
+system statement "users who selected $A$ also selected $B$".
+:::
+
+## Where association rules fit
+
+Association rule mining sits naturally beside several other topics in
+data mining and statistics.
+
+-   Confidence is simply an estimate of the conditional probability
+    $P(B|A)$.
+
+-   Lift compares $P(B|A)$ with the marginal probability $P(B)$, so it
+    acts as a measure of departure from independence.
+
+-   Unlike clustering, which groups observations, association rule
+    mining studies co-occurrence patterns among the variables or items.
+
+-   Unlike classification, there is no designated target variable and no
+    claim of causation. The rules are descriptive rather than
+    predictive in the usual supervised-learning sense.
+
+-   In recommender systems, market basket analysis provides the basic
+    intuition behind statements such as "customers who bought $A$ also
+    bought $B$".
 
 [^paranoid]: or, for the paranoid, a more complete profile of each user.
 
