@@ -16,7 +16,7 @@ format:
     highlight-style: github
     self-contained: true
 resources:
-  - lecture11_widgets
+  - widgets
 execute:
   echo: true
   warning: false
@@ -100,7 +100,7 @@ Toggle pizza toppings on and off to build a transaction database. Watch the bina
 
 ```{ojs}
 //| echo: false
-import { transactionBuilderWidget } from "./lecture11_widgets/transaction-builder-widget.js"
+import { transactionBuilderWidget } from "./widgets/association-rules/transaction-builder-widget.js"
 viewof pizzaToggles = transactionBuilderWidget()
 ```
 
@@ -151,7 +151,7 @@ Select items for the antecedent (A) and consequent (B) from the pizza data above
 
 ```{ojs}
 //| echo: false
-import { metricCalculatorWidget } from "./lecture11_widgets/metric-calculator-widget.js"
+import { metricCalculatorWidget } from "./widgets/association-rules/metric-calculator-widget.js"
 viewof metricInputs = metricCalculatorWidget(pizzaToggles)
 ```
 
@@ -216,7 +216,7 @@ Watch the Apriori algorithm work on the pizza transaction data. Adjust the minim
 
 ```{ojs}
 //| echo: false
-import { aprioriWidget } from "./lecture11_widgets/apriori-widget.js"
+import { aprioriWidget } from "./widgets/association-rules/apriori-widget.js"
 viewof aprioriSim = aprioriWidget(pizzaToggles)
 ```
 
@@ -442,7 +442,7 @@ Explore all mined recipe rules interactively. Brush the scatterplot, adjust thre
 
 ```{ojs}
 //| echo: false
-import { ruleExplorerWidget } from "./lecture11_widgets/rule-explorer-widget.js"
+import { ruleExplorerWidget } from "./widgets/association-rules/rule-explorer-widget.js"
 viewof ruleExplorer = ruleExplorerWidget(transpose(rules_data))
 ```
 
@@ -525,7 +525,7 @@ Click any cell to expand the explanation. See how association rules compare with
 
 ```{ojs}
 //| echo: false
-import { techniqueComparisonWidget } from "./lecture11_widgets/technique-comparison-widget.js"
+import { techniqueComparisonWidget } from "./widgets/association-rules/technique-comparison-widget.js"
 viewof techComparison = techniqueComparisonWidget()
 ```
 

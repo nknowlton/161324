@@ -20,7 +20,7 @@ execute:
   warning: false
   message: false
 resources:
-  - lecture10_widgets
+  - widgets
 ---
 
 ```{r}
@@ -344,7 +344,7 @@ dbscan_clusters <- dbscan_base(dbscan_data |> select(x, y), eps = 0.92, min_pts 
 dbscan_plot_data <- bind_cols(dbscan_data, dbscan_clusters)
 
 doc_dir <- dirname(knitr::current_input(dir = TRUE))
-csv_out <- file.path(doc_dir, "lecture10_widgets", "synthetic_points.csv")
+csv_out <- file.path(doc_dir, "widgets", "clustering", "synthetic_points.csv")
 write_csv(synthetic_points, csv_out)
 
 if (requireNamespace("arrow", quietly = TRUE)) {
@@ -378,10 +378,11 @@ if (requireNamespace("arrow", quietly = TRUE)) {
 ---
 
 ## Three datasets for today
+#todo place link to actual tidytuesday datasets here
 
 - `synthetic_points`: 118 two-dimensional observations with blobs, an ellipse, a crescent, a ring, and noise.
-- `monsters`: the real TidyTuesday D&D Monsters data, cached locally as `data/monsters.parquet`.
-- `qatarcars`: the real TidyTuesday Qatar Cars data, cached locally as `data/qatarcars.parquet`.
+- `monsters`: the real TidyTuesday D&D Monsters data.
+- `qatarcars`: the TidyTuesday Qatar Cars data.
 
 ```{r}
 bind_rows(
@@ -529,7 +530,7 @@ monsters |>
 ::: {.widget-cell}
 ```{ojs}
 //| echo: false
-import { hierarchicalWidget } from "./lecture10_widgets/hierarchical-widget.js"
+import { hierarchicalWidget } from "./widgets/clustering/hierarchical-widget.js"
 hierarchicalWidget()
 ```
 :::
@@ -541,7 +542,7 @@ hierarchicalWidget()
 ::: {.widget-cell}
 ```{ojs}
 //| echo: false
-import { hierarchicalComparison } from "./lecture10_widgets/hierarchical-widget.js"
+import { hierarchicalComparison } from "./widgets/clustering/hierarchical-widget.js"
 hierarchicalComparison()
 ```
 :::
@@ -596,7 +597,7 @@ tibble(bootstrap_ari = monster_bootstrap) |>
 ::: {.widget-cell}
 ```{ojs}
 //| echo: false
-import { bootstrapStabilityWidget } from "./lecture10_widgets/bootstrap-stability-widget.js"
+import { bootstrapStabilityWidget } from "./widgets/clustering/bootstrap-stability-widget.js"
 bootstrapStabilityWidget()
 ```
 :::
@@ -636,7 +637,7 @@ ojs_define(
 ::: {.widget-cell}
 ```{ojs}
 //| echo: false
-import { monsterKmeansWidget } from "./lecture10_widgets/monster-kmeans-widget.js"
+import { monsterKmeansWidget } from "./widgets/clustering/monster-kmeans-widget.js"
 monsterKmeansWidget(monster_kmeans_ojs_points, monster_elbow_ojs)
 ```
 :::
@@ -648,7 +649,7 @@ monsterKmeansWidget(monster_kmeans_ojs_points, monster_elbow_ojs)
 ::: {.widget-cell}
 ```{ojs}
 //| echo: false
-import { kmeansKmedoidsWidget } from "./lecture10_widgets/kmeans-kmedoids-widget.js"
+import { kmeansKmedoidsWidget } from "./widgets/clustering/kmeans-kmedoids-widget.js"
 kmeansKmedoidsWidget()
 ```
 :::
@@ -745,7 +746,7 @@ tibble(rank = seq_along(knn_distance), kth_distance = sort(knn_distance)) |>
 ::: {.widget-cell}
 ```{ojs}
 //| echo: false
-import { dbscanWidget } from "./lecture10_widgets/dbscan-widget.js"
+import { dbscanWidget } from "./widgets/clustering/dbscan-widget.js"
 dbscanWidget()
 ```
 :::
@@ -810,7 +811,7 @@ ojs_define(
 ::: {.widget-cell}
 ```{ojs}
 //| echo: false
-import { monsterUmapWidget } from "./lecture10_widgets/monster-umap-widget.js"
+import { monsterUmapWidget } from "./widgets/clustering/monster-umap-widget.js"
 monsterUmapWidget(
   monster_umap_ojs_points,
   monster_umap_axis_x,
@@ -840,7 +841,7 @@ ojs_define(
 ::: {.widget-cell}
 ```{ojs}
 //| echo: false
-import { clusterComparisonWidget } from "./lecture10_widgets/cluster-comparison-widget.js"
+import { clusterComparisonWidget } from "./widgets/clustering/cluster-comparison-widget.js"
 clusterComparisonWidget(
   monster_compare_ojs_points,
   monster_compare_ojs_assignments,
