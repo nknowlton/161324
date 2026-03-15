@@ -7,7 +7,7 @@ This repository contains teaching materials for `161.324 Data Mining` at Massey 
 The active source formats in this repo are:
 
 - xaringan lecture slides in `lectures/*.Rmd`
-- Quarto revealjs lecture slides in `lectures/lecture10.qmd` and `lectures/lecture11.qmd`
+- Quarto revealjs lecture slides in `lectures/*.qmd`
 - lab handouts in `labs/*.Rmd`
 - bookdown notes rooted at `notes/index.Rmd`
 - reusable R helpers in `common/*.R`
@@ -52,8 +52,8 @@ Keep lecture documents focused on teaching narrative and lightweight orchestrati
 
 ### Quarto Lecture Slides
 
-- `lectures/lecture10.qmd` and `lectures/lecture11.qmd` render with Quarto revealjs
-- preserve `resources:`, OJS imports, revealjs settings, and theme references such as `lecture10.scss` and `custom_quarto.css`
+- `lectures/*.qmd` render with Quarto revealjs
+- preserve `resources:`, OJS imports, revealjs settings, and theme references such as lecture-local `.scss` files and `custom_quarto.css`
 - keep reusable widget logic in `lectures/widgets/**`, not inline in the lecture when reuse is plausible
 
 ### Labs
@@ -71,7 +71,7 @@ Keep lecture documents focused on teaching narrative and lightweight orchestrati
 
 Validate the smallest relevant target after edits.
 
-- Quarto lectures: `quarto render lectures/lecture10.qmd` or `quarto render lectures/lecture11.qmd`
+- Quarto lectures: `quarto render path/to/file.qmd`
 - Labs and legacy lecture `.Rmd`: `rmarkdown::render("path/to/file.Rmd")`
 - Notes: `bookdown::render_book("notes/index.Rmd")`
 

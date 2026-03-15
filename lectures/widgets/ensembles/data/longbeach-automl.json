@@ -1,0 +1,361 @@
+{
+  "meta": {
+    "dataset": "Long Beach Animal Shelter (TidyTuesday 2025-03-04)",
+    "target": "is_adopted",
+    "positive_class": "Adopted",
+    "generated_at": "2026-03-15 01:45:34 NZDT",
+    "seed": 161324,
+    "max_runtime_secs": 60,
+    "train_rows": 18986,
+    "test_rows": 4746,
+    "predictors": ["animal_type", "sex", "primary_color", "intake_condition", "intake_type", "intake_subtype", "has_name", "intake_year", "intake_month", "intake_weekday", "age_years"]
+  },
+  "leaderboard": [
+    {
+      "rank": 1,
+      "model_id": "StackedEnsemble_BestOfFamily_4_AutoML_1_20260315_14405",
+      "algorithm": "Stacked Ensemble",
+      "auc": 0.899,
+      "aucpr": 0.9621,
+      "logloss": 0.3411,
+      "accuracy": 0.8504,
+      "best_threshold": 0.4869
+    },
+    {
+      "rank": 2,
+      "model_id": "StackedEnsemble_AllModels_2_AutoML_1_20260315_14405",
+      "algorithm": "Stacked Ensemble",
+      "auc": 0.8983,
+      "aucpr": 0.9622,
+      "logloss": 0.3409,
+      "accuracy": 0.851,
+      "best_threshold": 0.4127
+    },
+    {
+      "rank": 3,
+      "model_id": "StackedEnsemble_BestOfFamily_3_AutoML_1_20260315_14405",
+      "algorithm": "Stacked Ensemble",
+      "auc": 0.8981,
+      "aucpr": 0.9619,
+      "logloss": 0.3414,
+      "accuracy": 0.8512,
+      "best_threshold": 0.4761
+    },
+    {
+      "rank": 4,
+      "model_id": "StackedEnsemble_AllModels_1_AutoML_1_20260315_14405",
+      "algorithm": "Stacked Ensemble",
+      "auc": 0.8973,
+      "aucpr": 0.9619,
+      "logloss": 0.3422,
+      "accuracy": 0.8506,
+      "best_threshold": 0.4483
+    },
+    {
+      "rank": 5,
+      "model_id": "DRF_1_AutoML_1_20260315_14405",
+      "algorithm": "Random Forest",
+      "auc": 0.8971,
+      "aucpr": 0.9594,
+      "logloss": 0.4107,
+      "accuracy": 0.8525,
+      "best_threshold": 0.5417
+    },
+    {
+      "rank": 6,
+      "model_id": "StackedEnsemble_BestOfFamily_2_AutoML_1_20260315_14405",
+      "algorithm": "Stacked Ensemble",
+      "auc": 0.8964,
+      "aucpr": 0.9615,
+      "logloss": 0.3443,
+      "accuracy": 0.8504,
+      "best_threshold": 0.46
+    },
+    {
+      "rank": 7,
+      "model_id": "GBM_grid_1_AutoML_1_20260315_14405_model_1",
+      "algorithm": "GBM",
+      "auc": 0.8959,
+      "aucpr": 0.9614,
+      "logloss": 0.3446,
+      "accuracy": 0.847,
+      "best_threshold": 0.4619
+    },
+    {
+      "rank": 8,
+      "model_id": "StackedEnsemble_BestOfFamily_1_AutoML_1_20260315_14405",
+      "algorithm": "Stacked Ensemble",
+      "auc": 0.8944,
+      "aucpr": 0.9606,
+      "logloss": 0.3466,
+      "accuracy": 0.8458,
+      "best_threshold": 0.4126
+    },
+    {
+      "rank": 9,
+      "model_id": "GBM_4_AutoML_1_20260315_14405",
+      "algorithm": "GBM",
+      "auc": 0.8944,
+      "aucpr": 0.9606,
+      "logloss": 0.3467,
+      "accuracy": 0.85,
+      "best_threshold": 0.4422
+    },
+    {
+      "rank": 10,
+      "model_id": "GBM_1_AutoML_1_20260315_14405",
+      "algorithm": "GBM",
+      "auc": 0.8943,
+      "aucpr": 0.9606,
+      "logloss": 0.3467,
+      "accuracy": 0.8458,
+      "best_threshold": 0.4176
+    },
+    {
+      "rank": 11,
+      "model_id": "GBM_5_AutoML_1_20260315_14405",
+      "algorithm": "GBM",
+      "auc": 0.893,
+      "aucpr": 0.9599,
+      "logloss": 0.3488,
+      "accuracy": 0.8483,
+      "best_threshold": 0.481
+    },
+    {
+      "rank": 12,
+      "model_id": "GBM_3_AutoML_1_20260315_14405",
+      "algorithm": "GBM",
+      "auc": 0.8929,
+      "aucpr": 0.9596,
+      "logloss": 0.3487,
+      "accuracy": 0.8483,
+      "best_threshold": 0.442
+    },
+    {
+      "rank": 13,
+      "model_id": "GBM_2_AutoML_1_20260315_14405",
+      "algorithm": "GBM",
+      "auc": 0.8925,
+      "aucpr": 0.9599,
+      "logloss": 0.3498,
+      "accuracy": 0.8464,
+      "best_threshold": 0.5191
+    },
+    {
+      "rank": 14,
+      "model_id": "GBM_grid_1_AutoML_1_20260315_14405_model_2",
+      "algorithm": "GBM",
+      "auc": 0.8904,
+      "aucpr": 0.9586,
+      "logloss": 0.3602,
+      "accuracy": 0.8453,
+      "best_threshold": 0.5497
+    },
+    {
+      "rank": 15,
+      "model_id": "XRT_1_AutoML_1_20260315_14405",
+      "algorithm": "Other",
+      "auc": 0.8865,
+      "aucpr": 0.9541,
+      "logloss": 0.376,
+      "accuracy": 0.8464,
+      "best_threshold": 0.6338
+    },
+    {
+      "rank": 16,
+      "model_id": "DeepLearning_grid_1_AutoML_1_20260315_14405_model_2",
+      "algorithm": "Deep Learning",
+      "auc": 0.8794,
+      "aucpr": 0.9535,
+      "logloss": 0.3723,
+      "accuracy": 0.842,
+      "best_threshold": 0.5699
+    },
+    {
+      "rank": 17,
+      "model_id": "DeepLearning_1_AutoML_1_20260315_14405",
+      "algorithm": "Deep Learning",
+      "auc": 0.8777,
+      "aucpr": 0.9538,
+      "logloss": 0.3698,
+      "accuracy": 0.8413,
+      "best_threshold": 0.4904
+    },
+    {
+      "rank": 18,
+      "model_id": "DeepLearning_grid_1_AutoML_1_20260315_14405_model_1",
+      "algorithm": "Deep Learning",
+      "auc": 0.8759,
+      "aucpr": 0.9506,
+      "logloss": 0.3998,
+      "accuracy": 0.8388,
+      "best_threshold": 0.5744
+    },
+    {
+      "rank": 19,
+      "model_id": "GLM_1_AutoML_1_20260315_14405",
+      "algorithm": "GLM",
+      "auc": 0.8729,
+      "aucpr": 0.9504,
+      "logloss": 0.3775,
+      "accuracy": 0.8342,
+      "best_threshold": 0.4656
+    },
+    {
+      "rank": 20,
+      "model_id": "GBM_grid_1_AutoML_1_20260315_14405_model_3",
+      "algorithm": "GBM",
+      "auc": 0.8368,
+      "aucpr": 0.9018,
+      "logloss": 0.4953,
+      "accuracy": 0.8323,
+      "best_threshold": 0.6932
+    }
+  ],
+  "leader": {
+    "model_id": "StackedEnsemble_BestOfFamily_4_AutoML_1_20260315_14405",
+    "algorithm": "Stacked Ensemble",
+    "auc": 0.899,
+    "aucpr": 0.9621,
+    "logloss": 0.3411,
+    "best_accuracy": 0.8483,
+    "best_threshold": 0.5,
+    "confusion": [
+      {
+        "actual": "Other",
+        "Other": 3255,
+        "Adopted": 289
+      },
+      {
+        "actual": "Adopted",
+        "Other": 431,
+        "Adopted": 771
+      }
+    ]
+  },
+  "threshold_curve": [
+    {
+      "threshold": 0.1,
+      "accuracy": 0.6728,
+      "precision": 0.4336,
+      "recall": 0.9534,
+      "f1": 0.5961
+    },
+    {
+      "threshold": 0.15,
+      "accuracy": 0.7307,
+      "precision": 0.4835,
+      "recall": 0.9251,
+      "f1": 0.6351
+    },
+    {
+      "threshold": 0.2,
+      "accuracy": 0.7689,
+      "precision": 0.5257,
+      "recall": 0.8927,
+      "f1": 0.6617
+    },
+    {
+      "threshold": 0.25,
+      "accuracy": 0.8003,
+      "precision": 0.5705,
+      "recall": 0.8552,
+      "f1": 0.6844
+    },
+    {
+      "threshold": 0.3,
+      "accuracy": 0.8192,
+      "precision": 0.6075,
+      "recall": 0.8087,
+      "f1": 0.6938
+    },
+    {
+      "threshold": 0.35,
+      "accuracy": 0.8321,
+      "precision": 0.6411,
+      "recall": 0.7654,
+      "f1": 0.6978
+    },
+    {
+      "threshold": 0.4,
+      "accuracy": 0.8373,
+      "precision": 0.6664,
+      "recall": 0.7163,
+      "f1": 0.6905
+    },
+    {
+      "threshold": 0.45,
+      "accuracy": 0.8445,
+      "precision": 0.6993,
+      "recall": 0.6772,
+      "f1": 0.6881
+    },
+    {
+      "threshold": 0.5,
+      "accuracy": 0.8483,
+      "precision": 0.7274,
+      "recall": 0.6414,
+      "f1": 0.6817
+    },
+    {
+      "threshold": 0.55,
+      "accuracy": 0.8481,
+      "precision": 0.7524,
+      "recall": 0.5965,
+      "f1": 0.6654
+    },
+    {
+      "threshold": 0.6,
+      "accuracy": 0.846,
+      "precision": 0.7735,
+      "recall": 0.5541,
+      "f1": 0.6457
+    },
+    {
+      "threshold": 0.65,
+      "accuracy": 0.8405,
+      "precision": 0.8061,
+      "recall": 0.4875,
+      "f1": 0.6076
+    },
+    {
+      "threshold": 0.7,
+      "accuracy": 0.8304,
+      "precision": 0.8281,
+      "recall": 0.4168,
+      "f1": 0.5545
+    },
+    {
+      "threshold": 0.75,
+      "accuracy": 0.8163,
+      "precision": 0.865,
+      "recall": 0.3253,
+      "f1": 0.4728
+    },
+    {
+      "threshold": 0.8,
+      "accuracy": 0.7946,
+      "precision": 0.8847,
+      "recall": 0.2171,
+      "f1": 0.3487
+    },
+    {
+      "threshold": 0.85,
+      "accuracy": 0.7695,
+      "precision": 0.8913,
+      "recall": 0.1023,
+      "f1": 0.1836
+    },
+    {
+      "threshold": 0.9,
+      "accuracy": 0.7501,
+      "precision": 0.8333,
+      "recall": 0.0166,
+      "f1": 0.0326
+    }
+  ],
+  "stacked_ensemble": {
+    "present": true,
+    "best_model_id": "StackedEnsemble_BestOfFamily_4_AutoML_1_20260315_14405"
+  }
+}

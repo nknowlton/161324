@@ -1,286 +1,221 @@
 ---
-title: "Workshop 11 Guide: Association Rule Mining"
+title: "Workshop 11 Guide: Clustering"
 output: html_document
 ---
 
-This guide follows the same structure as `lab11.Rmd` and fills in one
-complete solution path. The exact rules you focus on can vary, but the
-workflow below is the intended one.
+This guide works through one complete clustering analysis using the same
+flow as `lab10.Rmd`. There is still room for judgment, especially when
+choosing the number of clusters, but the code below gives one sensible
+solution path.
 
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
-library(arules)
+library(broom)
+library(cluster)
+source(file.path(dirname(knitr::current_input(dir = TRUE)), "..", "common", "tidytuesday.R"))
+source(file.path(dirname(knitr::current_input(dir = TRUE)), "..", "common", "ggplot_utils.R"))
 
 theme_set(theme_minimal())
+doc_dir <- dirname(knitr::current_input(dir = TRUE))
+data_dir <- resolve_data_dir(doc_dir)
+
+qatar_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-12-09/qatarcars.csv"
+monster_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-05-27/monsters.csv"
+
+qatarcars <- read_tidytuesday_cached(qatar_url, "qatarcars.parquet", data_dir = data_dir, csv_file = "qatarcars.csv")
+monsters <- read_tidytuesday_cached(monster_url, "monsters.parquet", data_dir = data_dir, csv_file = "monsters.csv")
 ```
 
-## 1. Load and clean the recipe data
+## 1. Warm-up: scaling matters
 
 ```{r}
-cuisines_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-09-16/cuisines.csv"
-cuisines_raw <- read_csv(cuisines_url, show_col_types = FALSE)
+car_vars <- c(
+  "length", "width", "height", "mass", "horsepower",
+  "price", "performance", "economy", "trunk", "seating"
+)
 
-cuisines_raw |> glimpse()
+cars <- qatarcars |>
+  select(type, enginetype, all_of(car_vars)) |>
+  drop_na() |>
+  mutate(car_id = row_number(), .before = 1)
+
+cars_raw <- cars |>
+  select(all_of(car_vars))
+
+cars_scaled <- cars_raw |>
+  mutate(across(everything(), ~ as.numeric(scale(.x))))
+
+summary(cars_raw)
+```
+
+The raw summaries show that variables such as `price`, `mass`, and
+`horsepower` are on much larger scales than `seating` or `height`. If
+we use Euclidean distance directly, those larger-scale variables will
+dominate the dissimilarities.
+
+```{r}
+round(as.matrix(dist(cars_raw |> slice(1:6))), 2)
+round(as.matrix(dist(cars_scaled |> slice(1:6))), 2)
+```
+
+The scaled distance matrix is the more appropriate input for the
+clustering methods used below.
+
+## 2. Hierarchical clustering
+
+```{r}
+cars_dist <- dist(cars_scaled, method = "euclidean")
+cars_hc <- hclust(cars_dist, method = "complete")
+
+plot(cars_hc, labels = FALSE, hang = -1, main = "Complete-linkage dendrogram for Qatar Cars")
 ```
 
 ```{r}
-not_ingredients <- c(
-  "chopped", "minced", "diced", "sliced", "grated", "shredded", "crushed",
-  "julienned", "cubed", "halved", "quartered", "peeled", "seeded", "stemmed",
-  "trimmed", "cleaned", "rinsed", "drained", "thawed", "softened", "melted",
-  "beaten", "divided", "separated", "sifted", "crumbled", "toasted",
-  "mashed", "pureed", "blanched", "boiled", "roasted", "juiced",
-  "thinly sliced", "finely chopped", "coarsely chopped",
-  "finely", "coarsely", "thinly",
-  "to taste", "as needed", "or to taste", "or as needed",
-  "or more", "or more to taste", "or more as needed",
-  "salt to taste", "salt and pepper to taste",
-  "salt and ground black pepper to taste",
-  "salt and ground black pepper",
-  "salt and pepper", "if desired", "for garnish",
-  "salt", "pepper", "kosher salt", "ground black pepper",
-  "freshly ground black pepper",
-  "skinless", "cooking spray", "room temperature", "needed", "taste"
-)
+cars_hc4 <- cars |>
+  mutate(cluster = factor(cutree(cars_hc, k = 4)))
 
-unit_rx <- regex(
-  paste0(
-    "^(cups?|tablespoons?|tbsp|teaspoons?|tsp|pounds?|lbs?|ounces?|oz|",
-    "cans?|packages?|pkgs?|envelopes?|pinch(es)?|cloves?|slices?|",
-    "stalks?|heads?|bunche?s?|pieces?|strips?|sprigs?)\\s+(of\\s+)?"
-  ),
-  ignore_case = TRUE
-)
+cars_hc5 <- cars |>
+  mutate(cluster = factor(cutree(cars_hc, k = 5)))
 
-recipe_items <- cuisines_raw |>
-  select(name, country, ingredients) |>
-  mutate(recipe_id = row_number()) |>
-  separate_longer_delim(ingredients, delim = ", ") |>
+cars_hc4 |>
+  count(cluster, type, sort = TRUE)
+
+cars_hc4 |>
+  count(cluster, enginetype, sort = TRUE)
+```
+
+There is no unique correct cut, but `k = 4` is a reasonable working
+choice because it keeps the interpretation manageable while still
+separating noticeably different car groups.
+
+## 3. $K$-means and the elbow plot
+
+```{r}
+set.seed(161324)
+car_elbow <- tibble(k = 1:8) |>
   mutate(
-    ingredient = ingredients |>
-      str_to_lower() |>
-      str_trim() |>
-      str_remove_all("\\(.*?\\)") |>
-      str_remove("^[0-9\\u00bd\\u00bc\\u00be\\u2153\\u2154\\u215b\\u215c\\u215d\\u215e/\\. ]+") |>
-      str_remove(unit_rx) |>
-      str_remove(regex("^(large|medium|small|extra-?large)\\s+", ignore_case = TRUE)) |>
-      str_remove(regex("\\s+(to taste|as needed|if desired|or more to taste|or more)$",
-                       ignore_case = TRUE)) |>
-      str_remove(regex(",\\s*(divided|optional|drained|thawed|softened|melted|beaten)$",
-                       ignore_case = TRUE)) |>
-      str_trim() |>
-      str_replace_all("^unsalted butter$", "butter") |>
-      str_replace_all("^garlic powder$", "garlic") |>
-      str_replace_all("^minced garlic$", "garlic") |>
-      str_replace_all("^eggs$", "egg") |>
-      str_replace_all("^onions$", "onion") |>
-      str_replace_all("^potatoes$", "potato") |>
-      str_replace_all("^tomatoes$", "tomato") |>
-      str_replace_all("^carrots$", "carrot") |>
-      str_replace_all("^lemons$", "lemon") |>
-      str_replace_all("^limes$", "lime") |>
-      str_replace_all("^mushrooms$", "mushroom") |>
-      str_replace_all("^bananas$", "banana") |>
-      str_replace_all("^green onions$", "green onion") |>
-      str_replace_all("^cloves$", "clove")
+    model = map(k, ~ kmeans(cars_scaled, centers = .x, nstart = 20)),
+    fit = map(model, glance)
   ) |>
-  filter(
-    nchar(ingredient) > 2,
-    !ingredient %in% not_ingredients
-  )
+  unnest(fit)
 
-recipe_items |>
-  count(ingredient, sort = TRUE) |>
-  slice_head(n = 20)
-```
-
-Very common ingredients deserve caution later, because they can produce
-high-confidence rules with lift near one.
-
-## 2. Create the transaction object
-
-```{r}
-top_ingredients <- recipe_items |>
-  count(ingredient, sort = TRUE) |>
-  slice_head(n = 75) |>
-  pull(ingredient)
-
-recipe_items_filtered <- recipe_items |>
-  filter(ingredient %in% top_ingredients)
-
-recipe_trans <- recipe_items_filtered |>
-  select(recipe_id, ingredient) |>
-  distinct() |>
-  mutate(present = TRUE) |>
-  pivot_wider(
-    names_from = ingredient,
-    values_from = present,
-    values_fill = FALSE
-  ) |>
-  select(-recipe_id) |>
-  as.matrix() |>
-  as("transactions")
-
-recipe_trans
+car_elbow
 ```
 
 ```{r}
-recipe_trans |>
-  head(n = 10) |>
-  inspect()
+compose_ggplot(
+  ggplot(car_elbow, aes(x = k, y = tot.withinss)),
+  geom_line(),
+  geom_point(size = 2)
+)
 ```
 
-`inspect()` is usually the better first tool for transactions because it
-keeps the basket structure visible.
-
-## 3. Item frequencies
+One reasonable reading of the elbow plot is that the main gains occur by
+about `k = 4`, so we continue with that choice.
 
 ```{r}
-itemFrequencyPlot(recipe_trans, topN = 25, type = "relative")
+set.seed(161324)
+cars_km4 <- kmeans(cars_scaled, centers = 4, nstart = 25)
+
+cars |>
+  mutate(cluster = factor(cars_km4$cluster)) |>
+  count(cluster, type, sort = TRUE)
 ```
 
 ```{r}
-recipe_trans |>
-  itemFrequency() |>
-  enframe(name = "ingredient", value = "support") |>
-  arrange(desc(support)) |>
-  slice_head(n = 25) |>
-  ggplot(aes(x = support, y = fct_reorder(ingredient, support))) +
-  geom_col()
+cars |>
+  mutate(cluster = factor(cars_km4$cluster)) |>
+  group_by(cluster) |>
+  summarise(across(all_of(car_vars), mean), n = n())
 ```
 
-The top-frequency items are exactly the ones that can make confidence
-look large even when the rule tells us little that is new.
+The cluster summaries on the original scale are usually easier to
+interpret than the scaled cluster centres.
 
-## 4. Mine rules with Apriori
+## 4. PAM and silhouette widths
 
 ```{r}
-recipe_rules <- apriori(
-  recipe_trans,
-  parameter = list(support = 0.05, confidence = 0.40, minlen = 2, maxlen = 4),
-  control = list(verbose = FALSE)
+cars_pam4 <- pam(cars_scaled, k = 4)
+plot(silhouette(cars_pam4), border = NA, do.clus.stat = FALSE, do.n.k = FALSE)
+```
+
+```{r}
+cars_pam_sil <- cars_pam4 |>
+  pluck("silinfo", "widths") |>
+  as_tibble()
+
+cars_pam_sil |>
+  group_by(cluster) |>
+  summarise(avg_sil = mean(sil_width), n = n())
+```
+
+High average silhouette widths indicate that the cluster is reasonably
+well separated from the others. Low or negative widths would suggest a
+poor fit or an artificial split.
+
+## 5. Comparison with D&D Monsters
+
+```{r}
+monster_vars <- c(
+  "str", "dex", "con", "int", "wis", "cha",
+  "hp_number", "cr", "speed_base_number"
 )
 
-recipe_rules
-summary(recipe_rules)
+monster_data <- monsters |>
+  select(type, all_of(monster_vars)) |>
+  drop_na()
+
+monster_scaled <- monster_data |>
+  select(all_of(monster_vars)) |>
+  mutate(across(everything(), ~ as.numeric(scale(.x))))
+
+monster_hc <- monster_scaled |>
+  dist(method = "euclidean") |>
+  hclust(method = "complete")
+
+monster_groups <- cutree(monster_hc, k = 5)
+
+monster_data |>
+  mutate(cluster = factor(monster_groups)) |>
+  count(cluster, type, sort = TRUE)
 ```
 
-```{r}
-recipe_rules |>
-  sort(by = "support") |>
-  head(n = 10) |>
-  inspect()
+This remains an unsupervised problem. The known `type` values are used
+only after fitting, to help interpret whether the clustering has picked
+up recognizable structure.
 
-recipe_rules |>
-  sort(by = "confidence") |>
-  head(n = 10) |>
-  inspect()
-
-recipe_rules |>
-  sort(by = "lift") |>
-  head(n = 10) |>
-  inspect()
-```
-
-For exploratory work, lift is usually the more informative ranking
-because it discounts consequents that are common everywhere.
-
-## 5. High confidence versus high lift
-
-```{r}
-recipe_rules |>
-  subset(confidence >= 0.75 & lift <= 1.05) |>
-  sort(by = "confidence") |>
-  head(n = 10) |>
-  inspect()
-```
-
-These are the classic misleading rules: the consequent is so common that
-high confidence does not necessarily indicate a strong association.
-
-## 6. Filter rules
-
-```{r}
-garlic_rules <- recipe_rules |>
-  subset(lhs %in% "garlic" & lift > 1.1)
-
-garlic_rules |>
-  sort(by = "lift") |>
-  head(n = 10) |>
-  inspect()
-```
-
-```{r}
-recipe_rules |>
-  subset(lhs %in% "olive oil") |>
-  sort(by = "lift") |>
-  head(n = 10) |>
-  inspect()
-```
-
-```{r}
-recipe_rules |>
-  subset(lhs %ain% c("garlic", "onion")) |>
-  sort(by = "lift") |>
-  head(n = 10) |>
-  inspect()
-```
-
-This is where `subset()` becomes useful: once the full rule set has been
-generated, the main challenge is reducing it to the part that matches
-your substantive question.
-
-## 7. Optional interactive view
+## 6. Optional DBSCAN extension
 
 ```{r, eval=FALSE}
-library(arulesViz)
+library(dbscan)
 
-recipe_rules |>
-  sort(by = "lift") |>
-  head(n = 100) |>
-  inspectDT()
+cars_2d <- cars |>
+  select(price, horsepower) |>
+  drop_na() |>
+  mutate(across(everything(), ~ as.numeric(scale(.x))))
+
+dbscan::kNNdistplot(as.matrix(cars_2d), k = 4)
+abline(h = 0.6, lty = 2, col = 2)
+
+cars_db <- dbscan::dbscan(as.matrix(cars_2d), eps = 0.6, minPts = 5)
+
+bind_cols(cars_2d, cluster = factor(cars_db$cluster)) |>
+  (\(data) compose_ggplot(
+    ggplot(data, aes(x = price, y = horsepower, colour = cluster)),
+    geom_point(alpha = 0.8, size = 2)
+  ))()
 ```
 
-## 8. Bank-service extension
-
-```{r}
-bank <- read_csv("../data/bank-rules.csv", show_col_types = FALSE) |>
-  transactions(format = "long", cols = c("ACCOUNT", "SERVICE"))
-
-bank_rules <- apriori(
-  bank,
-  parameter = list(support = 0.005, confidence = 0.4),
-  control = list(verbose = FALSE)
-)
-```
-
-```{r}
-bank_rules |>
-  subset(rhs %in% "CCRD") |>
-  sort(by = "lift") |>
-  head(n = 10) |>
-  inspect()
-```
-
-```{r}
-bank_rules |>
-  subset((lhs %in% "MTG" | rhs %in% "MTG") &
-         (lhs %in% "HMEQLC" | rhs %in% "HMEQLC")) |>
-  sort(by = "lift") |>
-  head(n = 10) |>
-  inspect()
-```
-
-Compared with the recipe data, the bank rules are often easier to read
-as action items because the services already have a direct cross-selling
-interpretation.
+The DBSCAN extension is mainly about parameter choice and recognising
+that density-based clustering answers a different question from
+hierarchical clustering or $K$-means.
 
 ## Wrap-up
 
-One defensible summary is:
+One defensible conclusion is:
 
-- support tells us how common a pattern is
-- confidence tells us how often the rhs appears once the lhs is present
-- lift is usually the best first check for whether a rule is genuinely
-  more informative than baseline item popularity
-- `subset()` is essential once the rule set gets large
+- scaling is essential before Euclidean clustering on the Qatar Cars data
+- `k = 4` gives a practical working partition across several methods
+- hierarchical clustering is useful for exploration
+- $K$-means and PAM give clearer fixed partitions once a candidate `K`
+  is on the table

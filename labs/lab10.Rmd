@@ -1,281 +1,265 @@
 ---
-title: "Workshop 10: Clustering"
+title: "Workshop 10: Ensemble Learning with tidymodels"
 output: html_document
 ---
 
-In this workshop we follow the lecture workflow for clustering:
+In this workshop we build an ensemble workflow on the **Long Beach Animal
+Shelter** TidyTuesday data. The lecture introduced the concepts; here we
+will do the modelling step by step in `tidymodels`.
 
-- build a dissimilarity matrix
-- check the effect of scaling
-- compare hierarchical clustering, $K$-means, and PAM
-- use silhouette widths to defend a choice of $K$
-- compare the final results with a second dataset
+Our main goals are to:
 
-The main dataset is the Qatar Cars TidyTuesday data. The D&D Monsters
-data are used later as a shorter comparison exercise. The chunks below
-first try to read the local parquet backups from `../data/`; if `arrow`
-is not installed they fall back to the online CSV files used in the
-lecture.
+- define a clean binary target for adoption
+- build one shared preprocessing recipe
+- compare a single tree, a bagged tree, and a boosted tree
+- evaluate the models with cross-validation
+- optionally combine tuned models with `stacks`
 
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
-library(broom)
-library(cluster)
+library(tidymodels)
+library(baguette)
+library(stacks)
+library(bonsai)
+source(file.path(dirname(knitr::current_input(dir = TRUE)), "..", "common", "tidytuesday.R"))
+source(file.path(dirname(knitr::current_input(dir = TRUE)), "..", "common", "longbeach.R"))
 
 theme_set(theme_minimal())
+tidymodels_prefer()
 
-read_tidytuesday_data <- function(url, local_parquet = NULL) {
-  if (!is.null(local_parquet) &&
-      file.exists(local_parquet) &&
-      requireNamespace("arrow", quietly = TRUE)) {
-    return(arrow::read_parquet(local_parquet) |> as_tibble())
-  }
+doc_dir <- dirname(knitr::current_input(dir = TRUE))
+data_dir <- resolve_data_dir(doc_dir)
+longbeach_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-03-04/longbeach.csv"
 
-  read_csv(url, show_col_types = FALSE)
+longbeach <- read_tidytuesday_cached(
+  longbeach_url,
+  backup_file = "longbeach.parquet",
+  data_dir = data_dir,
+  csv_file = "longbeach.csv"
+)
+if (requireNamespace("arrow", quietly = TRUE)) {
+  write_tidytuesday_parquet(longbeach, "longbeach.parquet", data_dir)
 }
 
-qatar_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-12-09/qatarcars.csv"
-monster_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-05-27/monsters.csv"
-
-qatarcars <- read_tidytuesday_data(qatar_url, "../data/qatarcars.parquet")
-monsters <- read_tidytuesday_data(monster_url, "../data/monsters.parquet")
+adoption_data <- prepare_longbeach_adoption_data(longbeach)
 ```
 
-## 1. Warm-up: distances and scaling
+## 1. Inspect the modelling data
 
-For the clustering analysis we will use the following numeric variables:
+We are predicting whether a cat or dog ends up in the `Adopted` class,
+using intake-time variables only.
 
 ```{r}
-car_vars <- c(
-  "length", "width", "height", "mass", "horsepower",
-  "price", "performance", "economy", "trunk", "seating"
-)
+adoption_data |> glimpse()
 
-cars <- qatarcars |>
-  select(type, enginetype, all_of(car_vars)) |>
-  drop_na() |>
-  mutate(car_id = row_number(), .before = 1)
-
-cars_raw <- cars |>
-  select(all_of(car_vars))
-
-cars_scaled <- cars_raw |>
-  mutate(across(everything(), ~ as.numeric(scale(.x))))
-
-cars |> glimpse()
+adoption_data |>
+  count(is_adopted) |>
+  mutate(prop = n / sum(n))
 ```
 
 ### Try yourself
 
-1. Use `summary()` on `cars_raw`. Which variables appear to be on very
-   different scales?
+1. Which predictors are numeric, and which are categorical?
+2. Why is `accuracy` not enough on its own for this task?
+3. Which variables do you think might be most predictive of adoption?
 
-2. Compute the Euclidean distance matrix for the first six cars before
-   scaling and after scaling.
-
-3. Which variables do you expect to dominate the unscaled distances?
-
-```{r}
-round(as.matrix(dist(cars_raw |> slice(1:6))), 2)
-round(as.matrix(dist(cars_scaled |> slice(1:6))), 2)
-```
-
-## 2. Hierarchical clustering on Qatar Cars
-
-We start with complete-linkage hierarchical clustering on the scaled
-data.
-
-```{r}
-cars_dist <- dist(cars_scaled, method = "euclidean")
-cars_hc <- hclust(cars_dist, method = "complete")
-
-plot(cars_hc, labels = FALSE, hang = -1, main = "Complete-linkage dendrogram for Qatar Cars")
-```
-
-### Try yourself
-
-1. Cut the dendrogram into `k = 4` and `k = 5` clusters.
-
-2. For each choice of `k`, compare the resulting clusters with `type`
-   and `enginetype`.
-
-3. Which value of `k` looks more interpretable? There is no unique
-   answer here, but for the rest of the worksheet continue with
-   `k = 4` unless you have a strong case for another value.
-
-```{r}
-cars_hc4 <- cars |>
-  mutate(cluster = factor(cutree(cars_hc, k = 4)))
-
-cars_hc5 <- cars |>
-  mutate(cluster = factor(cutree(cars_hc, k = 5)))
-
-cars_hc4 |>
-  count(cluster, type, sort = TRUE)
-
-cars_hc5 |>
-  count(cluster, type, sort = TRUE)
-```
-
-## 3. $K$-means and the elbow heuristic
-
-Next fit $K$-means for several values of $K$ and inspect the total
-within-cluster sum of squares.
+## 2. Training/test split and resampling
 
 ```{r}
 set.seed(161324)
-car_elbow <- tibble(k = 1:8) |>
-  mutate(
-    model = map(k, ~ kmeans(cars_scaled, centers = .x, nstart = 20)),
-    fit = map(model, glance)
-  ) |>
-  unnest(fit)
+adoption_split <- initial_split(adoption_data, prop = 0.8, strata = is_adopted)
+adoption_train <- training(adoption_split)
+adoption_test <- testing(adoption_split)
 
-car_elbow
+adoption_folds <- vfold_cv(adoption_train, v = 3, strata = is_adopted)
+adoption_folds
+```
+
+We will compare models using:
+
+- `roc_auc`
+- `pr_auc`
+- `accuracy`
+
+```{r}
+ensemble_metrics <- metric_set(roc_auc, pr_auc, accuracy)
+```
+
+## 3. One recipe for all workflows
+
+We will use one recipe across all models so the comparison is fair.
+
+```{r}
+adoption_recipe <- recipe(is_adopted ~ ., data = adoption_train) |>
+  step_other(primary_color, intake_subtype, threshold = 0.03) |>
+  step_novel(all_nominal_predictors()) |>
+  step_unknown(all_nominal_predictors()) |>
+  step_dummy(all_nominal_predictors()) |>
+  step_zv(all_predictors())
+
+adoption_recipe
 ```
 
 ### Try yourself
 
-1. Produce an elbow plot of `tot.withinss` against `k`.
+1. Why is `step_other()` useful here?
+2. Why is `step_dummy()` needed before `xgboost`?
+3. Which parts of the recipe are protecting us against new categories in test data?
 
-2. Where does the main drop occur?
+## 4. Define model specifications
 
-3. Fit a final $K$-means model with `K = 4` and compare the clusters
-   with `type` and `enginetype`.
+We will compare:
+
+- a single decision tree
+- a bagged tree
+- a boosted tree with `xgboost`
 
 ```{r}
-ggplot(car_elbow, aes(x = k, y = tot.withinss)) +
-  geom_line() +
-  geom_point(size = 2)
+tree_spec <- decision_tree(
+  cost_complexity = tune(),
+  tree_depth = tune(),
+  min_n = tune()
+) |>
+  set_engine("rpart") |>
+  set_mode("classification")
+
+bag_spec <- bag_tree(
+  cost_complexity = tune(),
+  tree_depth = tune(),
+  min_n = tune()
+) |>
+  set_engine("rpart", times = 10) |>
+  set_mode("classification")
+
+xgb_spec <- boost_tree(
+  trees = tune(),
+  tree_depth = tune(),
+  learn_rate = tune(),
+  min_n = tune(),
+  loss_reduction = tune(),
+  sample_size = tune()
+) |>
+  set_engine("xgboost") |>
+  set_mode("classification")
 ```
+
+Now attach the recipe to each model:
+
+```{r}
+tree_wf <- workflow() |>
+  add_recipe(adoption_recipe) |>
+  add_model(tree_spec)
+
+bag_wf <- workflow() |>
+  add_recipe(adoption_recipe) |>
+  add_model(bag_spec)
+
+xgb_wf <- workflow() |>
+  add_recipe(adoption_recipe) |>
+  add_model(xgb_spec)
+```
+
+## 5. Tune the models
+
+Use intentionally small grids so the workflow stays fast and inspectable in a workshop setting.
+
+```{r}
+tree_grid <- grid_regular(cost_complexity(), tree_depth(), min_n(), levels = 3)
+bag_grid <- grid_regular(cost_complexity(), tree_depth(), min_n(), levels = 2)
+xgb_grid <- grid_latin_hypercube(
+  trees(),
+  tree_depth(),
+  learn_rate(),
+  min_n(),
+  loss_reduction(),
+  sample_prop(),
+  size = 6
+)
+```
+
+### Try yourself
+
+Tune each workflow on the same folds:
 
 ```{r}
 set.seed(161324)
-cars_km4 <- kmeans(cars_scaled, centers = 4, nstart = 25)
-
-cars |>
-  mutate(cluster = factor(cars_km4$cluster)) |>
-  count(cluster, type, sort = TRUE)
-```
-
-### Try yourself
-
-1. Summarise the original car variables within each $K$-means cluster.
-
-2. Which variables seem to separate the clusters most clearly?
-
-3. Do the $K$-means clusters tell a similar story to the hierarchical
-   clusters?
-
-```{r}
-cars |>
-  mutate(cluster = factor(cars_km4$cluster)) |>
-  group_by(cluster) |>
-  summarise(across(all_of(car_vars), mean), n = n())
-```
-
-## 4. PAM and silhouette widths
-
-PAM lets us keep the clustering on the same scaled variables, but with a
-medoid rather than a centroid.
-
-```{r}
-cars_pam4 <- pam(cars_scaled, k = 4)
-plot(silhouette(cars_pam4), border = NA, do.clus.stat = FALSE, do.n.k = FALSE)
-```
-
-### Try yourself
-
-1. Extract the silhouette widths from `cars_pam4`.
-
-2. Compute the average silhouette width in each cluster.
-
-3. Compare the overall clustering quality from PAM with your earlier
-   interpretation of the hierarchical and $K$-means fits.
-
-```{r}
-cars_pam_sil <- cars_pam4 |>
-  pluck("silinfo", "widths") |>
-  as_tibble()
-
-cars_pam_sil |>
-  group_by(cluster) |>
-  summarise(avg_sil = mean(sil_width), n = n())
-```
-
-## 5. Short comparison: D&D Monsters
-
-The lecture used the D&D Monsters data as a second example because the
-known `type` variable gives us a rough truth signal after clustering.
-
-```{r}
-monster_vars <- c(
-  "str", "dex", "con", "int", "wis", "cha",
-  "hp_number", "cr", "speed_base_number"
+tree_res <- tune_grid(
+  tree_wf,
+  resamples = adoption_folds,
+  grid = tree_grid,
+  metrics = ensemble_metrics,
+  control = control_stack_grid()
 )
 
-monster_data <- monsters |>
-  select(type, all_of(monster_vars)) |>
-  drop_na()
+set.seed(161324)
+bag_res <- tune_grid(
+  bag_wf,
+  resamples = adoption_folds,
+  grid = bag_grid,
+  metrics = ensemble_metrics,
+  control = control_stack_grid()
+)
 
-monster_scaled <- monster_data |>
-  select(all_of(monster_vars)) |>
-  mutate(across(everything(), ~ as.numeric(scale(.x))))
+set.seed(161324)
+xgb_res <- tune_grid(
+  xgb_wf,
+  resamples = adoption_folds,
+  grid = xgb_grid,
+  metrics = ensemble_metrics,
+  control = control_stack_grid()
+)
+```
 
-monster_hc <- monster_scaled |>
-  dist(method = "euclidean") |>
-  hclust(method = "complete")
+Compare the best results:
 
-monster_groups <- cutree(monster_hc, k = 5)
+```{r}
+bind_rows(
+  show_best(tree_res, metric = "roc_auc", n = 3) |> mutate(model = "tree"),
+  show_best(bag_res, metric = "roc_auc", n = 3) |> mutate(model = "bagged"),
+  show_best(xgb_res, metric = "roc_auc", n = 3) |> mutate(model = "xgboost")
+) |>
+  select(model, .metric, mean, everything())
+```
+
+## 6. Finalise the best settings
+
+Choose the best tuning parameters for each model and evaluate them on
+the held-out test set.
+
+```{r}
+best_tree <- select_best(tree_res, metric = "roc_auc")
+best_bag <- select_best(bag_res, metric = "roc_auc")
+best_xgb <- select_best(xgb_res, metric = "roc_auc")
+
+final_tree <- finalize_workflow(tree_wf, best_tree)
+final_bag <- finalize_workflow(bag_wf, best_bag)
+final_xgb <- finalize_workflow(xgb_wf, best_xgb)
 ```
 
 ### Try yourself
 
-1. Tabulate the 5-cluster monster solution against `type`.
+1. Fit each final workflow to `adoption_train`.
+2. Use `augment()` or `predict()` on `adoption_test`.
+3. Compare the final test metrics.
+4. Which model would you deploy if:
+   - you only care about predictive performance?
+   - you want a more explainable model?
 
-2. Which monster types are concentrated in one cluster, and which are
-   spread across several clusters?
+## 7. Optional capstone: stack the tuned models
 
-3. Why is this still an unsupervised task even though we are using
-   `type` for interpretation afterwards?
+If you have time, use the tuning results to build a stacked ensemble.
 
 ```{r}
-monster_data |>
-  mutate(cluster = factor(monster_groups)) |>
-  count(cluster, type, sort = TRUE)
+model_stack <- stacks() |>
+  add_candidates(tree_res) |>
+  add_candidates(bag_res) |>
+  add_candidates(xgb_res) |>
+  blend_predictions(metric = metric_set(roc_auc)) |>
+  fit_members()
 ```
 
-## 6. Optional challenge: DBSCAN on a two-variable view
+### Try yourself
 
-If you have the `dbscan` package available, try a density-based
-clustering on two scaled variables. This is only a low-dimensional
-projection, so do not expect it to match the earlier results exactly.
-
-```{r, eval=FALSE}
-library(dbscan)
-
-cars_2d <- cars |>
-  select(price, horsepower) |>
-  drop_na() |>
-  mutate(across(everything(), ~ as.numeric(scale(.x))))
-
-dbscan::kNNdistplot(as.matrix(cars_2d), k = 4)
-abline(h = 0.6, lty = 2, col = 2)
-
-cars_db <- dbscan::dbscan(as.matrix(cars_2d), eps = 0.6, minPts = 5)
-
-bind_cols(cars_2d, cluster = factor(cars_db$cluster)) |>
-  ggplot(aes(x = price, y = horsepower, colour = cluster)) +
-  geom_point(alpha = 0.8, size = 2)
-```
-
-### Final questions
-
-1. Which clustering method gave the most interpretable segmentation of
-   the Qatar Cars data?
-
-2. How important was scaling for this problem?
-
-3. If you had to explain your final clustering to a non-technical
-   audience, which output would you show: a dendrogram, cluster means,
-   medoids, or silhouette widths?
+1. Compare the stack against the best single model on the test set.
+2. Which member models get non-zero weight?
+3. Does stacking buy enough extra performance to justify the extra complexity?
