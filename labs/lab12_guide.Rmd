@@ -3,34 +3,78 @@ title: "Workshop 12 Guide: Association Rule Mining"
 output: html_document
 ---
 
-This guide follows the same structure as `lab11.Rmd` and fills in one
+This guide follows the same structure as `lab12.Rmd` and fills in one
 complete solution path. The exact rules you focus on can vary, but the
 workflow below is the intended one.
+
+Use the `tidytuesdayR` package to pull the recipe data directly from
+TidyTuesday. If RStudio offers to install `tidytuesdayR`, allow it
+before running the setup chunk.
 
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(arules)
-source(file.path(dirname(knitr::current_input(dir = TRUE)), "..", "common", "tidytuesday.R"))
-source(file.path(dirname(knitr::current_input(dir = TRUE)), "..", "common", "ggplot_utils.R"))
 
 theme_set(theme_minimal())
-doc_dir <- dirname(knitr::current_input(dir = TRUE))
-data_dir <- resolve_data_dir(doc_dir)
+
+load_tidytuesday_dataset <- function(tt_date, dataset_name, parquet_url) {
+  if (requireNamespace("tidytuesdayR", quietly = TRUE)) {
+    tt_data <- tryCatch(
+      suppressMessages(tidytuesdayR::tt_load(tt_date)),
+      error = function(e) NULL
+    )
+
+    if (!is.null(tt_data) &&
+        dataset_name %in% names(tt_data) &&
+        !is.null(tt_data[[dataset_name]])) {
+      return(tt_data[[dataset_name]] |> tibble::as_tibble())
+    }
+  }
+
+  if (!requireNamespace("arrow", quietly = TRUE)) {
+    stop(
+      "Install the 'tidytuesdayR' package (RStudio will usually prompt you), ",
+      "or install 'arrow' to use the backup data file.",
+      call. = FALSE
+    )
+  }
+
+  parquet_file <- tempfile(fileext = ".parquet")
+  on.exit(unlink(parquet_file), add = TRUE)
+  download_status <- tryCatch(
+    utils::download.file(parquet_url, parquet_file, mode = "wb", quiet = TRUE),
+    error = function(e) 1L
+  )
+
+  if (!identical(download_status, 0L) || !file.exists(parquet_file)) {
+    stop(
+      "Could not load the dataset from TidyTuesday or the course backup file.",
+      call. = FALSE
+    )
+  }
+
+  arrow::read_parquet(parquet_file) |> tibble::as_tibble()
+}
+
+compose_ggplot <- function(plot, ...) {
+  layers <- list(...)
+
+  for (i in seq_along(layers)) {
+    plot <- ggplot2:::add_ggplot(plot, layers[[i]], paste0("layer_", i))
+  }
+
+  plot
+}
 ```
 
 ## 1. Load and clean the recipe data
 
 ```{r}
-cuisines_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-09-16/cuisines.csv"
-cuisines_raw <- read_tidytuesday_cached(
-  cuisines_url,
-  backup_file = "cuisines.parquet",
-  data_dir = data_dir,
-  csv_file = "cuisines.csv"
+cuisines_raw <- load_tidytuesday_dataset(
+  tt_date = "2025-09-16",
+  dataset_name = "cuisines",
+  parquet_url = "https://knowlton.co.nz/161324/data/cuisines.parquet"
 )
-if (requireNamespace("arrow", quietly = TRUE)) {
-  write_tidytuesday_parquet(cuisines_raw, "cuisines.parquet", data_dir)
-}
 
 cuisines_raw |> glimpse()
 ```
@@ -152,15 +196,16 @@ itemFrequencyPlot(recipe_trans, topN = 25, type = "relative")
 ```
 
 ```{r}
-recipe_trans |>
+recipe_freq <- recipe_trans |>
   itemFrequency() |>
   enframe(name = "ingredient", value = "support") |>
   arrange(desc(support)) |>
-  slice_head(n = 25) |>
-  (\(data) compose_ggplot(
-    ggplot(data, aes(x = support, y = fct_reorder(ingredient, support))),
-    geom_col()
-  ))()
+  slice_head(n = 25)
+
+compose_ggplot(
+  ggplot(recipe_freq, aes(x = support, y = fct_reorder(ingredient, support))),
+  geom_col()
+)
 ```
 
 The top-frequency items are exactly the ones that can make confidence

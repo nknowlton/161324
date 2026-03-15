@@ -4,26 +4,80 @@ output: html_document
 ---
 
 This guide works through one complete clustering analysis using the same
-flow as `lab10.Rmd`. There is still room for judgment, especially when
+flow as `lab11.Rmd`. There is still room for judgment, especially when
 choosing the number of clusters, but the code below gives one sensible
 solution path.
+
+Use the `tidytuesdayR` package to pull the data directly from
+TidyTuesday. If RStudio offers to install `tidytuesdayR`, allow it
+before running the setup chunk.
 
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(broom)
 library(cluster)
-source(file.path(dirname(knitr::current_input(dir = TRUE)), "..", "common", "tidytuesday.R"))
-source(file.path(dirname(knitr::current_input(dir = TRUE)), "..", "common", "ggplot_utils.R"))
 
 theme_set(theme_minimal())
-doc_dir <- dirname(knitr::current_input(dir = TRUE))
-data_dir <- resolve_data_dir(doc_dir)
 
-qatar_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-12-09/qatarcars.csv"
-monster_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-05-27/monsters.csv"
+load_tidytuesday_dataset <- function(tt_date, dataset_name, parquet_url) {
+  if (requireNamespace("tidytuesdayR", quietly = TRUE)) {
+    tt_data <- tryCatch(
+      suppressMessages(tidytuesdayR::tt_load(tt_date)),
+      error = function(e) NULL
+    )
 
-qatarcars <- read_tidytuesday_cached(qatar_url, "qatarcars.parquet", data_dir = data_dir, csv_file = "qatarcars.csv")
-monsters <- read_tidytuesday_cached(monster_url, "monsters.parquet", data_dir = data_dir, csv_file = "monsters.csv")
+    if (!is.null(tt_data) &&
+        dataset_name %in% names(tt_data) &&
+        !is.null(tt_data[[dataset_name]])) {
+      return(tt_data[[dataset_name]] |> tibble::as_tibble())
+    }
+  }
+
+  if (!requireNamespace("arrow", quietly = TRUE)) {
+    stop(
+      "Install the 'tidytuesdayR' package (RStudio will usually prompt you), ",
+      "or install 'arrow' to use the backup data file.",
+      call. = FALSE
+    )
+  }
+
+  parquet_file <- tempfile(fileext = ".parquet")
+  on.exit(unlink(parquet_file), add = TRUE)
+  download_status <- tryCatch(
+    utils::download.file(parquet_url, parquet_file, mode = "wb", quiet = TRUE),
+    error = function(e) 1L
+  )
+
+  if (!identical(download_status, 0L) || !file.exists(parquet_file)) {
+    stop(
+      "Could not load the dataset from TidyTuesday or the course backup file.",
+      call. = FALSE
+    )
+  }
+
+  arrow::read_parquet(parquet_file) |> tibble::as_tibble()
+}
+
+compose_ggplot <- function(plot, ...) {
+  layers <- list(...)
+
+  for (i in seq_along(layers)) {
+    plot <- ggplot2:::add_ggplot(plot, layers[[i]], paste0("layer_", i))
+  }
+
+  plot
+}
+
+qatarcars <- load_tidytuesday_dataset(
+  tt_date = "2025-12-09",
+  dataset_name = "qatarcars",
+  parquet_url = "https://knowlton.co.nz/161324/data/qatarcars.parquet"
+)
+monsters <- load_tidytuesday_dataset(
+  tt_date = "2025-05-27",
+  dataset_name = "monsters",
+  parquet_url = "https://knowlton.co.nz/161324/data/monsters.parquet"
+)
 ```
 
 ## 1. Warm-up: scaling matters
@@ -184,10 +238,13 @@ This remains an unsupervised problem. The known `type` values are used
 only after fitting, to help interpret whether the clustering has picked
 up recognizable structure.
 
-## 6. Optional DBSCAN extension
+## 6. DBSCAN extension
+
+#todo redo this one with DD monsterss are qatar cars is not a good example for dbscan.  
 
 ```{r, eval=FALSE}
 library(dbscan)
+
 
 cars_2d <- cars |>
   select(price, horsepower) |>
@@ -197,13 +254,14 @@ cars_2d <- cars |>
 dbscan::kNNdistplot(as.matrix(cars_2d), k = 4)
 abline(h = 0.6, lty = 2, col = 2)
 
-cars_db <- dbscan::dbscan(as.matrix(cars_2d), eps = 0.6, minPts = 5)
+cars_db <- dbscan::dbscan(as.matrix(cars_2d), eps = 0.3, minPts = 3)
 
-bind_cols(cars_2d, cluster = factor(cars_db$cluster)) |>
-  (\(data) compose_ggplot(
-    ggplot(data, aes(x = price, y = horsepower, colour = cluster)),
-    geom_point(alpha = 0.8, size = 2)
-  ))()
+cars_db_plot <- bind_cols(cars_2d, cluster = factor(cars_db$cluster))
+
+compose_ggplot(
+  ggplot(cars_db_plot, aes(x = price, y = horsepower, colour = cluster)),
+  geom_point(alpha = 0.8, size = 2)
+)
 ```
 
 The DBSCAN extension is mainly about parameter choice and recognising
