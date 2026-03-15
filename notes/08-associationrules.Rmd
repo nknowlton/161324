@@ -43,6 +43,14 @@ cases fewer than ten items. Table \@ref(tab:market1)
 shows a few entries from a typical transaction
 database.
 
+**How this chapter connects.** Association rules are another
+unsupervised task from the comparison table in
+Section \@ref(sec:task-compare), but the focus is different from
+clustering. Here we study which items or conditions co-occur, rather
+than how to group the observations themselves. This makes the chapter a
+natural companion to Section \@ref(sec:cluster-compare) for categorical
+or transactional data.
+
 ```{r market1, echo=FALSE}
 marketdb <- tribble(~transaction, ~items,
               1, c('bread', 'milk'),
@@ -460,7 +468,7 @@ technique pairings. This is very close in spirit to the recommender
 system statement "users who selected $A$ also selected $B$".
 :::
 
-## Where association rules fit
+## Where association rules fit {#sec:association-fit}
 
 Association rule mining sits naturally beside several other topics in
 data mining and statistics.
@@ -481,6 +489,27 @@ data mining and statistics.
 -   In recommender systems, market basket analysis provides the basic
     intuition behind statements such as "customers who bought $A$ also
     bought $B$".
+
+## Summary
+
+Association rule mining is designed for sparse transactional or
+categorical data where co-occurrence is the main object of interest.
+
+-   Support controls how common an itemset is, confidence estimates a
+    conditional probability, and lift compares that probability with a
+    baseline of independence.
+
+-   The Apriori principle makes the search over large itemsets feasible,
+    while filtering and visualisation help us focus on rules that are
+    both strong and interesting.
+
+-   Association rules are descriptive rather than causal. Their value is
+    usually in summarising behaviour, supporting recommendation, or
+    surfacing patterns worth following up.
+
+Looking ahead, Section \@ref(sec:ensemble) returns to supervised
+learning and shows how multiple models can be combined to improve
+prediction and classification performance.
 
 [^paranoid]: or, for the paranoid, a more complete profile of each user.
 

@@ -15,6 +15,14 @@ the detection and analysis of clusters. We start by developing a
 methodology based upon measures of dissimilarity ('pseudo-distance', if
 you like) between multivariate observations.
 
+**How this chapter connects.** Prediction and classification use a
+labelled outcome, whereas clustering removes that outcome and asks
+whether natural groupings are present in the predictors alone. The
+comparison table in Section \@ref(sec:task-compare) places clustering
+beside the supervised tasks, and the preprocessing ideas from
+Section \@ref(sec:missing) still matter here because scaling, outliers,
+and missingness can strongly affect the groups we find.
+
 ## Dissimilarity Matrices for Multivariate Data
 
 Let $x_{ij}$ be the observed value of the $j$th variable for the $i$th
@@ -1141,35 +1149,228 @@ for interpretation, not for training the clustering itself.
 
 ## HDBSCAN and UMAP
 
+### HDBSCAN {#sec:hdbscan}
+
 DBSCAN uses a single value of $\varepsilon$, so it can struggle when a
 dataset contains both sparse and dense clusters. HDBSCAN (Hierarchical
-DBSCAN) addresses this by considering a whole range of density
-thresholds and constructing a hierarchy of density-based clusters. The
-final clusters are then extracted from those parts of the hierarchy that
-are most stable across density levels. Conceptually this makes HDBSCAN
-closer to hierarchical clustering than to the fixed-threshold DBSCAN
-algorithm.
+DBSCAN, Campello et al. 2013) addresses this limitation by building a
+hierarchy over a range of density thresholds rather than committing to
+a single $\varepsilon$.
 
-When the data are high-dimensional, it is often useful to first produce
-a low-dimensional display. UMAP (Uniform Manifold Approximation and
-Projection) is not itself a clustering method. Rather, it constructs a
-low-dimensional map that attempts to preserve local neighbourhood
-relationships from the original feature space. In the notation of the
-lecture, if $y_i$ are low-dimensional coordinates and $w_{ij}$ are
-weights describing neighbourhood strength in the original data, then the
-low-dimensional affinities may be written as
-$$v_{ij} = \left(1 + a \| y_i - y_j \|^{2b} \right)^{-1},$$ and the
-coordinates are chosen to minimise a cross-entropy objective of the form
-$$\mathcal{L} =
-\sum_{i \neq j}
+The key idea is the *mutual reachability distance* between two points
+$x_i$ and $x_j$:
+\begin{equation}
+d_{\text{mreach}}(x_i, x_j) = \max\!\bigl( d_{\text{core}}(x_i),\,
+  d_{\text{core}}(x_j),\, d(x_i, x_j) \bigr),
+(\#eq:mreach)
+\end{equation}
+where $d_{\text{core}}(x_i)$ is the *core distance* of $x_i$: the
+distance to its $k$-th nearest neighbour (for a fixed $k$,
+`minPts` in the implementation). The mutual reachability distance equals
+the ordinary distance between the points unless one or both is in a
+sparse region, in which case it is inflated to their core distances.
+This has the effect of smoothing out noise without distorting dense
+clusters.
+
+HDBSCAN constructs a minimum spanning tree of the mutual reachability
+distances, converts it to a dendrogram (*condensed cluster tree*), and
+then extracts clusters as the subtrees that are most stable across the
+range of density thresholds. Stability is measured by how long a cluster
+persists as $\varepsilon$ decreases; clusters that appear briefly are
+absorbed into their parent. This self-tuning avoids the need to choose
+$\varepsilon$ manually, making HDBSCAN particularly useful when cluster
+densities vary across the dataset.
+
+::: {.example}
+**HDBSCAN on the Qatar Cars data**
+
+```{r, eval=FALSE}
+library(dbscan)
+
+cars_scaled <- qatarcars |>
+  select(length, width, height, mass, horsepower,
+         price, performance, economy, trunk, seating) |>
+  drop_na() |>
+  mutate(across(everything(), ~ as.numeric(scale(.x))))
+
+hdb <- hdbscan(cars_scaled, minPts = 5)
+hdb
+plot(hdb)   # condensed cluster tree
+```
+
+Points to note:
+
+-   Only the `minPts` parameter need be chosen. A value of 5 is a
+    common default; larger values produce fewer, more conservative
+    clusters.
+
+-   `plot()` on an `hdbscan` object draws the condensed cluster tree.
+    Wide bands indicate large, stable clusters; thin bands that
+    correspond to briefly-present density groups are collapsed to noise.
+
+-   Observations with cluster label 0 are noise points that did not
+    belong to any stable cluster.
+:::
+
+### UMAP {#sec:umap}
+
+UMAP (Uniform Manifold Approximation and Projection, McInnes et al.
+2018) is a dimensionality reduction technique used to produce
+low-dimensional displays of high-dimensional data. It is not a
+clustering method, but is widely used to visualise the structure found
+by clustering algorithms and to inspect how well different clusters
+separate in a 2D or 3D projection.
+
+**Neighbourhood graph construction.** UMAP begins by building a weighted
+graph of the $k$ nearest neighbours of each point $x_i$ in the
+original feature space, where $k$ is controlled by the `n_neighbors`
+parameter. The edge weight $w_{ij}$ between neighbouring points $x_i$
+and $x_j$ is a *fuzzy set membership strength* that reflects how close
+$x_j$ is to $x_i$ relative to the local neighbourhood scale around
+$x_i$:
+$$w_{ij} = \exp\!\left(\frac{-(d(x_i, x_j) - \rho_i)}{\sigma_i}\right),$$
+where $\rho_i$ is the distance from $x_i$ to its nearest neighbour
+(so that the weight of the closest neighbour is always 1), and
+$\sigma_i$ is a per-point bandwidth calibrated so that the effective
+number of neighbours (the fuzzy set cardinality) matches $k$.  The
+final symmetric weights are $\bar{w}_{ij} = w_{ij} + w_{ji} -
+w_{ij}w_{ji}$.
+
+**Low-dimensional optimisation.** UMAP then seeks coordinates
+$y_1, \ldots, y_n \in \mathbb{R}^d$ (usually $d = 2$) such that the
+low-dimensional pairwise affinities
+\begin{equation}
+v_{ij} = \left(1 + a\,\lVert y_i - y_j \rVert^{2b}\right)^{-1}
+(\#eq:umap-aff)
+\end{equation}
+match the high-dimensional weights $\bar{w}_{ij}$ as closely as
+possible. The parameters $a$ and $b$ are determined from the
+`min_dist` hyperparameter, which controls how tightly UMAP packs
+nearby points in the embedding. The coordinates are chosen to minimise
+the cross-entropy between the two fuzzy sets:
+\begin{equation}
+\mathcal{L} = \sum_{i \neq j}
 \left[
-w_{ij}\log\frac{w_{ij}}{v_{ij}}
- + (1-w_{ij})\log\frac{1-w_{ij}}{1-v_{ij}}
-\right].$$
-The resulting `UMAP 1` and `UMAP 2` axes are therefore display
-coordinates rather than original variables. This is useful for plotting
-clusters, but the clustering itself should still be fit in the original
-feature space unless dimension reduction is itself part of the model.
+  \bar{w}_{ij}\log\frac{\bar{w}_{ij}}{v_{ij}}
+  + (1 - \bar{w}_{ij})\log\frac{1 - \bar{w}_{ij}}{1 - v_{ij}}
+\right].
+(\#eq:umap-loss)
+\end{equation}
+This ensures that pairs that are neighbours in the original space
+(large $\bar{w}_{ij}$) are placed close together in the embedding
+(large $v_{ij}$), while non-neighbouring pairs are pushed apart.
+
+**Key hyperparameters:**
+
+-   `n_neighbors` ($k$): controls the local neighbourhood size.
+    Smaller values emphasise fine-grained local structure; larger
+    values produce a more global view.
+-   `min_dist`: controls how tightly points are packed in the
+    embedding. Smaller values produce clumped clusters; larger values
+    spread points out for a more continuous layout.
+-   `n_components`: the dimensionality of the embedding (typically 2
+    for visualisation).
+
+**Interpreting a UMAP plot.** The `UMAP 1` and `UMAP 2` axes are
+computed display coordinates. Unlike principal components, they have no
+linear interpretation in terms of the original variables. Distances
+between widely separated clusters in a UMAP plot should not be
+interpreted as meaningful: UMAP preserves local structure well but
+global structure (the distances between clusters) is not reliable.
+Within a cluster, relative distances are approximately meaningful.
+
+As a direct consequence: *clustering should be fit in the original
+feature space unless dimension reduction is itself part of the model.*
+UMAP is used to display clustering results, not to determine them.
+
+::: {.example}
+**UMAP visualisation of a clustering solution**
+
+```{r, eval=FALSE}
+library(uwot)
+
+# Fit UMAP on the scaled data (same matrix used for clustering)
+umap_coords <- umap(cars_scaled, n_neighbors = 15, min_dist = 0.1,
+                    n_components = 2, n_threads = 1)
+
+car_umap <- as_tibble(umap_coords, .name_repair = ~ c("UMAP1", "UMAP2")) |>
+  bind_cols(cluster = factor(hdb$cluster),
+            type    = qatarcars_complete$type)
+
+ggplot(car_umap, aes(x = UMAP1, y = UMAP2, colour = cluster,
+                     shape = type)) +
+  geom_point(alpha = 0.7) +
+  labs(title = "UMAP view of Qatar Cars -- HDBSCAN clusters")
+```
+
+Points to note:
+
+-   `umap()` from the `uwot` package is the recommended R
+    implementation. Setting `n_threads = 1` makes the result
+    reproducible when combined with a fixed seed.
+
+-   The UMAP is fit using the same scaled numeric matrix as HDBSCAN,
+    so the display is consistent with what the algorithm actually saw.
+
+-   Setting `shape = type` uses the car body type as an independent
+    label (not used in fitting) to check whether the clusters align
+    with domain categories. This is a useful validity check.
+:::
+
+### Practical method comparison {#sec:cluster-compare}
+
+The table below summarises the practical trade-offs between the
+clustering methods covered in this chapter.
+
+| Method          | Key idea                        | Handles non-convex? | Scales to $n$? | Needs $K$? | Handles noise? |
+|:----------------|:--------------------------------|:-------------------:|:--------------:|:----------:|:--------------:|
+| Hierarchical    | Merge/split by dissimilarity    | Depends on linkage  | Poor ($O(n^2)$)| No (cut tree)| No           |
+| K-means         | Minimise within-SS              | No (convex only)    | Good           | Yes        | No             |
+| K-medoids (PAM) | Minimise to actual centre       | No (convex only)    | Moderate       | Yes        | Partial        |
+| DBSCAN          | Density connected regions       | Yes                 | Good           | No         | Yes            |
+| HDBSCAN         | Hierarchical density extraction | Yes                 | Good           | No         | Yes            |
+
+A few practical guidelines:
+
+-   Use **hierarchical clustering** when the data are small enough to
+    inspect the full dendrogram, or when the number of clusters is
+    genuinely unknown and you want an overview at multiple scales.
+
+-   Use **K-means or K-medoids** when the clusters are roughly
+    spherical and the number of clusters can be chosen via the silhouette
+    width or elbow plot. K-medoids is more robust to outliers because
+    the cluster centre is a real observation.
+
+-   Use **DBSCAN** when the clusters are non-convex or irregularly
+    shaped, and when identifying noise points is important. Choose
+    $\varepsilon$ via a $k$-distance plot.
+
+-   Use **HDBSCAN** as the default when cluster densities vary across
+    the dataset, or when you do not want to commit to a single
+    $\varepsilon$. It is the most general-purpose density method.
+
+-   Use **UMAP** for visualisation after fitting any of the above
+    methods, particularly when the data are high-dimensional. Always
+    fit the clustering in the original feature space.
+
+## Summary
+
+Clustering is the main unsupervised grouping tool in these notes.
+
+-   The choice of dissimilarity measure matters as much as the choice of
+    clustering algorithm.
+
+-   Methods such as $K$-means and PAM work best for compact,
+    centre-based clusters, while DBSCAN and HDBSCAN are better suited to
+    irregular shapes and noisy data.
+
+-   Preprocessing is especially important in clustering because the
+    algorithm sees only the features we give it; scaling, missing-value
+    handling, and outlier review therefore directly affect the clusters.
+
+Looking ahead, Section \@ref(sec:association-fit) studies another
+unsupervised task, association rule mining, which focuses on
+co-occurrence patterns rather than grouping observations.
 
 [^supervised]: In fields such as computer science and image analysis, cluster
     analysis is referred to as *unsupervised learning* and discriminant
@@ -1182,3 +1383,4 @@ feature space unless dimension reduction is itself part of the model.
 [^silzero]: If a cluster contains only one point, the average dissimilarity to
     other points in the cluster is not well defined. We use the natural
     definition that $a(i)\equiv 0$ which gives $s(i)=1$ in this case.
+

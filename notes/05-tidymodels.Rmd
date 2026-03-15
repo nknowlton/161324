@@ -32,17 +32,28 @@ fitting different models and provides a common interface that generally works ac
 a wide range of model types. It also has packages for data processing and model
 evaluation, among other things.
 
-We will be looking at just part of the `tidymodels` framework, and will be leaving
-some of the more powerful aspects (e.g. workflows and model tuning) aside.
+We will begin with the core pieces of the framework and then extend them
+to a more complete workflow using `workflows`, resampling, and simple
+tuning.
 
 The packages we'll be focusing on in this chapter are:
 
 - `rsample` for resampling.
 - `recipes` for data processing.
 - `parsnip` for model fitting.
+- `workflows` for bundling preprocessing and a model together.
+- `tune` for resampling-based evaluation and tuning.
 - `yardstick` for measuring model performance.
 
 The [tidymodels website](https://tidymodels.org) has a number of excellent tutorials and an overview of some of the additional packages available (e.g. `tune`, `workshop`).
+
+**How this chapter connects.** Sections \@ref(sec:predictionbasics) and
+\@ref(sec:roc) introduced the main supervised-learning methods. This
+chapter turns those ideas into a reusable workflow: split the data,
+preprocess them, fit a model, evaluate it honestly, then tune and
+finalise it. The preprocessing stage also connects back to
+Section \@ref(sec:missing), because missing-value handling belongs in
+the same pipeline rather than being treated as a mysterious side quest.
 
 ## Splitting and resampling data
 
@@ -89,6 +100,13 @@ Often the data that we have to work with needs processing prior to applying mode
 In the case of transforming variables via scaling, such as normalising a numeric measure to have mean zero and variance one, we need to ensure that the transformation is identical across the training and testing datasets. We can't normalise variables across the two sets separately, as the datasets are likely to have at least slightly different means and variances.
 
 The `recipes` package takes care of these details, providing a set of instructions (a `recipe`) for taking our raw data (ingredients) and preparing a data set ready for modelling.
+
+If we need imputation, this is also where it should happen. For
+example, Section \@ref(sec:missing) discussed replacing missing values
+using summaries or nearby observations. In a modern modelling workflow,
+those choices should be encoded as recipe steps so that they are learned
+from the training data and then applied in exactly the same way to new
+data.
 
 ::: {.example #wagerecipe}
 **A recipe for scaling the US Wage data**
@@ -147,9 +165,9 @@ wage.valid.baked <- bake(wage.prepped, wage.validation)
 ```
 :::
 
-## Modelling with parnsip
+## Modelling with parsnip
 
-We have seen throughout the [prediction chapter](#prediction) that each prediction model has it's own functions available for fitting the model and predicting new observations given a model.
+We have seen throughout the [prediction chapter](#prediction) that each prediction model has its own functions available for fitting the model and predicting new observations given a model.
 
 In the case of linear models via `lm`, regression trees via `rpart`, random forests via `randomForest`and neural networks via `nnet` both the construction of models and prediction from those models follow essentially identical syntaxes. We fit models using:
 
@@ -165,7 +183,7 @@ pred <- predict(model, newdata=testing)
 
 Unfortunately, this convenient formulation is not the norm. There are model types that are fit by providing a vector outcome and matrix of predictors (e.g. `glmnet` for penalised regression), and there are model types where predictions require additional processing to yield a vector of outcomes (e.g. `ranger` for random forests).
 
-The `parnsip` package[^parnsippun] is designed to alleviate this by providing a consistent interface to a wide range of models for both prediction and classification. The idea is that we have essentially two main functions `fit` and `predict` that apply over different types of model fit using different modelling engines. For example, the linear regression model `linear_reg` can be fit using the `lm` engine we're familiar with, or via penalised regression[^penalised] with `glmnet` or in a Bayesian framework[^bayes] with `stan`. Whichever model or engine we choose, the `predict` method will always return a data frame with one row for each row of the new data supplied to it which is convenient for binding as a new column.
+The `parsnip` package[^parnsippun] is designed to alleviate this by providing a consistent interface to a wide range of models for both prediction and classification. The idea is that we have essentially two main functions `fit` and `predict` that apply over different types of model fit using different modelling engines. For example, the linear regression model `linear_reg` can be fit using the `lm` engine we're familiar with, or via penalised regression[^penalised] with `glmnet` or in a Bayesian framework[^bayes] with `stan`. Whichever model or engine we choose, the `predict` method will always return a data frame with one row for each row of the new data supplied to it which is convenient for binding as a new column.
 
 ::: {.example #wagefit}
 **Fitting a linear regression and neural network to the US Wage data using parsnip**
@@ -201,7 +219,7 @@ Some notes:
     which is the default. The additional parameter `hidden_units` defines the number of nodes in the
     hidden layer (i.e. the `size` argument of `nnet`) while `penalty` defines the amount of weight decay
     (the `decay` parameter of `nnet`). The `epochs` parameter is for the maximum number of training
-    iterations (`maxit` in `nnet`). The `parsnip` package redefines it's own names for these
+    iterations (`maxit` in `nnet`). The `parsnip` package redefines its own names for these
     parameters and translates them for each of the possible engines that can be used (e.g. neural nets
     can also be fit using the `keras` engine).
 
@@ -311,6 +329,204 @@ ggplot(data = wage.long) +
 ```
 
 :::
+
+## Workflows {#sec:tidymodels-workflow}
+
+Once we have a recipe and a model specification, the next natural step
+is to bundle them together. A `workflow` does exactly that. This helps
+avoid the fiddly business of remembering which baked dataset matches
+which model, and it keeps preprocessing and modelling tied together in a
+single object.
+
+::: {.example}
+**Bundling a recipe and model into a workflow**
+
+Below we combine the wage recipe with the linear model and neural
+network specifications from Example \@ref(exm:wagefit).
+
+```{r, message=FALSE}
+library(workflows)
+
+wage.wf.lm <- workflow() |>
+  add_recipe(wage.recipe) |>
+  add_model(wage.spec.lm)
+
+wage.wf.nn <- workflow() |>
+  add_recipe(wage.recipe) |>
+  add_model(wage.spec.nn)
+
+wage.wf.nn.fit <- wage.wf.nn |> fit(data = wage.new.train)
+predict(wage.wf.nn.fit, new_data = wage.validation) |>
+  slice_head(n = 4)
+```
+
+Some notes:
+
+ -  The workflow is given the **raw** training data. It takes care of
+    prepping and baking the recipe internally before fitting the model.
+
+ -  When we predict on `wage.validation`, we again supply the raw data.
+    The workflow applies the same preprocessing steps automatically.
+
+ -  If we later decide to add imputation or dummy-variable creation,
+    those changes belong in the recipe, not scattered through multiple
+    separate code blocks.
+:::
+
+## Resampling with `fit_resamples()` {#sec:tidymodels-resamples}
+
+The validation split from Example \@ref(exm:wagesplit) is useful, but
+it is still only one split. A model may look slightly better or worse
+just because of that one random partition. Resampling gives us a more
+stable picture by repeating the assessment over several training and
+validation folds.
+
+::: {.example}
+**Comparing two workflows by cross-validation**
+
+We can compare the linear model and neural network workflows using
+5-fold cross-validation on the training data.
+
+```{r, message=FALSE}
+library(tune)
+
+set.seed(1945)
+wage_folds <- vfold_cv(wage.new.train, v = 5)
+
+wage.resamples.lm <- wage.wf.lm |>
+  fit_resamples(resamples = wage_folds,
+                metrics = metric_set(rmse, mae, rsq))
+
+wage.resamples.nn <- wage.wf.nn |>
+  fit_resamples(resamples = wage_folds,
+                metrics = metric_set(rmse, mae, rsq))
+
+bind_rows(
+  collect_metrics(wage.resamples.lm) |> mutate(model = "linear model"),
+  collect_metrics(wage.resamples.nn) |> mutate(model = "neural network")
+) |>
+  select(model, .metric, mean, std_err)
+```
+
+Some notes:
+
+ -  `vfold_cv()` creates a collection of training/assessment splits from
+    `wage.new.train`. The original held-out set `wage.validation`
+    remains untouched for later.
+
+ -  `fit_resamples()` fits the workflow separately on each analysis fold
+    and evaluates it on the corresponding assessment fold.
+
+ -  The resulting summary is usually more trustworthy than judging two
+    models from a single split alone.
+:::
+
+## Simple tuning with `tune_grid()` {#sec:tidymodels-tuning}
+
+Resampling is also the natural setting for tuning hyperparameters. To
+illustrate this, let us tune a random forest using the same wage data.
+This updates the random-forest story from Section \@ref(sec:randomforest)
+into a more modern workflow.
+
+::: {.example}
+**Tuning a random forest with `ranger`**
+
+```{r, message=FALSE, warning=FALSE}
+library(ranger)
+
+wage.spec.rf <- rand_forest(mode = "regression",
+                            trees = 500,
+                            mtry = tune(),
+                            min_n = tune()) |>
+  set_engine("ranger")
+
+wage.wf.rf <- workflow() |>
+  add_recipe(wage.recipe) |>
+  add_model(wage.spec.rf)
+
+wage.rf.grid <- crossing(
+  mtry = c(2L, 4L, 6L),
+  min_n = c(2L, 5L, 20L)
+)
+
+wage.rf.tune <- wage.wf.rf |>
+  tune_grid(resamples = wage_folds,
+            grid = wage.rf.grid,
+            metrics = metric_set(rmse, mae, rsq))
+
+show_best(wage.rf.tune, metric = "rmse")
+```
+
+Some notes:
+
+ -  The arguments `mtry = tune()` and `min_n = tune()` mark these
+    quantities as hyperparameters to be chosen by resampling rather than
+    fixed in advance.
+
+ -  The grid here is deliberately small so that the example is easy to
+    follow. In a real project we might search more values or use a more
+    efficient tuning strategy.
+
+ -  `show_best()` gives the strongest settings under the chosen metric,
+    here RMSE.
+:::
+
+## Final model fitting with `last_fit()` {#sec:tidymodels-final}
+
+Once tuning is complete, we choose the preferred hyperparameters,
+finalise the workflow, and then fit it one last time using the original
+training/test split from Example \@ref(exm:wagesplit). This gives us an
+honest assessment on data that were not used during tuning.
+
+::: {.example}
+**Finalising the tuned random forest**
+
+```{r}
+best_wage_rf <- select_best(wage.rf.tune, metric = "rmse")
+wage.rf.final <- finalize_workflow(wage.wf.rf, best_wage_rf)
+
+wage.rf.last <- wage.rf.final |>
+  last_fit(split = split, metrics = metric_set(rmse, mae, rsq))
+
+collect_metrics(wage.rf.last)
+```
+
+Some notes:
+
+ -  `select_best()` extracts the tuning settings that performed best on
+    the resamples.
+
+ -  `finalize_workflow()` plugs those settings into the workflow.
+
+ -  `last_fit()` refits the final workflow on the full training portion
+    of `split` and evaluates it once on the held-out test portion.
+
+ -  This is the supervised-learning pipeline in compact form: import and
+    clean the data, define the recipe, resample, tune, and only then
+    look at the final test-set performance.
+:::
+
+## Summary
+
+The `tidymodels` framework provides a tidy and reproducible supervised
+modelling pipeline.
+
+-   `rsample` handles splitting and resampling, so that model assessment
+    is not based on a lucky or unlucky single split.
+
+-   `recipes` encodes preprocessing such as scaling, dummy-variable
+    creation, and imputation in a form that can be reused consistently.
+
+-   `parsnip` provides a common interface to many model families, while
+    `workflows` keeps the recipe and model together so they do not drift
+    apart.
+
+-   `fit_resamples()`, `tune_grid()`, and `last_fit()` turn model
+    comparison, tuning, and final evaluation into a coherent pipeline.
+
+Looking ahead, the same workflow ideas support the classification
+methods in Section \@ref(sec:roc) and the ensemble methods in
+Section \@ref(sec:ensemble).
 
 [^bootstraprows]: In the case of a bootstrap resample, rows may appear multiple times in the analysis set, as they are sampled with replacement. The rows in the assessment set are rows that don't appear in the analysis set.
 

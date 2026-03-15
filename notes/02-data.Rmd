@@ -7,6 +7,14 @@ theme_set(theme_minimal())
 options(pillar.sigfig = 5)
 ```
 
+**How this chapter connects.** This chapter is the start of the
+practical pipeline introduced in Section \@ref(sec:notes-roadmap): get
+the data into R, check how variables have been interpreted, and make
+missing values explicit. Section \@ref(sec:missing) then develops what
+to do once those missing values have been identified, and Chapter 5
+shows how the same cleaning decisions can be embedded in a reproducible
+modelling workflow.
+
 ## Obtaining Data
 
 Several datasets are provided for your study of data mining. They come from
@@ -47,7 +55,10 @@ We'll tend to use CSV (comma separated value) files, for which the
 `read_csv()` command is appropriate.
 
 By default, this should work out of the box for just about all data
-sets we use, but some poorly formatted data may need alternatives.
+sets we use, but some poorly formatted data may need alternatives. In a
+real workflow, one of the most important early checks is whether missing
+values have been encoded correctly at import time, for example through
+the `na=` argument of `read_csv()`.
 
 This might be easier to see through a specific example, so consider the
 following command:
@@ -321,6 +332,27 @@ husbands |> skimr::skim()
 ```
 
 :::
+
+## Summary
+
+This chapter has focused on the first stage of a data mining workflow:
+getting data into R in a form that can be analysed reliably.
+
+-   Import choices matter. Variable types, file paths, and missing-value
+    encodings should be checked immediately rather than discovered only
+    after modelling has begun.
+
+-   Tools such as `glimpse()`, `skimr::skim()`, and simple summaries are
+    useful for spotting implausible values, sentinel codes, and type
+    mismatches early.
+
+-   Making missingness explicit with `NA` is an important handoff to the
+    missing-data methods in Section \@ref(sec:missing) and to the
+    preprocessing pipelines developed in Chapter 5.
+
+Looking ahead, Section \@ref(sec:missing) studies how to describe,
+visualise, and handle missing values once they have been imported
+correctly.
 
 [^otherpackages]: R can also interact with database systems as well, although the
     process is a little more complex.

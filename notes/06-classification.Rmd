@@ -27,10 +27,18 @@ features. In the test data we will have just the features. We can then
 apply the classification method developed on the training data to
 allocate each test case to a group.
 
-As we did when discussing prediction, we will a times look at validation
+As we did when discussing prediction, we will at times look at validation
 datasets (i.e. artificial test datasets) in which the true class
 memberships are available. This is for illustrative purposes, helping us
 to compare and contrast various classification technique.
+
+**How this chapter connects.** This chapter focuses on the main
+classification methods and the ideas behind them. When we want a more
+reproducible implementation path with recipes, workflows, resampling,
+and tuning, Chapter 5 is the place to look. The comparison table in
+Section \@ref(sec:task-compare) is also a useful reminder of how
+classification differs from prediction, clustering, and association
+rules.
 
 As an example of a classification problem, recall the Italian wine data
 that we met in Exercise 1 of Laboratory 4. Thinking of this as a
@@ -1236,6 +1244,87 @@ Some comments on this R snippet.
     predictors.
 :::
 
+### ROC curves and the classification threshold {#sec:roc}
+
+In the examples above we have used the default classification rule:
+assign to the class with the highest predicted posterior probability.
+For a binary classifier this amounts to predicting class 1 when
+$\hat p(\boldsymbol{x}) > 0.5$ and class 0 otherwise. Not all problems
+are symmetric, however. When the consequences of a false negative differ
+from those of a false positive -- as in medical screening, fraud
+detection, or adoption prediction -- it can be worthwhile to use a
+different threshold $\tau$, predicting class 1 when
+$\hat p(\boldsymbol{x}) > \tau$.
+
+As $\tau$ varies from 0 to 1, the *sensitivity* (true positive rate,
+TPR) and *specificity* (true negative rate, TNR) of the classifier
+change in opposite directions:
+\begin{align}
+\text{Sensitivity}(\tau) &= \frac{\text{TP}(\tau)}{\text{TP}(\tau) + \text{FN}(\tau)}, \\
+1 - \text{Specificity}(\tau) &= \frac{\text{FP}(\tau)}{\text{FP}(\tau) + \text{TN}(\tau)}.
+(\#eq:tpr-fpr)
+\end{align}
+The *Receiver Operating Characteristic* (ROC) curve is a plot of
+sensitivity against $1 - \text{specificity}$ as $\tau$ ranges over
+$[0, 1]$. A perfect classifier produces a point at $(0, 1)$ for some
+threshold (all positives detected, no false alarms). A random classifier
+produces a diagonal line from $(0, 0)$ to $(1, 1)$.
+
+The *area under the ROC curve* (AUC) summarises the overall
+discrimination ability of a model in a single number. It has a useful
+probabilistic interpretation: it is the probability that a randomly
+selected positive case receives a higher predicted probability than a
+randomly selected negative case:
+$$\text{AUC} = P\!\left(\hat p(\boldsymbol{x}^+) > \hat p(\boldsymbol{x}^-)\right)$$
+where $\boldsymbol{x}^+$ and $\boldsymbol{x}^-$ are drawn from the
+positive and negative class distributions respectively. AUC = 0.5
+corresponds to a coin-flip classifier; practical classifiers typically
+achieve AUC $> 0.7$, and values above 0.9 are considered excellent.
+
+AUC has the advantage over accuracy of being independent of the
+classification threshold and of class proportions, making it suitable
+for comparing models in the presence of class imbalance.
+
+When the positive class is rare, a complementary summary is the
+*area under the precision-recall curve* (AUCPR). The precision
+$\frac{\text{TP}}{\text{TP} + \text{FP}}$ and recall
+$\frac{\text{TP}}{\text{TP} + \text{FN}}$ are plotted against each
+other as $\tau$ varies; a perfect classifier achieves
+$(\text{recall}, \text{precision}) = (1, 1)$ for some threshold.
+
+::: {.example}
+**ROC curve and AUC for logistic regression on the Swiss bank notes**
+
+```{r roc-swiss, message=FALSE}
+library(yardstick)
+
+swiss.lr.2.pred |>
+  roc_curve(truth = type, .pred_genuine) |>
+  autoplot()
+
+swiss.lr.2.pred |>
+  roc_auc(truth = type, .pred_genuine)
+```
+
+The curve hugs the top-left corner, confirming that the logistic
+regression model is a strong discriminator for this dataset.
+
+The `roc_curve()` function from `yardstick` requires the predicted
+probabilities for one of the classes (here `type = genuine`). The
+`autoplot()` method produces the standard ROC plot; `roc_auc()`
+computes the AUC directly.
+:::
+
+When the costs of misclassification differ between the two classes, an
+alternative to changing the threshold is to incorporate
+misclassification costs explicitly into the training or evaluation.
+If a false negative costs $c_{\text{FN}}$ and a false positive costs
+$c_{\text{FP}}$, the expected cost-weighted misclassification rate is
+$$C(\tau) = c_{\text{FN}} \cdot \text{FNR}(\tau) \cdot \pi_+ + c_{\text{FP}} \cdot \text{FPR}(\tau) \cdot \pi_-$$
+where $\pi_+$ and $\pi_-$ are the class prior probabilities, and one
+minimises $C(\tau)$ over $\tau$ to obtain the optimal threshold for
+deployment.
+
 ## Other Methods of Classification
 
 The classifiers that we have considered to date have either been based
@@ -1386,22 +1475,25 @@ change to the model, for example.
 Random Forests may be adapted to the task of classification in the same
 way as decision trees are adapted: We change the trees to classification
 trees rather than regression trees, and assemble an ensemble of trees.
-Prediction is then done by each tree creating it's individual predited
+Prediction is then done by each tree creating its individual predicted
 classes for each observation, and voting across all the trees, choosing
 the most frequently predicted class. Note that in some cases this choice
 may result in an even split (e.g. 200 trees might say class "A", 200 trees
 say class "B", and 100 trees class "C") where the assignment may then
 be implementation-specific, but typically decided through random allocation.
 
+In modern R workflows, `ranger` is usually the default random-forest
+engine because it is fast and integrates cleanly with `tidymodels`.
+
 ::: {.example}
 **A Classification Forest for the Wine Data**
 
 Our classification forest is fit in the same way as we did for prediction,
 switching out the `mode` to be "classification". We'll utilise the
-`randomForest` package as before.
+`ranger` engine here.
 
 ```{r, message=FALSE}
-wine.rf <- rand_forest(mode="classification", engine="randomForest") |>
+wine.rf <- rand_forest(mode="classification", engine="ranger") |>
   fit(Cultivar ~ . ,data=wine.train)
 wine.rf.pred <- wine.rf |>
   augment(new_data=wine.test)
@@ -1415,6 +1507,9 @@ perf.rf <- wine.rf.pred |> get_perf(Cultivar, .pred_class)
 
 The misclassification error is $`r perf.rf$wrong`/`r perf.rf$total` \approx `r perf.rf$perc`\%$,
 similar to many of the other models. These data are not hard to classify!
+
+For a more systematic tuning workflow for forests and other classifiers,
+see Chapter 5.
 
 :::
 ### Neural Networks for Classification
@@ -1497,6 +1592,111 @@ Some notes:
     rate.
 :::
 
+## Dealing with Class Imbalance {#sec:classimbalance}
+
+Many real classification problems have highly unequal class sizes: fraud
+transactions are a tiny fraction of all transactions; disease cases are
+rare relative to healthy individuals; adoption events may be
+considerably less common than other shelter outcomes. When one class
+greatly outnumbers another, standard classifiers tend to predict the
+majority class most of the time, achieving high accuracy while failing
+to detect the minority class.
+
+A simple baseline illustrates the problem: if $5\%$ of cases are
+positive, a classifier that always predicts negative achieves $95\%$
+accuracy while having zero sensitivity. Standard accuracy is therefore a
+misleading metric in this setting; AUC, F1-score, or cost-weighted
+metrics (Section \@ref(sec:roc)) are more informative.
+
+### Resampling strategies
+
+One direct remedy is to modify the training set to make the class
+distribution less extreme before fitting the classifier.
+
+**Undersampling** randomly removes majority-class observations from
+the training set until the desired ratio is achieved. It is simple and
+fast, but discards potentially informative data.
+
+**Oversampling** duplicates minority-class observations. Naïve random
+oversampling creates exact duplicates, which can cause overfitting.
+
+### SMOTE: synthetic minority oversampling {#sec:smote}
+
+SMOTE (Synthetic Minority Over-sampling Technique, Chawla et al. 2002)
+creates *synthetic* minority-class observations rather than exact
+duplicates.
+
+For each minority-class observation $x_i$, SMOTE:
+
+1.  Finds the $k$ nearest neighbours of $x_i$ among the minority class
+    (typically $k = 5$).
+2.  Selects one neighbour $x_j$ at random.
+3.  Creates a new synthetic observation
+    $x_{\text{new}} = x_i + u(x_j - x_i)$ where $u \sim
+    \operatorname{Uniform}(0, 1)$.
+
+The new point $x_{\text{new}}$ lies on the line segment between $x_i$
+and $x_j$ at a random position, interpolating between real minority-class
+cases. This fills in the minority-class region of the feature space
+rather than simply repeating existing points, making it more difficult
+for the classifier to find a shortcut boundary that ignores the minority
+class.
+
+SMOTE as originally defined applies to continuous features. The
+extension SMOTE-NC (SMOTE for Nominal and Continuous) handles datasets
+with a mix of numeric and categorical predictors: numeric features are
+interpolated as above, while the synthetic observation's categorical
+features are copied from the most frequent value among the $k$ nearest
+neighbours.
+
+In `tidymodels`, the `themis` package provides `step_smote()` and
+`step_smotenc()` as recipe steps, ensuring that the synthetic
+observations are created only within the training data of each
+cross-validation fold and are never applied to the validation fold.
+
+::: {.example}
+**SMOTE-NC for a binary classification recipe**
+
+Suppose we are building a classifier where `outcome` is highly
+imbalanced. The recipe below illustrates the standard placement of
+`step_smotenc()`:
+
+```{r, eval=FALSE}
+library(themis)
+
+imbalanced_recipe <- recipe(outcome ~ ., data = train_data) |>
+  step_novel(all_nominal_predictors()) |>
+  step_unknown(all_nominal_predictors()) |>
+  step_dummy(all_nominal_predictors())   |>  # must come before smotenc
+  step_normalize(all_numeric_predictors()) |>
+  step_smotenc(outcome, over_ratio = 0.5)
+```
+
+Some notes on this code:
+
+-   `step_smotenc()` requires that dummy encoding has already been
+    applied, because it uses Euclidean distances over the numeric
+    columns while handling the binary dummy variables through the
+    majority-value rule.
+
+-   The `over_ratio` argument sets the ratio of minority to majority
+    class observations after oversampling. `over_ratio = 0.5` results
+    in the minority class being brought up to half the size of the
+    majority class.
+
+-   Because oversampling is a recipe step, it is applied *only* during
+    training when the recipe is `prep()`-ed or baked via a workflow.
+    Validation and test folds are never oversampled, which is
+    essential for honest evaluation.
+:::
+
+SMOTE can improve classifier performance on the minority class, but it
+is not a universal remedy. If the minority class genuinely overlaps with
+the majority class in feature space, synthetic interpolation will create
+ambiguous extra observations and may hurt overall accuracy. Adjusting
+the classification threshold (Section \@ref(sec:roc)) is often a simpler
+and equally effective first step.
+
 ## High Class Classifiers
 
 We have discussed a variety of techniques for classification. As usual,
@@ -1514,6 +1714,26 @@ percent. There are frequently competitions on the Internet where teams
 of researchers seek to obtain the best classifications possible. At
 present, Kaggle (`www.kaggle.com`) hosts arguably the most well known
 website for such competitions.
+
+## Summary
+
+Classification is the supervised-learning task where the target variable
+is categorical rather than numeric.
+
+-   Different classifiers make different assumptions about class
+    structure. Stronger assumptions can help when they are reasonable,
+    but they can also fail badly when they are not.
+
+-   Evaluation needs more than one number. Confusion matrices, class
+    probabilities, ROC curves, and threshold choice all matter.
+
+-   Flexible modern workflows still rest on the same basic sequence:
+    split the data, preprocess carefully, fit the model, and evaluate it
+    honestly on held-out cases.
+
+Looking ahead, Section \@ref(sec:cluster-compare) drops the labelled
+response entirely and turns to clustering, where the groups must be
+discovered from the predictors alone.
 
 [^discrimination]: As the names of the first two listed techniques suggest,
     statistical classification can also be referred to as discriminant

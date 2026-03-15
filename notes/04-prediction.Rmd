@@ -40,6 +40,13 @@ learning literatures, classification and clustering are commonly
 referred to as *supervised learning* and *unsupervised learning*
 respectively.
 
+**How this chapter connects.** This chapter introduces the main ideas
+behind prediction and shows how the different model families behave. For
+a modern implementation workflow built around reusable preprocessing,
+resampling, tuning, and final model fitting, see Chapter 5. In other
+words, this chapter is mainly about the methods; Chapter 5 is about
+putting them to work cleanly.
+
 To illustrate these ideas, consider the following archaeological
 scenarios.
 
@@ -1382,7 +1389,7 @@ cross-validation results are subject to error, and so are by no means
 certain to identify the best model.
 :::
 
-### Tree instability
+### Tree instability {#sec:treeinstability}
 
 Unfortunately, decision tree models are known to be **unstable**. When many variables are available, there are often many potential competing splits that serve to improve the model fit by around the same amount. However, the choice of which split to use can then result in very different subtrees.
 
@@ -1436,6 +1443,19 @@ The forest then benefits from the instability of the trees: Each bootstrap resam
 
 Random forests are examples of **ensemble methods** which combine prediction across multiple different models to give a better prediction than just one of the models could provide.
 
+The key mechanism underlying random forests is *bagging* (bootstrap
+aggregating): each tree is trained on a different bootstrap resample of
+the training data, and predictions are averaged across all trees.
+Because each bootstrap sample produces a somewhat different tree (recall
+the instability demonstrated in Section \@ref(sec:treeinstability)), the
+average of many such trees is considerably more stable than any single
+tree. Random forests add one further step -- random predictor subsets at
+each split -- which makes the individual trees less correlated with each
+other and thereby improves the benefit of averaging (the formal
+variance-reduction argument is given in Section \@ref(sec:ensemble)).
+Other ensemble strategies, including boosting and stacking, are also
+covered in that chapter.
+
 There are two key parameters when fitting a random forest that can potentially be tuned:
 
 1. The number of predictor variables to consider for each split. This can be important for tuning model fit. Often using fewer predictor variables for each split can work well to ensure the trees differ.
@@ -1449,7 +1469,11 @@ There are a number of different packages in R that can fit random forests. For e
 - `ranger()` from the `ranger` package
 - `ml_random_forest()` from the `sparklyr` package
 
-We'll be sticking to the first of these in this course as demonstrated in the following example.
+For practical work, `ranger()` is a good modern default: it is fast,
+widely used, and fits naturally into the `tidymodels` workflow that we
+develop in Chapter 5. The older `randomForest()` package remains useful
+to know about because you will still encounter it in older code and
+examples.
 
 ::: {.example}
 **Random forest for the WAGE data**
@@ -1458,11 +1482,11 @@ A random forest model is fit to the WAGE data with default arguments as follows,
 on the test set is performed:
 
 ```{r, message=FALSE, warning=FALSE}
-library(randomForest)
+library(ranger)
 set.seed(1945)
-wage.rf.1 <- randomForest(WAGE ~ ., data = wage.train)
+wage.rf.1 <- ranger(WAGE ~ ., data = wage.train, num.trees = 500)
 wage.rf.1.pred <- wage.test |>
-  bind_cols(.pred = predict(wage.rf.1, newdata = wage.test))
+  bind_cols(.pred = predict(wage.rf.1, data = wage.test)$predictions)
 wage.rf.1.pred |>
   summarise(MSE = mean((.pred - WAGE)^2))
 ```
@@ -1471,31 +1495,26 @@ Some notes:
 
  -  As the forest utilises randomisation, we set the random seed so we can reproduce these results.
 
- -  The forest performs reasonably well without additional tuning.
- 
- -  The first two trees from the forest are shown in \@ref(fig:wageforest). We can see that these trees have been grown very deeply and are quite different.
- 
-```{r wageforest, echo=FALSE, message=FALSE, fig.cap="The first two trees from the random forest `wage.rf.1`"}
-library(reprtree)
-tree1 <- reprtree:::as.tree(getTree(wage.rf.1, k=1, labelVar = TRUE),
-                            wage.rf.1)
-tree2 <- reprtree:::as.tree(getTree(wage.rf.1, k=2, labelVar = TRUE),
-                            wage.rf.1)
-par(mfrow=c(2,1), mar=c(0,0,1,0))
-plot(tree1, type="uniform", main="Tree 1")
-text(tree1, cex=0.4, label=NULL)
-plot(tree2, type="uniform", main="Tree 2")
-text(tree2, cex=0.4, label=NULL)
-```
-We can tune the model by altering the `mtry` parameter, which selects the number of predictors to consider for each split in the tree. By default it is set to $p/3$ where $p$ is the number of predictors, so in this example will be 3. Another possible tuning parameter governs the depth of the tree, given by the `nodesize` parameter. By default this is set to 5, meaning that at least 5 observations must be present at a node before a split is considered. Setting it to a large value will produce smaller trees.
+ -  The forest performs reasonably well without additional tuning, which
+    is one reason random forests are so popular in practice.
+
+ -  The argument `num.trees = 500` asks for 500 trees in the forest,
+    which is a common default choice.
+
+We can tune the model by altering the `mtry` parameter, which selects
+the number of predictors to consider for each split in the tree. Another
+possible tuning parameter governs the depth of the tree, given in
+`ranger` by `min.node.size`. Smaller values allow deeper trees.
 
 ```{r}
-wage.rf.2 <- randomForest(WAGE ~ ., data=wage.train, mtry = 2)
-wage.rf.3 <- randomForest(WAGE ~ ., data=wage.train, mtry = 2, nodesize = 1)
+wage.rf.2 <- ranger(WAGE ~ ., data = wage.train, num.trees = 500,
+                    mtry = 2)
+wage.rf.3 <- ranger(WAGE ~ ., data = wage.train, num.trees = 500,
+                    mtry = 2, min.node.size = 1)
 wage.rf.pred <- wage.test |>
                   bind_cols(
-                    .pred2 = predict(wage.rf.2, newdata=wage.test),
-                    .pred3 = predict(wage.rf.3, newdata=wage.test)
+                    .pred2 = predict(wage.rf.2, data = wage.test)$predictions,
+                    .pred3 = predict(wage.rf.3, data = wage.test)$predictions
                   )
 wage.rf.pred |>
   summarise(MSE.2 = mean((.pred2 - WAGE)^2),
@@ -1504,11 +1523,16 @@ wage.rf.pred |>
 
  -  The `wage.rf.2` forest is fit with `mtry=2`, so that just 2 predictors (chosen at random) will be considered for each split.
  
- -  The `wage.rf.3` forest additionally sets `nodesize=1` so that the trees will be grown to their maximum possible depth - any node at which at least 2 observations is available is eligible to be split further.
+ -  The `wage.rf.3` forest additionally sets `min.node.size=1` so that
+    the trees will be grown more deeply.
 
  -  We bind the predictions from both forests as separate columns `.pred2` and `.pred3` to the `wage.test` data, so that we can then use `summarise()` to compute the mean square error of each.
  
  -  In this example, the original forest performs better.
+
+ -  For a more systematic version of this tuning process, using
+    cross-validation rather than a single validation split, see
+    Chapter 5.
 :::
 
 ## Neural Networks{#sec:neuralnet}
@@ -1935,7 +1959,11 @@ problem like you might do in an assignment). The rest of the examples in
 this chapter dealt with the artificial setting in which we knew the
 values of the target variable for the test cases, since one of the
 purposes of those examples is to learn more about the comparative
-performance of various prediction method methods.
+performance of various prediction methods.
+
+Looking ahead, Chapter 5 revisits this material using `recipes`,
+`workflows`, resampling, and tuning, so that the same prediction ideas
+can be used in a more reproducible modelling pipeline.
 
 [^1]: The *predictand* is the variable whose value one is trying to
     predict. The predictors are those variables that are used to

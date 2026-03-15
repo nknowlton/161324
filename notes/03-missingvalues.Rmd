@@ -15,6 +15,13 @@ In some cases we may be able to fill in these gaps through judicious use of othe
 variables for which the data are not missing. In other cases it may be best to discard
 variables or observations for which we have little data.
 
+**How this chapter connects.** Section \@ref(sec:missing1) showed that
+missingness often first appears as an import and coding problem, such as
+sentinel values like `9999` that need to be turned into `NA`. This
+chapter studies what the missingness means and how to handle it, while
+Chapter 5 returns to the same ideas in a modelling workflow where
+imputation and preprocessing are estimated on training data only.
+
 ## Patterns of Missingness{#sec:missing}
 
 As noted in Section \@ref(sec:missing1), it is not unusual for real datasets to
@@ -343,6 +350,30 @@ straightforward.
 
 While interesting, the details of these alternative methods of
 imputation are beyond the scope of this course.
+
+## Summary
+
+Missing values are not just an inconvenience: they are part of the data
+analysis problem.
+
+-   Before choosing a method, we should understand both the amount of
+    missingness and its likely mechanism.
+
+-   Simple approaches such as complete-case analysis or mean imputation
+    may be acceptable in some settings, but they can also throw away
+    information or distort relationships.
+
+-   More structured approaches such as $k$ nearest neighbour imputation
+    borrow information from similar observations and often preserve the
+    data structure better.
+
+-   In a modern supervised workflow, the imputation step should sit
+    inside the preprocessing recipe so that it is learned from the
+    training data and then applied consistently to validation and test
+    sets.
+
+Looking ahead, Chapter 5 turns these ideas into reproducible
+preprocessing steps using `recipes`, `workflows`, and resampling.
 
 [^missingness]: If you were wondering, 'missingness' is a real word! It appears
     uncommon in everyday usage (it does not appear in my 1876 page

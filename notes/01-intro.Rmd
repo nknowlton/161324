@@ -185,7 +185,7 @@ also teach you some techniques that will be useful for other courses.
 
 ## The tidyverse
 
-Our philosphy is to use the `tidyverse` as much as we practically can.
+Our philosophy is to use the `tidyverse` as much as we practically can.
 If you haven't used the functionality in the `tidyverse` much in the
 past, then we can recommend the online text "R for Data Science" by the author
 of much of the tidyverse, Hadley Wickham:
@@ -195,6 +195,47 @@ https://r4ds.had.co.nz
 In addition, the main tidyverse website is a useful resource:
 
 https://tidyverse.org
+
+## A roadmap for these notes {#sec:notes-roadmap}
+
+These notes are designed to read as a connected workflow rather than as
+independent topics. In practice, a data mining project usually begins
+with getting data into R and understanding how they are represented
+(Section \@ref(sec:dataload)). It then moves to data quality checks,
+especially the detection and treatment of missing values
+(Section \@ref(sec:missing)).
+
+From there, the notes split into the main task families summarised in
+Section \@ref(sec:task-compare). Section \@ref(sec:predictionbasics)
+introduces supervised prediction methods, while Chapter 5 gathers the
+same ideas into a modern `tidymodels` workflow using recipes,
+workflows, resampling, and tuning. Classification methods are covered
+in Section \@ref(sec:lda), clustering methods in
+Section \@ref(sec:cluster-compare), and association rules in
+Section \@ref(sec:association-fit). Ensemble methods in
+Section \@ref(sec:ensemble) then return to supervised learning and show
+how combining many models can improve predictive performance.
+
+The order of the chapters reflects both ideas and practice. We first
+learn what the main methods are and why they work, then we revisit them
+through a more reproducible modelling pipeline.
+
+### Comparing the main task families {#sec:task-compare}
+
+The table below provides a compact map of the main problem types that
+appear throughout the notes.
+
+| Task | Output | Labelled data required? | Typical preprocessing | Common metrics | Main strengths | Typical use cases |
+|:-----|:-------|:------------------------|:----------------------|:---------------|:---------------|:------------------|
+| Prediction | Numeric target | Yes | Missing-value handling, scaling, dummy variables, train/test splitting | RMSE, MAE, $R^2$ | Flexible forecasting of quantitative outcomes | Wages, prices, yields, demand |
+| Classification | Class label or class probabilities | Yes | Missing-value handling, factor encoding, scaling for some models, class-balance checks | Accuracy, sensitivity, specificity, ROC AUC, confusion matrix | Direct decisions for labelled outcomes | Diagnosis, credit risk, authorship, species ID |
+| Clustering | Unlabelled groups | No | Scaling, dissimilarity choice, occasional imputation, outlier review | Within-cluster variation, silhouette width, stability | Finds structure without predefined classes | Customer segments, document groups, ecological types |
+| Association rules | Co-occurring items or conditions | No designated target | Transaction encoding, item filtering, support thresholds | Support, confidence, lift | Interpretable co-occurrence patterns | Market baskets, questionnaires, recommenders |
+| Ensembles | Combined predictions or classes | Usually yes | Same as supervised learning, plus resampling and tuning | Same as base task, plus out-of-bag or validation metrics | Often stronger predictive performance than one model alone | High-performing prediction and classification systems |
+
+Looking ahead, Section \@ref(sec:dataload) starts this workflow by
+showing how to import data carefully so that later preprocessing and
+modelling steps are built on sound foundations.
 
 [^pearson]: Every student taking a 300-level statistics paper should be at
     least vaguely familiar with the names Ronald Fisher and Karl
