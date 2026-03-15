@@ -1,6 +1,9 @@
 prepare_longbeach_adoption_data <- function(longbeach) {
   weekday_levels <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 
+  # Normalise blanks and any case-variant of "unknown" to NA so step_unknown() can handle them
+  clean_chr <- function(x) dplyr::if_else(is.na(x) | trimws(x) == "" | tolower(trimws(x)) == "unknown", NA_character_, x)
+
   longbeach |>
     dplyr::filter(
       animal_type %in% c("dog", "cat"),
@@ -24,11 +27,11 @@ prepare_longbeach_adoption_data <- function(longbeach) {
     dplyr::transmute(
       is_adopted,
       animal_type = factor(animal_type),
-      sex = factor(dplyr::coalesce(dplyr::na_if(sex, ""), "Unknown")),
-      primary_color = factor(dplyr::coalesce(dplyr::na_if(primary_color, ""), "Unknown")),
-      intake_condition = factor(dplyr::coalesce(dplyr::na_if(intake_condition, ""), "Unknown")),
-      intake_type = factor(dplyr::coalesce(dplyr::na_if(intake_type, ""), "Unknown")),
-      intake_subtype = factor(dplyr::coalesce(dplyr::na_if(intake_subtype, ""), "Unknown")),
+      sex = factor(clean_chr(sex)),
+      primary_color = factor(clean_chr(primary_color)),
+      intake_condition = factor(clean_chr(intake_condition)),
+      intake_type = factor(clean_chr(intake_type)),
+      intake_subtype = factor(clean_chr(intake_subtype)),
       has_name = factor(has_name),
       intake_year,
       intake_month,

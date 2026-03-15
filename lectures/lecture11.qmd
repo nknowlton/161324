@@ -26,11 +26,7 @@ resources:
 ```{r}
 #| label: setup
 #| include: false
-project_lib <- normalizePath(
-  file.path(dirname(knitr::current_input(dir = TRUE)), "..", ".Rlib"),
-  winslash = "/",
-  mustWork = FALSE
-)
+project_lib <- getwd()
 dir.create(project_lib, recursive = TRUE, showWarnings = FALSE)
 .libPaths(c(project_lib, .libPaths()))
 
@@ -42,7 +38,7 @@ theme_set(theme_minimal(base_size = 18))
 options(pillar.sigfig = 5)
 knitr::opts_chunk$set(fig.width = 8.4, fig.height = 5.4, fig.retina = 2, out.width = "100%", comment = "#>")
 
-doc_dir <- dirname(knitr::current_input(dir = TRUE))
+doc_dir <- getwd()
 data_dir <- normalizePath(file.path(doc_dir, "..", "data"), winslash = "/", mustWork = FALSE)
 dir.create(data_dir, recursive = TRUE, showWarnings = FALSE)
 
@@ -165,6 +161,7 @@ monster_umap <- if (requireNamespace("uwot", quietly = TRUE)) {
     n_neighbors = 15,
     min_dist = 0.15,
     metric = "euclidean",
+    init = "spca",
     verbose = FALSE
   ) |>
     as_tibble(.name_repair = ~ c("umap1", "umap2"))
@@ -343,7 +340,7 @@ dbscan_data <- synthetic_points |>
 dbscan_clusters <- dbscan_base(dbscan_data |> select(x, y), eps = 0.92, min_pts = 5)
 dbscan_plot_data <- bind_cols(dbscan_data, dbscan_clusters)
 
-doc_dir <- dirname(knitr::current_input(dir = TRUE))
+doc_dir <- getwd()
 csv_out <- file.path(doc_dir, "widgets", "clustering", "synthetic_points.csv")
 write_csv(synthetic_points, csv_out)
 
