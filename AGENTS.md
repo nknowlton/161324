@@ -60,6 +60,7 @@ Keep lecture documents focused on teaching narrative and lightweight orchestrati
 
 - `labs/*.Rmd` render as `html_document`
 - preserve lab prose, runnable code chunks, and package choices unless a task requires change
+- Duplicating small setup/helper code across labs is expected as student usability is more important here than reuse
 
 ### Notes
 

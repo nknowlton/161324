@@ -1,4 +1,4 @@
-name: Deploy notes to knowlton.co.nz
+name: Deploy 161324 course content to knowlton.co.nz
 
 on:
   workflow_dispatch:

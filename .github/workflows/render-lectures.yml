@@ -1,0 +1,57 @@
+name: Render lectures 10-12
+
+on:
+  push:
+    paths:
+      - 'lectures/lecture10.qmd'
+      - 'lectures/lecture11.qmd'
+      - 'lectures/lecture12.qmd'
+      - 'lectures/lecture11.scss'
+      - 'lectures/custom_quarto.css'
+      - 'lectures/widgets/**'
+      - 'common/*.R'
+      - 'data/longbeach.csv'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: quarto-dev/quarto-actions/setup@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+          use-public-rspm: true
+
+      - name: Install R packages
+        shell: Rscript {0}
+        run: |
+          pkgs <- c(
+            "tidyverse", "tidymodels", "baguette", "ranger", "xgboost",
+            "stacks", "arules", "arulesViz", "cluster", "dbscan", "uwot",
+            "arrow", "jsonlite", "vip", "Matrix", "irlba",
+            "patchwork", "skimr", "rsample"
+          )
+          install.packages(pkgs, repos = "https://packagemanager.posit.co/cran/__linux__/jammy/latest")
+
+      - name: Render lecture 10 (Ensemble Learning)
+        run: quarto render lectures/lecture10.qmd -M embed-resources:true
+
+      - name: Render lecture 11 (Cluster Analysis)
+        run: quarto render lectures/lecture11.qmd -M embed-resources:true
+
+      - name: Render lecture 12 (Association Rule Mining)
+        run: quarto render lectures/lecture12.qmd -M embed-resources:true
+
+      - name: Commit rendered HTML
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "ci: render lectures 10-12 [skip ci]"
+          file_pattern: "lectures/lecture10.html lectures/lecture11.html lectures/lecture12.html"
