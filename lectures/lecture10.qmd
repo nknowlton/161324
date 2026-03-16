@@ -8,7 +8,7 @@ format:
     slide-number: true
     progress: true
     chalkboard: false
-    incremental: false
+    incremental: true
     smaller: false
     transition: fade
     controls: true
@@ -62,22 +62,29 @@ adopt_recipe <- recipe(is_adopted ~ ., data = adopt_train) |>
   step_novel(all_nominal_predictors()) |>
   step_unknown(all_nominal_predictors()) |>
   step_dummy(all_nominal_predictors())
-
-# Load AutoML data for widget
-automl_json <- tryCatch(
-  jsonlite::read_json("widgets/ensembles/data/longbeach-automl.json"),
-  error = function(e) NULL
-)
-automl_data <- if (!is.null(automl_json)) automl_json else list(leaderboard = list())
 ```
+
+---
+
+## Improving Model Performance
+
+- Once you have a classification or prediction model, how can you make it better?
+
+- Hyperparameter tuning is one option, but it can only go so far
+
+- Why not combine multiple models to get better performance?
+
+---
 
 ## Why Combine Models?
 
 - Single models can be unstable (high variance)
 - Different models make different errors
 - Combining predictions reduces overall error
+ 
+---
 
-### The variance reduction argument
+## Mathimatically Reasoning
 
 If we have $B$ learners $\hat{f}_1, \ldots, \hat{f}_B$, each with variance $\sigma^2$, and pairwise correlation $\rho$:
 
@@ -95,56 +102,34 @@ $$\operatorname{Var}\!\left(\frac{1}{B}\sum_{b=1}^B \hat{f}_b(x)\right) = \rho\s
 - Fit a learner to each bootstrap sample
 - Average predictions from all $B$ learners
 
-### Key insight
+. . .
+
+::: {.callout-note}
 
 Each bootstrap sample excludes ~36.8% of observations (out-of-bag)
 → We can use OOB observations to estimate test error without a validation set
+:::
+
+---
 
 ### Interactive: Bagging Widget
 
 ```{ojs}
+//| echo: false
 import { baggingWidget } from "./widgets/ensembles/bagging-widget.js"
 baggingWidget()
 ```
 
 ---
 
-## Bagging in R with tidymodels
+## Random Forests Redux
 
-```{r}
-#| eval: false
-# Single decision tree
-single_tree_spec <- decision_tree(mode = "classification") |>
-  set_engine("rpart")
 
-# Bagged trees (50 bootstrap samples)
-bag_spec <- bag_tree(mode = "classification") |>
-  set_engine("rpart", times = 50)
-
-wf <- workflow() |> add_recipe(adopt_recipe)
-
-# Compare performance
-single_tree_res <- wf |>
-  add_model(single_tree_spec) |>
-  fit_resamples(adopt_folds, metrics = metric_set(accuracy, roc_auc))
-
-bag_res <- wf |>
-  add_model(bag_spec) |>
-  fit_resamples(adopt_folds, metrics = metric_set(accuracy, roc_auc))
-
-bind_rows(
-  collect_metrics(single_tree_res) |> mutate(model = "single tree"),
-  collect_metrics(bag_res)         |> mutate(model = "bagged trees")
-) |> select(model, .metric, mean)
-```
-
----
-
-## Random Forests
-
-- Bagging + one important modification
+- Bagging [+ one important modification]{.fragment .fade-in style="color: blue;"}
 - At each split, only consider a random subset of $m$ predictors
 - Common defaults: $m = \sqrt{p}$ (classification), $m = p/3$ (regression)
+
+. . .
 
 ### Why it works
 
@@ -152,39 +137,15 @@ bind_rows(
 - Each tree sees only a subset of predictors
 - More diverse ensemble → better predictions
 
+::: {.fragment}
+
 ### Variable Importance
 
 Two main approaches:
 
 1. **Impurity-based**: Sum of Gini/variance reduction from splits on each variable
 2. **Permutation**: Increase in OOB error when variable values are randomly shuffled
-
----
-
-## Random Forest in R
-
-```{r}
-#| eval: false
-rf_spec <- rand_forest(mode = "classification", trees = 500, mtry = tune()) |>
-  set_engine("ranger", importance = "impurity")
-
-rf_res <- wf |>
-  add_model(rf_spec) |>
-  tune_grid(adopt_folds, grid = 5, metrics = metric_set(roc_auc))
-
-show_best(rf_res, metric = "roc_auc")
-
-# Fit final model
-final_rf <- wf |>
-  add_model(rf_spec) |>
-  add_formula(is_adopted ~ .) |>
-  last_fit(adopt_split)
-
-collect_metrics(final_rf)
-
-# Variable importance
-final_rf |> extract_fit_engine() |> vip()
-```
+:::
 
 ---
 
@@ -192,20 +153,33 @@ final_rf |> extract_fit_engine() |> vip()
 
 - Build learners **sequentially**, not independently
 - Each new learner targets the **residuals** (errors) of the previous
-- Learning rate controls how much each tree contributes
+- Learning rate controls how much each model contributes
 
-### How it works
+. . .
 
-1. Start with a simple model (e.g., mean prediction)
-2. Fit a tree to the residuals
-3. Add this tree to the ensemble (weighted by learning rate)
-4. Repeat
+### Pseudo-code for boosting:
 
-### Interactive: Boosting Widget
+- Start with a simple model (e.g., mean prediction)
+- Fit a model to the residuals
+- Add this model to the ensemble (weighted by learning rate)
+- Repeat
+
+:::{.fragment}
+
+#### Why weight the learning rate?
+
+To prevent overfitting by controlling how much each tree can correct the errors of the previous ones.
+
+:::
+
+---
+
+### Interactive: Combined Boosting Widget
 
 ```{ojs}
-import { boostingWidget } from "./widgets/ensembles/boosting-widget.js"
-boostingWidget()
+//| echo: false
+import { boostingCombinedWidget } from "./widgets/ensembles/boosting-combined-widget.js"
+boostingCombinedWidget()
 ```
 
 ---
@@ -217,6 +191,18 @@ boostingWidget()
 - General framework for minimizing a loss function
 - At each step, fit a tree to the **negative gradient** of the loss
 - Loss function determines what we're optimizing (MSE, logloss, etc.)
+
+---
+
+## What Changes In Gradient Boosting?
+
+- Ordinary boosting says "fit the next learner to what the current ensemble is getting wrong"
+- Gradient boosting makes that precise by defining "wrong" as the **negative gradient of a chosen loss**
+- For squared error, this is just the usual residual, so it looks like basic boosting
+- For classification, survival models, and other settings, the pseudo-residual depends on the loss rather than raw observed minus predicted values
+- Updates may happen on a transformed scale, such as log-odds for Bernoulli logloss, before converting back to probabilities
+
+---
 
 ### XGBoost (eXtreme Gradient Boosting)
 
@@ -239,9 +225,12 @@ boostingWidget()
 | `lambda` (reg_lambda) | L2 regularization on leaf weights |
 | `alpha` (reg_alpha) | L1 regularization on leaf weights |
 
+---
+
 ### Interactive: XGBoost Widget
 
 ```{ojs}
+//| echo: false
 import { xgboostWidget } from "./widgets/ensembles/xgboost-widget.js"
 xgboostWidget()
 ```
@@ -259,41 +248,14 @@ xgboostWidget()
 Each model family has different inductive biases → different errors
 → a well-chosen meta-learner can exploit complementary strengths
 
+---
+
 ### Interactive: Stacking Widget
 
 ```{ojs}
+//| echo: false
 import { stackingWidget } from "./widgets/ensembles/stacking-widget.js"
 stackingWidget()
-```
-
----
-
-## Stacking in R
-
-```{r}
-#| eval: false
-# Define base models
-tree_spec <- decision_tree() |> set_mode("classification")
-rf_spec <- rand_forest(trees = 100) |> set_mode("classification")
-xgb_spec <- boost_tree(trees = 100) |> set_mode("classification")
-log_spec <- logistic_reg() |> set_mode("classification")
-
-# Create a model stack
-library(stacks)
-stack_spec <- stacks() |>
-  add_candidates(tree_res) |>
-  add_candidates(rf_res) |>
-  add_candidates(xgb_res) |>
-  add_candidates(log_res)
-
-# Fit the meta-learner
-stack_fit <- stack_spec |>
-  blend_predictions() |>
-  fit_members()
-
-# Predictions use all members + meta-learner
-stack_pred <- adopt_test |>
-  bind_cols(predict(stack_fit, adopt_test))
 ```
 
 ---
@@ -316,10 +278,16 @@ stack_pred <- adopt_test |>
 - May miss domain-specific insights
 - Often overkill for simple problems
 
+---
+
 ### Interactive: AutoML Widget
 
 ```{ojs}
+//| echo: false
 import { automlWidget } from "./widgets/ensembles/automl-widget.js"
+
+automl_data = FileAttachment("widgets/ensembles/data/longbeach-automl.json").json()
+
 automlWidget(automl_data)
 ```
 

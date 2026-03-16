@@ -1,4 +1,18 @@
-import { card, clearNode, drawAxes, linearScale, mulberry32, palette, randn, svgEl, ticks } from "./shared.js"
+import {
+  card,
+  clearNode,
+  collectThresholds,
+  drawAxes,
+  fitGreedyTree,
+  linearScale,
+  mean,
+  mulberry32,
+  palette,
+  predictTree,
+  randn,
+  svgEl,
+  ticks
+} from "./shared.js"
 
 function makeRegressionPoints(seed = 32410) {
   const rng = mulberry32(seed)
@@ -12,52 +26,30 @@ function makeRegressionPoints(seed = 32410) {
   })
 }
 
-function mean(values) {
-  return values.reduce((sum, value) => sum + value, 0) / Math.max(values.length, 1)
-}
-
-function fitResidualStump(points, residuals) {
-  const ordered = points.slice().sort((left, right) => left.x - right.x)
-  const candidates = ordered.slice(0, -1).map((point, index) => (point.x + ordered[index + 1].x) / 2)
-  let best = { threshold: 0.5, leftValue: 0, rightValue: 0, loss: Infinity }
-
-  candidates.forEach((threshold) => {
-    const leftIndices = points.map((point, index) => ({ point, index })).filter(({ point }) => point.x < threshold).map(({ index }) => index)
-    const rightIndices = points.map((point, index) => ({ point, index })).filter(({ point }) => point.x >= threshold).map(({ index }) => index)
-    if (leftIndices.length === 0 || rightIndices.length === 0) return
-
-    const leftValue = mean(leftIndices.map((index) => residuals[index]))
-    const rightValue = mean(rightIndices.map((index) => residuals[index]))
-    const loss = residuals.reduce((sum, residual, index) => {
-      const pred = points[index].x < threshold ? leftValue : rightValue
-      return sum + (residual - pred) ** 2
-    }, 0)
-
-    if (loss < best.loss) {
-      best = { threshold, leftValue, rightValue, loss }
-    }
-  })
-
-  return best
-}
-
-function boostingTrace(points, rounds = 7, learningRate = 0.35) {
+function boostingTrace(points, rounds = 10, learningRate = 0.35, treeSplits = 1) {
   const base = mean(points.map((point) => point.y))
   let prediction = points.map(() => base)
-  const trace = [{ round: 0, prediction: prediction.slice(), mse: mean(points.map((point, index) => (point.y - prediction[index]) ** 2)), stump: null }]
+  const trace = [
+    {
+      round: 0,
+      prediction: prediction.slice(),
+      mse: mean(points.map((point, index) => (point.y - prediction[index]) ** 2)),
+      tree: null
+    }
+  ]
 
   for (let round = 1; round <= rounds; round += 1) {
     const residuals = points.map((point, index) => point.y - prediction[index])
-    const stump = fitResidualStump(points, residuals)
+    const tree = fitGreedyTree(points, residuals, treeSplits)
     prediction = prediction.map((value, index) => {
-      const update = points[index].x < stump.threshold ? stump.leftValue : stump.rightValue
+      const update = predictTree(tree, points[index].x)
       return value + learningRate * update
     })
     trace.push({
       round,
       prediction: prediction.slice(),
       mse: mean(points.map((point, index) => (point.y - prediction[index]) ** 2)),
-      stump
+      tree
     })
   }
 
@@ -66,7 +58,8 @@ function boostingTrace(points, rounds = 7, learningRate = 0.35) {
 
 export function boostingWidget() {
   const points = makeRegressionPoints()
-  const state = { rounds: 4, learningRate: 0.35 }
+  const maxRounds = 10
+  const state = { rounds: 4, learningRate: 0.35, treeSplits: 1 }
 
   const container = document.createElement("div")
   container.className = "widget-shell"
@@ -82,7 +75,7 @@ export function boostingWidget() {
   const roundsSlider = document.createElement("input")
   roundsSlider.type = "range"
   roundsSlider.min = "0"
-  roundsSlider.max = "7"
+  roundsSlider.max = String(maxRounds)
   roundsSlider.step = "1"
   roundsSlider.value = String(state.rounds)
   roundsSlider.style.width = "220px"
@@ -97,7 +90,16 @@ export function boostingWidget() {
   etaSlider.style.width = "220px"
   const etaLabel = document.createElement("strong")
 
-  controls.append("Boosting rounds", roundsSlider, roundsLabel, "Learning rate", etaSlider, etaLabel)
+  const splitSelect = document.createElement("select")
+  ;[1, 2, 3].forEach((value) => {
+    const option = document.createElement("option")
+    option.value = String(value)
+    option.textContent = value === 1 ? "1 split (stump)" : `${value} splits`
+    if (value === state.treeSplits) option.selected = true
+    splitSelect.appendChild(option)
+  })
+
+  controls.append("Boosting rounds", roundsSlider, roundsLabel, "Learning rate", etaSlider, etaLabel, "Tree size", splitSelect)
 
   const panels = document.createElement("div")
   panels.style.display = "grid"
@@ -121,7 +123,7 @@ export function boostingWidget() {
   function render() {
     roundsLabel.textContent = String(state.rounds)
     etaLabel.textContent = state.learningRate.toFixed(2)
-    const trace = boostingTrace(points, 7, state.learningRate)
+    const trace = boostingTrace(points, maxRounds, state.learningRate, state.treeSplits)
     const current = trace[state.rounds]
 
     clearNode(fitSvg)
@@ -170,27 +172,38 @@ export function boostingWidget() {
       })
     )
 
-    if (current.stump) {
+    collectThresholds(current.tree).forEach((threshold) => {
       fitSvg.appendChild(
         svgEl("line", {
-          x1: xScale(current.stump.threshold),
+          x1: xScale(threshold),
           y1: fitMargin.top,
-          x2: xScale(current.stump.threshold),
+          x2: xScale(threshold),
           y2: fitHeight - fitMargin.bottom,
           stroke: palette.blue,
           "stroke-width": 1.8,
           "stroke-dasharray": "6 5"
         })
       )
-    }
+    })
 
     const mseWidth = 460
     const mseHeight = 330
     const mseMargin = { top: 24, right: 22, bottom: 44, left: 60 }
-    const roundScale = linearScale(0, 7, mseMargin.left, mseWidth - mseMargin.right)
+    const roundScale = linearScale(0, maxRounds, mseMargin.left, mseWidth - mseMargin.right)
     const mseMax = Math.max(...trace.map((step) => step.mse)) * 1.06
     const mseScale = linearScale(0, mseMax, mseHeight - mseMargin.bottom, mseMargin.top)
-    drawAxes(mseSvg, mseWidth, mseHeight, mseMargin, [0, 1, 2, 3, 4, 5, 6, 7], ticks(0, mseMax, 5), roundScale, mseScale, "Boosting round", "Mean squared error")
+    drawAxes(
+      mseSvg,
+      mseWidth,
+      mseHeight,
+      mseMargin,
+      Array.from({ length: maxRounds + 1 }, (_, index) => index),
+      ticks(0, mseMax, 5),
+      roundScale,
+      mseScale,
+      "Boosting round",
+      "Mean squared error"
+    )
 
     mseSvg.appendChild(
       svgEl("polyline", {
@@ -216,8 +229,10 @@ export function boostingWidget() {
 
     const improvement = trace[0].mse - current.mse
     note.innerHTML = `
-      <strong>What to notice:</strong> boosting is not averaging independent trees. Each new stump is trained on the
+      <strong>What to notice:</strong> boosting is not averaging independent trees. Each new weak learner is trained on the
       current residuals, so the prediction line bends toward the mistakes left by earlier rounds.
+      Using <strong>${state.treeSplits}</strong> ${state.treeSplits === 1 ? "split" : "splits"} per learner makes each round
+      ${state.treeSplits === 1 ? "a stump" : "a slightly richer tree"}.
       After <strong>${state.rounds}</strong> rounds the training MSE has fallen by <strong>${improvement.toFixed(3)}</strong>
       from the round-0 baseline.
     `
@@ -229,6 +244,10 @@ export function boostingWidget() {
   })
   etaSlider.addEventListener("input", () => {
     state.learningRate = Number(etaSlider.value)
+    render()
+  })
+  splitSelect.addEventListener("change", () => {
+    state.treeSplits = Number(splitSelect.value)
     render()
   })
 

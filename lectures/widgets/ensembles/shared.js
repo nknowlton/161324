@@ -43,6 +43,10 @@ export function linearScale(domainMin, domainMax, rangeMin, rangeMax) {
   return (value) => rangeMin + ((value - domainMin) / span) * (rangeMax - rangeMin)
 }
 
+export function mean(values) {
+  return values.reduce((sum, value) => sum + value, 0) / Math.max(values.length, 1)
+}
+
 export function extent(values, paddingFraction = 0.08) {
   const min = Math.min(...values)
   const max = Math.max(...values)
@@ -75,6 +79,97 @@ export function card(title) {
 
   shell.appendChild(heading)
   return { shell, heading }
+}
+
+function squaredError(indices, targets, value) {
+  return indices.reduce((sum, index) => sum + (targets[index] - value) ** 2, 0)
+}
+
+function bestSplitForIndices(points, targets, indices, xAccessor) {
+  if (indices.length <= 1) return null
+
+  const ordered = indices
+    .slice()
+    .sort((left, right) => xAccessor(points[left]) - xAccessor(points[right]))
+  const parentValue = mean(indices.map((pointIndex) => targets[pointIndex]))
+  let best = null
+
+  for (let index = 0; index < ordered.length - 1; index += 1) {
+    const leftIndex = ordered[index]
+    const rightIndex = ordered[index + 1]
+    if (xAccessor(points[leftIndex]) === xAccessor(points[rightIndex])) continue
+
+    const threshold = (xAccessor(points[leftIndex]) + xAccessor(points[rightIndex])) / 2
+    const leftIndices = ordered.filter((pointIndex) => xAccessor(points[pointIndex]) < threshold)
+    const rightIndices = ordered.filter((pointIndex) => xAccessor(points[pointIndex]) >= threshold)
+    if (leftIndices.length === 0 || rightIndices.length === 0) continue
+
+    const leftValue = mean(leftIndices.map((pointIndex) => targets[pointIndex]))
+    const rightValue = mean(rightIndices.map((pointIndex) => targets[pointIndex]))
+    const loss =
+      squaredError(leftIndices, targets, leftValue) +
+      squaredError(rightIndices, targets, rightValue)
+    const gain = squaredError(indices, targets, parentValue) - loss
+
+    if (!best || loss < best.loss) {
+      best = { threshold, leftIndices, rightIndices, leftValue, rightValue, loss, gain }
+    }
+  }
+
+  return best
+}
+
+export function fitGreedyTree(points, targets, maxSplits = 1, xAccessor = (point) => point.x) {
+  const rootIndices = points.map((_, index) => index)
+  const root = {
+    indices: rootIndices,
+    value: mean(rootIndices.map((index) => targets[index]))
+  }
+  const leaves = [root]
+
+  for (let split = 0; split < maxSplits; split += 1) {
+    let bestLeaf = null
+    let bestLeafSplit = null
+
+    leaves.forEach((leaf) => {
+      const candidate = bestSplitForIndices(points, targets, leaf.indices, xAccessor)
+      if (!candidate || candidate.gain <= 0) return
+      if (!bestLeafSplit || candidate.gain > bestLeafSplit.gain) {
+        bestLeaf = leaf
+        bestLeafSplit = candidate
+      }
+    })
+
+    if (!bestLeaf || !bestLeafSplit) break
+
+    bestLeaf.threshold = bestLeafSplit.threshold
+    bestLeaf.left = {
+      indices: bestLeafSplit.leftIndices,
+      value: bestLeafSplit.leftValue
+    }
+    bestLeaf.right = {
+      indices: bestLeafSplit.rightIndices,
+      value: bestLeafSplit.rightValue
+    }
+
+    const leafIndex = leaves.indexOf(bestLeaf)
+    leaves.splice(leafIndex, 1, bestLeaf.left, bestLeaf.right)
+  }
+
+  return root
+}
+
+export function predictTree(tree, xValue) {
+  if (!tree.left || !tree.right) return tree.value
+  return xValue < tree.threshold ? predictTree(tree.left, xValue) : predictTree(tree.right, xValue)
+}
+
+export function collectThresholds(tree, thresholds = []) {
+  if (!tree || !tree.left || !tree.right) return thresholds
+  thresholds.push(tree.threshold)
+  collectThresholds(tree.left, thresholds)
+  collectThresholds(tree.right, thresholds)
+  return thresholds
 }
 
 export function drawAxes(svg, width, height, margin, xTicks, yTicks, xScale, yScale, xLabel, yLabel) {

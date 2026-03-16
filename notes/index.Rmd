@@ -1,6 +1,6 @@
 --- 
 title: "Data mining"
-author: "Jonathan Marshall, Martin Hazelton"
+author: "Jonathan Marshall, Martin Hazelton, Nick Knowlton"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 documentclass: book
