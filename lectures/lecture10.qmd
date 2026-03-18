@@ -1,14 +1,14 @@
 ---
 title: "Lecture 10"
-subtitle: "Ensemble Learning"
+subtitle: "Cluster Analysis"
 author: "Data Mining"
 format:
   revealjs:
-    theme: [default, custom_quarto.css]
+    theme: [default, lecture11.scss]
     slide-number: true
     progress: true
     chalkboard: false
-    incremental: true
+    incremental: false
     smaller: false
     transition: fade
     controls: true
@@ -26,296 +26,946 @@ resources:
 ```{r}
 #| label: setup
 #| include: false
-project_lib <- normalizePath(
-  file.path(dirname(knitr::current_input(dir = TRUE)), "..", ".Rlib"),
-  winslash = "/",
-  mustWork = FALSE
-)
+project_lib <- getwd()
 dir.create(project_lib, recursive = TRUE, showWarnings = FALSE)
 .libPaths(c(project_lib, .libPaths()))
 
 suppressPackageStartupMessages(suppressWarnings(library(tidyverse)))
-library(tidymodels)
-library(baguette)
-library(ranger)
-tidymodels_prefer()
+library(cluster)
+library(broom)
 
 theme_set(theme_minimal(base_size = 18))
 options(pillar.sigfig = 5)
 knitr::opts_chunk$set(fig.width = 8.4, fig.height = 5.4, fig.retina = 2, out.width = "100%", comment = "#>")
 
-doc_dir <- dirname(knitr::current_input(dir = TRUE))
+doc_dir <- getwd()
 data_dir <- normalizePath(file.path(doc_dir, "..", "data"), winslash = "/", mustWork = FALSE)
 dir.create(data_dir, recursive = TRUE, showWarnings = FALSE)
 
-source("../common/longbeach.R")
-longbeach <- read_csv("../data/longbeach.csv", show_col_types = FALSE)
-adoption_data <- prepare_longbeach_adoption_data(longbeach)
+read_tidytuesday_backup <- function(url, backup_file) {
+  backup_path <- file.path(data_dir, backup_file)
+  online <- tryCatch(
+    readr::read_csv(url, show_col_types = FALSE),
+    error = function(e) NULL
+  )
 
-set.seed(2024)
-adopt_split  <- initial_split(adoption_data, prop = 0.75, strata = is_adopted)
-adopt_train  <- training(adopt_split)
-adopt_test   <- testing(adopt_split)
-adopt_folds  <- vfold_cv(adopt_train, v = 5, strata = is_adopted)
+  if (!is.null(online)) {
+    if (requireNamespace("arrow", quietly = TRUE)) {
+      arrow::write_parquet(online, backup_path)
+    }
+    return(online)
+  }
 
-adopt_recipe <- recipe(is_adopted ~ ., data = adopt_train) |>
-  step_novel(all_nominal_predictors()) |>
-  step_unknown(all_nominal_predictors()) |>
-  step_dummy(all_nominal_predictors())
+  if (!requireNamespace("arrow", quietly = TRUE)) {
+    stop("Package 'arrow' is required to read the local parquet backup at ", backup_path, call. = FALSE)
+  }
+  if (!file.exists(backup_path)) {
+    stop("Could not download ", url, " and no local backup was found at ", backup_path, call. = FALSE)
+  }
+
+  arrow::read_parquet(backup_path) |> as_tibble()
+}
+
+make_synthetic_points <- function(seed = 161324) {
+  set.seed(seed)
+  blob_a <- tibble(
+    x = rnorm(22, -2.7, 0.42),
+    y = rnorm(22, -1.6, 0.42),
+    shape = "blob_a"
+  )
+  ellipse <- tibble(a = rnorm(22, 0, 0.85), b = rnorm(22, 0, 0.18)) |>
+    transmute(
+      x = -0.2 + a - 0.35 * b,
+      y = 2.3 + 0.35 * a + b,
+      shape = "ellipse"
+    )
+  blob_b <- tibble(
+    x = rnorm(22, 2.7, 0.38),
+    y = rnorm(22, -1.8, 0.4),
+    shape = "blob_b"
+  )
+  crescent <- tibble(
+    theta = runif(20, 0.1 * pi, 1.02 * pi),
+    radius = rnorm(20, 1.15, 0.08)
+  ) |>
+    transmute(
+      x = 2.3 + radius * cos(theta),
+      y = 1.8 + 0.78 * radius * sin(theta),
+      shape = "crescent"
+    )
+  ring <- tibble(
+    theta = runif(20, 0, 2 * pi),
+    radius = rnorm(20, 0.86, 0.07)
+  ) |>
+    transmute(
+      x = -3.1 + radius * cos(theta),
+      y = 2.2 + radius * sin(theta),
+      shape = "ring"
+    )
+  noise <- tibble(
+    x = runif(12, -4, 4),
+    y = runif(12, -3, 3),
+    shape = "noise"
+  )
+
+  bind_rows(blob_a, ellipse, blob_b, crescent, ring, noise) |>
+    mutate(id = row_number(), label = paste0("P", id)) |>
+    select(id, label, x, y, shape)
+}
+
+monster_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-05-27/monsters.csv"
+qatar_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-12-09/qatarcars.csv"
+
+synthetic_points <- make_synthetic_points()
+hclust_widget_points <- synthetic_points |>
+  filter(shape %in% c("blob_a", "ellipse", "blob_b")) |>
+  slice(1:14)
+hclust_widget_dist <- dist(hclust_widget_points |> select(x, y))
+hclust_single <- hclust(hclust_widget_dist, method = "single")
+hclust_complete <- hclust(hclust_widget_dist, method = "complete")
+hclust_average <- hclust(hclust_widget_dist, method = "average")
+monsters <- read_tidytuesday_backup(monster_url, "monsters.parquet")
+qatarcars <- read_tidytuesday_backup(qatar_url, "qatarcars.parquet")
+
+numeric_cols <- c("str", "dex", "con", "int", "wis", "cha", "hp_number", "cr", "speed_base_number")
+monster_scaled <- monsters |>
+  mutate(across(all_of(numeric_cols), scale)) |>
+  mutate(across(all_of(numeric_cols), as.numeric))
+
+monster_dist <- monster_scaled |>
+  select(all_of(numeric_cols)) |>
+  dist(method = "euclidean")
+
+monster_hc <- hclust(monster_dist, method = "complete")
+monster_groups <- cutree(monster_hc, k = 5)
+monster_kmeans_models <- set_names(
+  map(1:8, function(k) {
+    set.seed(161324 + k)
+    kmeans(monster_scaled |> select(all_of(numeric_cols)), centers = k, nstart = 20)
+  }),
+  1:8
+)
+monster_kmeans <- monster_kmeans_models[["5"]]
+monster_pam_models <- set_names(
+  map(2:8, function(k) {
+    pam(monster_scaled |> select(all_of(numeric_cols)), k = k)
+  }),
+  2:8
+)
+monster_pam <- monster_pam_models[["5"]]
+monster_pca <- prcomp(monster_scaled |> select(all_of(numeric_cols)), scale. = FALSE)
+monster_umap <- if (requireNamespace("uwot", quietly = TRUE)) {
+  set.seed(161324)
+  uwot::umap(
+    monster_scaled |> select(all_of(numeric_cols)),
+    n_neighbors = 15,
+    min_dist = 0.15,
+    metric = "euclidean",
+    init = "spca",
+    verbose = FALSE
+  ) |>
+    as_tibble(.name_repair = ~ c("umap1", "umap2"))
+} else {
+  NULL
+}
+
+monster_display_points <- if (!is.null(monster_umap)) {
+  monster_umap |>
+    transmute(x = umap1, y = umap2)
+} else {
+  tibble(x = monster_pca$x[, 1], y = monster_pca$x[, 2])
+}
+monster_display_labels <- if (!is.null(monster_umap)) c("UMAP 1", "UMAP 2") else c("PC1", "PC2")
+monster_compare_points <- monsters |>
+  transmute(id = row_number(), name, type) |>
+  bind_cols(monster_display_points)
+
+monster_kmeans_points <- monsters |>
+  transmute(
+    name,
+    type,
+    pc1 = monster_pca$x[, 1],
+    pc2 = monster_pca$x[, 2]
+  ) |>
+  bind_cols(
+    map_dfc(2:8, function(k) {
+      tibble(!!paste0("k", k) := monster_kmeans_models[[as.character(k)]]$cluster)
+    })
+  )
+
+monster_ranges <- monsters |>
+  summarise(across(all_of(numeric_cols), list(min = min, max = max))) |>
+  pivot_longer(everything(), names_to = c("variable", ".value"), names_pattern = "^(.*)_(min|max)$")
+
+monster_elbow <- tibble(k = 1:8) |>
+  mutate(
+    model = map(k, ~ monster_kmeans_models[[as.character(.x)]]),
+    glance = map(model, broom::glance)
+  ) |>
+  unnest(glance)
+
+dbscan_base <- function(data, eps = 0.9, min_pts = 5) {
+  d <- as.matrix(dist(data))
+  n <- nrow(d)
+  neighbors <- lapply(seq_len(n), function(i) which(d[i, ] <= eps))
+  core <- lengths(neighbors) >= min_pts
+  visited <- rep(FALSE, n)
+  cluster <- rep(0L, n)
+  cluster_id <- 0L
+
+  for (i in seq_len(n)) {
+    if (visited[i]) next
+    visited[i] <- TRUE
+    if (!core[i]) next
+    cluster_id <- cluster_id + 1L
+    cluster[i] <- cluster_id
+    queue <- setdiff(neighbors[[i]], i)
+
+    while (length(queue) > 0) {
+      j <- queue[1]
+      queue <- queue[-1]
+      if (!visited[j]) {
+        visited[j] <- TRUE
+        if (core[j]) {
+          queue <- union(queue, neighbors[[j]])
+        }
+      }
+      if (cluster[j] == 0L) {
+        cluster[j] <- cluster_id
+      }
+    }
+  }
+
+  tibble(
+    cluster_id = if_else(cluster == 0L, -1L, cluster),
+    cluster = if_else(cluster == 0L, "noise", paste0("cluster_", cluster)),
+    core = core
+  )
+}
+
+monster_compare_assignments <- bind_rows(
+  map_dfr(c("single", "complete", "average"), function(linkage_value) {
+    tibble(
+      id = seq_len(nrow(monsters)),
+      method = "hierarchical",
+      linkage = linkage_value,
+      k = 5L,
+      eps = NA_real_,
+      min_pts = NA_integer_,
+      cluster_id = cutree(hclust(monster_dist, method = linkage_value), k = 5)
+    )
+  }),
+  map_dfr(2:8, function(k_value) {
+    tibble(
+      id = seq_len(nrow(monsters)),
+      method = "kmeans",
+      linkage = NA_character_,
+      k = k_value,
+      eps = NA_real_,
+      min_pts = NA_integer_,
+      cluster_id = monster_kmeans_models[[as.character(k_value)]]$cluster
+    )
+  }),
+  map_dfr(2:8, function(k_value) {
+    tibble(
+      id = seq_len(nrow(monsters)),
+      method = "kmedoids",
+      linkage = NA_character_,
+      k = k_value,
+      eps = NA_real_,
+      min_pts = NA_integer_,
+      cluster_id = unname(monster_pam_models[[as.character(k_value)]]$clustering)
+    )
+  }),
+  expand_grid(eps = seq(0.6, 1.4, by = 0.1), min_pts = 3:8) |>
+    mutate(
+      result = map2(
+        eps,
+        min_pts,
+        ~ dbscan_base(monster_scaled |> select(all_of(numeric_cols)), eps = .x, min_pts = .y)
+      )
+    ) |>
+    mutate(
+      rows = pmap(
+        list(eps, min_pts, result),
+        \(eps, min_pts, result) {
+          tibble(
+            id = seq_len(nrow(monsters)),
+            method = "dbscan",
+            linkage = NA_character_,
+            k = NA_integer_,
+            eps = eps,
+            min_pts = min_pts,
+            cluster_id = result$cluster_id
+          )
+        }
+      )
+    ) |>
+    pull(rows) |>
+    bind_rows()
+)
+
+ari <- function(labels_a, labels_b) {
+  tab <- table(labels_a, labels_b)
+  choose2 <- function(x) x * (x - 1) / 2
+  nij <- sum(choose2(tab))
+  ai <- sum(choose2(rowSums(tab)))
+  bj <- sum(choose2(colSums(tab)))
+  n <- sum(tab)
+  expected <- ai * bj / choose2(n)
+  max_index <- 0.5 * (ai + bj)
+  if (max_index == expected) return(1)
+  (nij - expected) / (max_index - expected)
+}
+
+bootstrap_ari <- function(data, baseline, reps = 30) {
+  out <- numeric(reps)
+  for (i in seq_len(reps)) {
+    idx <- sample.int(nrow(data), replace = TRUE)
+    unique_idx <- sort(unique(idx))
+    if (length(unique_idx) < 5) next
+    boot_data <- data[unique_idx, ]
+    boot_dist <- dist(boot_data)
+    boot_groups <- cutree(hclust(boot_dist, method = "complete"), k = 5)
+    out[i] <- ari(baseline[unique_idx], boot_groups)
+  }
+  out
+}
+
+monster_bootstrap <- bootstrap_ari(monster_scaled |> select(all_of(numeric_cols)), monster_groups, reps = 35)
+
+dbscan_data <- synthetic_points |>
+  filter(shape %in% c("crescent", "ring", "noise"))
+
+dbscan_clusters <- dbscan_base(dbscan_data |> select(x, y), eps = 0.92, min_pts = 5)
+dbscan_plot_data <- bind_cols(dbscan_data, dbscan_clusters)
+
+doc_dir <- getwd()
+csv_out <- file.path(doc_dir, "widgets", "clustering", "synthetic_points.csv")
+write_csv(synthetic_points, csv_out)
+
+if (requireNamespace("arrow", quietly = TRUE)) {
+  arrow::write_parquet(synthetic_points, file.path(doc_dir, "..", "data", "synthetic-clusters.parquet"))
+  arrow::write_parquet(qatarcars, file.path(doc_dir, "..", "data", "qatarcars.parquet"))
+}
+```
+
+# Cluster Analysis
+
+## What changes in an unsupervised problem?
+
+- Classification starts with known labels. Clustering starts with structure and asks whether groups exist at all.
+- We need a notion of similarity before we can talk about a cluster.
+- Different clustering algorithms make different promises.
+  - Hierarchical clustering gives a nested tree.
+  - K-means gives compact partitions.
+  - K-medoids swaps means for representative observations.
+  - DBSCAN keeps dense shapes and leaves sparse points as noise.
+
+---
+
+## Lecture roadmap
+
+1. Build dissimilarities for multivariate data.
+2. Cut a dendrogram and check whether the resulting groups are stable.
+3. Compare centroid and medoid based partitioning.
+4. Use density clustering when convex clusters fail.
+5. Finish with a modern workflow: parquet, HDBSCAN, UMAP, and the Qatar Cars exercise.
+
+---
+
+## Three datasets for today
+#todo place link to actual tidytuesday datasets here
+
+- `synthetic_points`: 118 two-dimensional observations with blobs, an ellipse, a crescent, a ring, and noise.
+- `monsters`: the real TidyTuesday D&D Monsters data.
+- `qatarcars`: the TidyTuesday Qatar Cars data.
+
+```{r}
+bind_rows(
+  tibble(dataset = "Synthetic 2D", rows = nrow(synthetic_points), columns = ncol(synthetic_points)),
+  tibble(dataset = "D&D Monsters", rows = nrow(monsters), columns = ncol(monsters)),
+  tibble(dataset = "Qatar Cars", rows = nrow(qatarcars), columns = ncol(qatarcars))
+)
 ```
 
 ---
 
-## Improving Model Performance
+## Synthetic data for the widgets
 
-- Once you have a classification or prediction model, how can you make it better?
+```{r}
+ggplot(synthetic_points, aes(x = x, y = y, colour = shape)) +
+  geom_point(alpha = 0.8, size = 2.1) +
+  guides(colour = guide_legend(nrow = 2)) +
+  labs(x = NULL, y = NULL, colour = NULL)
+```
 
-- Hyperparameter tuning is one option, but it can only go so far
-
-- Why not combine multiple models to get better performance?
-
----
-
-## Why Combine Models?
-
-- Single models can be unstable (high variance)
-- Different models make different errors
-- Combining predictions reduces overall error
- 
----
-
-## Mathimatically Reasoning
-
-If we have $B$ learners $\hat{f}_1, \ldots, \hat{f}_B$, each with variance $\sigma^2$, and pairwise correlation $\rho$:
-
-$$\operatorname{Var}\!\left(\frac{1}{B}\sum_{b=1}^B \hat{f}_b(x)\right) = \rho\sigma^2 + \frac{1-\rho}{B}\,\sigma^2$$
-
-- The second term shrinks as $B$ increases
-- Averaging helps most when learners are **weakly correlated** (low $\rho$)
-- Building diverse learners is central to ensemble design
-
----
-
-## Bagging: Bootstrap Aggregating
-
-- Draw $B$ bootstrap samples from training data
-- Fit a learner to each bootstrap sample
-- Average predictions from all $B$ learners
-
-. . .
-
-::: {.callout-note}
-
-Each bootstrap sample excludes ~36.8% of observations (out-of-bag)
-→ We can use OOB observations to estimate test error without a validation set
+::: {.widget-note}
+The widgets use the same broad geometry, but they subsample points so each step remains legible on a slide.
 :::
 
 ---
 
-### Interactive: Bagging Widget
+## Dissimilarity matrices
 
-```{ojs}
-//| echo: false
-import { baggingWidget } from "./widgets/ensembles/bagging-widget.js"
-baggingWidget()
-```
+<!-- TODO: put in gower dissimilarity metric from notes -->
+
+- Euclidean distance:
+  $$
+  d_{st} = \sqrt{\sum_{j=1}^p (x_{sj} - x_{tj})^2}
+  $$
+- Manhattan distance:
+  $$
+  d_{st} = \sum_{j=1}^p |x_{sj} - x_{tj}|
+  $$
+- Gower dissimilarity mixes numeric and categorical variables by rescaling each numeric field to its range and then combining numeric and factor mismatches.
 
 ---
 
-## Random Forests Redux
+## A distance matrix is just pairwise bookkeeping
 
+```{r}
+round(as.matrix(dist(synthetic_points |> slice(1:6) |> select(x, y))), 2)
+```
 
-- Bagging [+ one important modification]{.fragment .fade-in style="color: blue;"}
-- At each split, only consider a random subset of $m$ predictors
-- Common defaults: $m = \sqrt{p}$ (classification), $m = p/3$ (regression)
+- Diagonal entries are zero.
+- The matrix is symmetric.
+- Everything that follows depends on how informative this matrix is for the data at hand.
 
-. . .
+---
 
-### Why it works
+## Scaling matters before distance-based clustering
 
-- Reduces correlation between trees (lower $\rho$ in variance formula)
-- Each tree sees only a subset of predictors
-- More diverse ensemble → better predictions
+<!-- TODO: this needs cleaned up. The point is that the numeric features of the monsters are on different scales, so we need to standardise them before using Euclidean distance. The code below shows the ranges of the original features, which motivates the need for scaling. -->
 
-::: {.fragment}
+::: {.left-code}
+```{r}
+monster_ranges
+```
+:::
 
-### Variable Importance
-
-Two main approaches:
-
-1. **Impurity-based**: Sum of Gini/variance reduction from splits on each variable
-2. **Permutation**: Increase in OOB error when variable values are randomly shuffled
+::: {.right-plot}
+```{r}
+monster_ranges |>
+  pivot_longer(c(min, max), names_to = "bound", values_to = "value") |>
+  ggplot(aes(x = variable, y = value, fill = bound)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = NULL, fill = NULL)
+```
 :::
 
 ---
 
-## Boosting: Sequential Error Correction
+## D&D Monsters: why this is a good clustering demo
 
-- Build learners **sequentially**, not independently
-- Each new learner targets the **residuals** (errors) of the previous
-- Learning rate controls how much each model contributes
+<!-- TODO: remove this if it stays duplicative. The numeric features are on different scales, so scaling is necessary before clustering; this may already be covered by the previous slide. -->
 
-. . .
+- Ability scores live roughly on the `1` to `25` scale.
+- `hp_number` is much larger.
+- `type` gives us a rough truth signal after clustering.
+- The data are wide enough that 2D plots are incomplete, but still interpretable.
 
-### Pseudo-code for boosting:
+```{r}
+monsters |>
+  count(type, sort = TRUE)
+```
 
-- Start with a simple model (e.g., mean prediction)
-- Fit a model to the residuals
-- Add this model to the ensemble (weighted by learning rate)
-- Repeat
+# Hierarchical Clustering
 
-:::{.fragment}
+---
 
-#### Why weight the learning rate?
+## Agglomerative hierarchical clustering
 
-To prevent overfitting by controlling how much each tree can correct the errors of the previous ones.
+1. Start with each observation in its own cluster.
+2. Find the closest pair of clusters.
+3. Merge them.
+4. Repeat until only one cluster remains.
 
+The only extra decision is how to define the distance between clusters.
+
+- Single linkage uses the closest pair.
+- Complete linkage uses the furthest pair.
+- Average linkage uses the mean pairwise distance.
+
+---
+
+## Hierarchical clustering on monsters
+
+```{r}
+plot(monster_hc, labels = FALSE, hang = -1, main = "Complete-linkage dendrogram for D&D Monsters")
+```
+
+---
+
+## Cutting the tree gives an actual partition
+
+<!-- TODO: cleanup this slide. The point is that we can cut the tree at different heights to get different numbers of clusters, then compare those clusters to the known `type` variable to see how well the clustering did. The table shows the cross-tabulation of `type` and the cluster assignments, and the plot shows how those clusters look in terms of `hp_number` and `cr`, coloured by cluster. -->
+
+::: {.left-code}
+```{r}
+table(type = monsters$type, cluster = monster_groups)
+```
+:::
+
+::: {.right-plot}
+```{r}
+monsters |>
+  mutate(cluster = factor(monster_groups)) |>
+  ggplot(aes(x = hp_number, y = cr, colour = cluster)) +
+  geom_point(alpha = 0.85, size = 2.1) +
+  labs(x = "Hit points", y = "Challenge rating")
+```
 :::
 
 ---
 
-### Interactive: Combined Boosting Widget
+## Interactive build: hierarchical clustering
 
+<!-- TODO: the point is that the order in which clusters merge depends on the linkage method, and this can lead to different clusterings. The widget should make that tradeoff visible. Also consider making it physically larger on the slide because it can take the whole slide. -->
+
+::: {.widget-cell}
 ```{ojs}
 //| echo: false
-import { boostingCombinedWidget } from "./widgets/ensembles/boosting-combined-widget.js"
-boostingCombinedWidget()
+import { hierarchicalWidget } from "./widgets/clustering/hierarchical-widget.js"
+hierarchicalWidget()
+```
+:::
+
+---
+
+## Linkage is not a minor detail
+
+::: {.widget-cell}
+```{ojs}
+//| echo: false
+import { hierarchicalComparison } from "./widgets/clustering/hierarchical-widget.js"
+hierarchicalComparison()
+```
+:::
+
+- Single linkage is sensitive to chains of points.
+- Complete linkage prefers tight, compact groups.
+- Average linkage usually sits between them.
+- The widget makes the tradeoff visible because the same points merge in a different order as you change linkage.
+---
+
+
+## Bootstrap stability: do the same clusters return?
+
+- Resample observations.
+- Refit the clustering on each resample.
+- Compare the resulting partition with the original.
+- A stable cluster should survive small perturbations to the data.
+
+---
+
+## Bootstrap stability on monsters
+
+::: {.widget-note}
+The adjusted Rand index compares every pair of monsters across two partitions: did that pair stay together, or stay apart, in both clusterings? It then subtracts the agreement expected by chance,
+$$
+\mathrm{ARI} = \frac{\sum_{ij}\binom{n_{ij}}{2} - E}{\frac{1}{2}\left[\sum_i \binom{a_i}{2} + \sum_j \binom{b_j}{2}\right] - E},
+$$
+so `1` means a perfect match to the baseline clustering, `0` means about as much agreement as random assignment, and negative values mean worse than random agreement.
+:::
+
+::: {.left-code}
+```{r}
+#| echo: false
+tibble(bootstrap_ari = monster_bootstrap)
+```
+:::
+
+::: {.right-plot}
+```{r}
+#| echo: false
+tibble(bootstrap_ari = monster_bootstrap) |>
+  ggplot(aes(x = bootstrap_ari)) +
+  geom_histogram(binwidth = 0.05, fill = "#197278", colour = "white") +
+  labs(x = "Adjusted Rand index against baseline", y = "Resamples")
+```
+:::
+
+---
+
+## Interactive resampling view
+
+::: {.widget-cell}
+```{ojs}
+//| echo: false
+import { bootstrapStabilityWidget } from "./widgets/clustering/bootstrap-stability-widget.js"
+bootstrapStabilityWidget()
+```
+:::
+
+# K-means and K-medoids
+
+---
+
+## K-means minimises within-cluster variation
+
+For Euclidean distance the objective is
+$$
+\sum_{k=1}^K \sum_{C(i)=k} \lVert x_i - \mu_k \rVert^2.
+$$
+
+Algorithm:
+
+<!-- TODO: match the algorithm wording in the /notes. -->
+
+1. Initialise centroids.
+2. Assign each point to the nearest centroid.
+3. Recompute centroids.
+4. Repeat until the assignments stop changing.
+
+---
+
+## K-means on monsters
+
+```{r}
+#| echo: false
+ojs_define(
+  monster_kmeans_ojs_points = monster_kmeans_points,
+  monster_elbow_ojs = monster_elbow |> select(k, tot.withinss)
+)
+```
+
+::: {.widget-cell}
+```{ojs}
+//| echo: false
+import { monsterKmeansWidget } from "./widgets/clustering/monster-kmeans-widget.js"
+monsterKmeansWidget(monster_kmeans_ojs_points, monster_elbow_ojs)
+```
+:::
+
+---
+
+## Interactive centroid updates
+
+::: {.widget-cell}
+```{ojs}
+//| echo: false
+import { kmeansKmedoidsWidget } from "./widgets/clustering/kmeans-kmedoids-widget.js"
+kmeansKmedoidsWidget()
+```
+:::
+
+---
+
+## K-medoids / PAM
+
+- Replace the centroid with a real observation, the medoid.
+- This makes the method less sensitive to outliers.
+- It also lets us use any dissimilarity, not just Euclidean distance.
+
+```{r}
+monster_pam |> pluck("id.med")
 ```
 
 ---
 
-## Gradient Boosting vs XGBoost
+## Silhouette widths for PAM
 
-### Gradient Boosting
-
-- General framework for minimizing a loss function
-- At each step, fit a tree to the **negative gradient** of the loss
-- Loss function determines what we're optimizing (MSE, logloss, etc.)
-
----
-
-## What Changes In Gradient Boosting?
-
-- Ordinary boosting says "fit the next learner to what the current ensemble is getting wrong"
-- Gradient boosting makes that precise by defining "wrong" as the **negative gradient of a chosen loss**
-- For squared error, this is just the usual residual, so it looks like basic boosting
-- For classification, survival models, and other settings, the pseudo-residual depends on the loss rather than raw observed minus predicted values
-- Updates may happen on a transformed scale, such as log-odds for Bernoulli logloss, before converting back to probabilities
-
----
-
-### XGBoost (eXtreme Gradient Boosting)
-
-- Optimized implementation with regularization
-- Adds L2 penalty on leaf weights: $\lambda \sum_j w_j^2$
-- Adds tree complexity penalty: $\gamma \times \text{number of leaves}$
-- Much faster, better regularization than classic gradient boosting
-
----
-
-## XGBoost Hyperparameters
-
-| Parameter | Effect |
-|-----------|--------|
-| `eta` (learning rate) | Lower = more trees, less overfitting |
-| `max_depth` | Deeper = more complex, more overfitting |
-| `subsample` | Fraction of data per tree (reduces overfitting) |
-| `colsample_bytree` | Fraction of features per tree |
-| `min_child_weight` | Minimum sum of instance weight in leaf |
-| `lambda` (reg_lambda) | L2 regularization on leaf weights |
-| `alpha` (reg_alpha) | L1 regularization on leaf weights |
-
----
-
-### Interactive: XGBoost Widget
-
-```{ojs}
-//| echo: false
-import { xgboostWidget } from "./widgets/ensembles/xgboost-widget.js"
-xgboostWidget()
+```{r}
+plot(silhouette(monster_pam), border = NA, do.clus.stat = FALSE, do.n.k = FALSE, main = "PAM silhouettes")
 ```
 
 ---
 
-## Stacking: Combining Different Model Families
+## When K-means and PAM disagree
 
-- Use different model families as **base learners**
-- Train a **meta-learner** on their predictions
-- Base learner predictions become features for the meta-learner
+- K-means is faster and works well for compact numeric clusters.
+- PAM is more robust when outliers are likely or when the cluster center needs to be interpretable.
+- Both still force every observation into one of `K` groups.
 
-### Key idea
-
-Each model family has different inductive biases → different errors
-→ a well-chosen meta-learner can exploit complementary strengths
+# Density Clustering
 
 ---
 
-### Interactive: Stacking Widget
+## DBSCAN definitions
 
-```{ojs}
-//| echo: false
-import { stackingWidget } from "./widgets/ensembles/stacking-widget.js"
-stackingWidget()
+- `eps`: neighborhood radius.
+- `MinPts`: minimum neighborhood size.
+- Core point: at least `MinPts` observations in its `eps`-neighborhood.
+- Border point: not core, but within the neighborhood of a core point.
+- Noise point: neither core nor border.
+
+---
+
+## Why DBSCAN is different
+
+- It does not require `K`.
+- It can recover non-convex shapes.
+- It can leave points unclustered.
+- It is sensitive to scale and parameter choice.
+
+---
+
+## Custom DBSCAN on the synthetic crescent/ring data
+
+```{r}
+ggplot(dbscan_plot_data, aes(x = x, y = y, colour = cluster, shape = core)) +
+  geom_point(size = 2.2, alpha = 0.88) +
+  labs(x = NULL, y = NULL, colour = NULL, shape = "Core point")
 ```
 
 ---
 
-## AutoML: Automated Model Selection
+## Parameter choice: k-distance idea
 
-- Automatically searches over many model families and hyperparameters
-- Popular tools: H2O AutoML, auto-sklearn, TPOT, mljar
+<!-- TODO: cleanup this slide. The point is that we can use the distance to the `k`th nearest neighbor to help choose `eps`. We sort the points by this distance and look for an elbow in the plot, which indicates a natural separation between dense regions and noise. -->
 
-### Trade-offs
+- Here `MinPts = 5`, so a point becomes core when it has `4` other points inside its `eps` neighborhood.
+- That makes the distance to the `4`th nearest other point the smallest `eps` that would make that observation core.
+- Sort those distances and look for an elbow: dense-cluster points stay low, while border/noise points rise sharply.
+- Choosing `eps` near that bend usually keeps dense regions together without flooding sparse noise.
 
-**Pros:**
-- Fast baseline performance
-- Less manual tuning required
-- Good for initial exploration
-
-**Cons:**
-- Can be a "black box"
-- Risk of data leakage in validation
-- May miss domain-specific insights
-- Often overkill for simple problems
-
----
-
-### Interactive: AutoML Widget
-
-```{ojs}
-//| echo: false
-import { automlWidget } from "./widgets/ensembles/automl-widget.js"
-
-automl_data = FileAttachment("widgets/ensembles/data/longbeach-automl.json").json()
-
-automlWidget(automl_data)
+```{r}
+#| echo: true
+min_pts <- 5
+k <- min_pts - 1  # 4 other neighbors, because the point itself is counted in MinPts
+dmat <- as.matrix(dist(dbscan_data |> select(x, y)))
+knn_distance <- apply(dmat, 1, function(row) sort(row)[k + 1])  # +1 because the self-distance is 0
+tibble(rank = seq_along(knn_distance), kth_distance = sort(knn_distance)) |>
+  ggplot(aes(x = rank, y = kth_distance)) +
+  geom_line(colour = "#197278", size = 1.1) +
+  labs(
+    x = "Ordered points",
+    y = paste0("Distance to ", k, "th nearest other point (MinPts = ", min_pts, ")")
+  )
 ```
 
 ---
 
-## Summary: Ensemble Methods
+## Interactive DBSCAN expansion
 
-| Method | Key Idea | When to Use |
-|--------|----------|-------------|
-| **Bagging** | Average bootstrap trees | Reduce variance of unstable models |
-| **Random Forests** | Bagging + feature subsampling | Default for tabular data |
-| **Boosting** | Sequential error correction | When you need high accuracy |
-| **XGBoost** | Regularized boosting | Industry standard for competitions |
-| **Stacking** | Combine different model families | When you have diverse models |
-| **AutoML** | Automated search | Fast baseline, exploration |
+::: {.widget-cell}
+```{ojs}
+//| echo: false
+import { dbscanWidget } from "./widgets/clustering/dbscan-widget.js"
+dbscanWidget()
+```
+:::
 
-### Key Takeaways
-
-- Ensembles typically outperform single models
-- More trees = more stable (but diminishing returns)
-- Balance complexity with interpretability
-- Always validate properly (don't overfit to validation!)
+::: {.widget-note}
+DBSCAN repeats: inspect an unvisited point, test whether it is core, expand through its neighbors if it is core, and otherwise leave it as provisional noise until a later core point reaches it.
+:::
 
 ---
 
-## For More Details
+## HDBSCAN: the 2026 default when density varies
 
-- **Notes Chapter 9**: Full theoretical treatment with mathematical derivations
-- **Lab 9**: Hands-on practice with ensemble methods
-- **Tidymodels documentation**: https://www.tidymodels.org/
-- **XGBoost documentation**: https://xgboost.readthedocs.io/
+<!-- TODO: remove or rewrite this slide. The point is that DBSCAN can struggle when clusters have different densities, because a single `eps` value may not capture all the clusters well. HDBSCAN extends DBSCAN by building a hierarchy over varying density thresholds and then extracting stable clusters. It currently feels tacked on without an example or code-heavy payoff; maybe link to the study guide instead. -->
+
+- HDBSCAN extends DBSCAN into a hierarchy and avoids fixing a single `eps`.
+- It is a better default when dense and sparse clusters coexist.
+- In R, the standard entry point is `dbscan::hdbscan()`.
+
+```{r}
+#| eval: false
+library(dbscan)
+hdbscan(monster_scaled |> select(all_of(numeric_cols)), minPts = 8)
+```
+
+---
+
+## UMAP in one slide
+
+<!-- TODO: this may duplicate the later point that high-dimensional data are hard to visualise directly, and that UMAP provides a 2D view while preserving useful structure. Decide whether this theory slide and the later practice framing should be merged. -->
+
+- UMAP starts from local neighbor relationships in the original feature space and builds weighted affinities `w_{ij}`.
+- It then finds low-dimensional coordinates `y_i` whose low-dimensional affinities `v_{ij}` preserve those neighborhoods as well as possible.
+
+$$
+v_{ij} = \left(1 + a\lVert y_i - y_j \rVert^{2b}\right)^{-1}
+$$
+
+$$
+\mathcal{L} =
+\sum_{i \ne j}
+\left[
+w_{ij}\log\frac{w_{ij}}{v_{ij}}
+  + (1-w_{ij})\log\frac{1-w_{ij}}{1-v_{ij}}
+\right]
+$$
+
+- So `UMAP 1` and `UMAP 2` are not original variables. They are coordinates chosen to keep nearby monsters nearby in the map.
+
+---
+
+## UMAP view of monsters
+
+```{r}
+#| echo: false
+ojs_define(
+  monster_umap_ojs_points = monster_compare_points,
+  monster_umap_axis_x = monster_display_labels[[1]],
+  monster_umap_axis_y = monster_display_labels[[2]]
+)
+```
+
+::: {.widget-cell}
+```{ojs}
+//| echo: false
+import { monsterUmapWidget } from "./widgets/clustering/monster-umap-widget.js"
+monsterUmapWidget(
+  monster_umap_ojs_points,
+  monster_umap_axis_x,
+  monster_umap_axis_y
+)
+```
+:::
+
+::: {.widget-note}
+The next comparison slide uses these UMAP axes only for display. Each clustering method is still fit on the full scaled monster feature set.
+:::
+
+---
+
+## Method comparison on the same geometry
+
+```{r}
+#| echo: false
+ojs_define(
+  monster_compare_ojs_points = monster_compare_points,
+  monster_compare_ojs_assignments = monster_compare_assignments,
+  monster_compare_axis_x = monster_display_labels[[1]],
+  monster_compare_axis_y = monster_display_labels[[2]]
+)
+```
+
+::: {.widget-cell}
+```{ojs}
+//| echo: false
+import { clusterComparisonWidget } from "./widgets/clustering/cluster-comparison-widget.js"
+clusterComparisonWidget(
+  monster_compare_ojs_points,
+  monster_compare_ojs_assignments,
+  monster_compare_axis_x,
+  monster_compare_axis_y
+)
+```
+:::
+
+---
+
+## Practical comparison
+
+| Method | Strength | Risk | Needs scaling? |
+|:--|:--|:--|:--|
+| Hierarchical | Full tree, no need to pre-fix `K` | Linkage choice matters | Usually yes |
+| K-means | Fast, familiar, easy to explain | Splits non-convex shapes | Yes |
+| K-medoids | Robust, medoids are real points | Slower than K-means | Usually yes |
+| DBSCAN | Handles noise and shape | Parameter tuning can be awkward | Yes |
+| HDBSCAN | Better with varying density | Extra package, less introductory intuition | Yes |
+
+# Modern Workflow Notes
+
+<!-- TODO: this whole section is funky. The point is that modern data science practice often uses parquet for data exchange, UMAP for high-dimensional cluster displays, and tidyclust for tidyverse/tidymodels workflows. The Qatar Cars dataset is the lab focus where students apply these clustering techniques to a real dataset. -->
+
+---
+
+## Parquet for lab and project handoff
+
+<!-- TODO: the files should be saved before this slide, and the point is that parquet is a modern file format that is more efficient than CSV and preserves data types. The code below checks whether `arrow` is available and writes the monsters, Qatar Cars, and synthetic points datasets to `data/`. Rework the framing because students will not have a lab directory. -->
+
+```{r}
+if (requireNamespace("arrow", quietly = TRUE)) {
+  tibble(status = "Monsters, Qatar Cars, and synthetic cluster parquet files are available under data/.")
+} else {
+  tibble(status = "arrow is not installed here; keep the code pattern and run it in the teaching environment.")
+}
+```
+
+```{r}
+#| eval: false
+library(arrow)
+write_parquet(monsters, "../data/monsters.parquet")
+write_parquet(qatarcars, "../data/qatarcars.parquet")
+write_parquet(synthetic_points, "../data/synthetic-clusters.parquet")
+```
+
+---
+
+## tidyclust keeps clustering inside tidymodels
+
+```{r}
+#| eval: false
+library(tidyclust)
+library(parsnip)
+
+k_means(num_clusters = 5) |>
+  fit(~ ., data = monster_scaled |> select(all_of(numeric_cols)))
+```
+
+- Use this when you want clustering to sit inside a recipes and workflows pipeline.
+
+---
+
+## Student exercise preview: Qatar Cars
+
+::: {.left-code-wide}
+```{r}
+qatarcars |>
+  select(type, enginetype, length, width, height, mass, horsepower, price, performance, economy, trunk, seating) |>
+  summary()
+```
+:::
+
+::: {.right-plot-narrow}
+```{r}
+qatarcars |>
+  ggplot(aes(x = price, y = horsepower, colour = type)) +
+  geom_point(alpha = 0.85, size = 2.1) +
+  labs(x = "Price", y = "Horsepower", colour = "Type")
+```
+:::
+
+---
+
+## Questions for the lab
+
+1. Which variables should define similarity for the cars?
+2. How much does scaling change the result?
+3. Does a fixed `K` make sense, or do the data want a density-based view?
+4. Which truth signal is more informative for validation: `type` or `enginetype`?
+
+---
+
+## Suggested workflow for the Qatar Cars lab
+
+1. Start with `summary()` and a few scatterplots.
+2. Scale the numeric features before using Euclidean distance.
+3. Compare complete-linkage hierarchical clustering with K-means.
+4. Use PAM silhouettes to decide whether your chosen `K` is defensible.
+5. Try DBSCAN last on a small feature subset where the geometry is visible.
+
+# Summary
+
+---
+
+## Cluster analysis summary
+
+- Distances create the problem definition, so scaling and variable choice come first.
+- Hierarchical clustering is good for structure discovery and explanation.
+- K-means and PAM are explicit partitioning tools once a candidate `K` is on the table.
+- DBSCAN is the right move when you care about shape or noise.
+- Modern practice adds parquet for exchange, HDBSCAN for density variation, and UMAP for visualization.
+
+---
+
+## Code references for later
+
+```{r}
+tribble(
+  ~task, ~code,
+  "Distance matrix", "dist(x, method = 'euclidean')",
+  "Hierarchical clustering", "hclust(d, method = 'complete')",
+  "Cut dendrogram", "cutree(hc, k = 5)",
+  "K-means", "kmeans(x, centers = 5, nstart = 20)",
+  "K-medoids", "cluster::pam(x, k = 5)",
+  "DBSCAN", "dbscan::dbscan(x, eps = ..., minPts = ...)",
+  "HDBSCAN", "dbscan::hdbscan(x, minPts = ...)"
+)
+```

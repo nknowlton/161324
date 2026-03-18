@@ -1,27 +1,33 @@
 ---
-title: "Workshop 12: Association Rule Mining"
+title: "Workshop 12: Ensemble Learning with tidymodels"
 output: html_document
 ---
 
-In this workshop we build association rules from a TidyTuesday recipe
-dataset, then finish with a shorter extension on the local bank-service
-data. The main goals are to:
+In this workshop we build an ensemble workflow on the **Long Beach Animal
+Shelter** TidyTuesday data. The lecture introduced the concepts; here we
+will do the modelling step by step in `tidymodels`.
 
-- turn text data into transactions
-- inspect item frequencies
-- mine rules with `apriori()`
-- interpret support, confidence, and lift
-- filter rules using `subset()`
+Our main goals are to:
 
-We will use the `tidytuesdayR` package to pull the recipe data directly
-from TidyTuesday. If RStudio prompts you to install `tidytuesdayR`, let
-it do so before you continue.
+- define a clean binary target for adoption
+- build one shared preprocessing recipe
+- compare a single tree, a bagged tree, and a boosted tree
+- evaluate the models with cross-validation
+- optionally combine tuned models with `stacks`
+
+We will use the `tidytuesdayR` package to pull the data directly from
+TidyTuesday. If RStudio prompts you to install `tidytuesdayR`, let it do
+so before you continue.
 
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
-library(arules)
+library(tidymodels)
+library(baguette)
+library(stacks)
+library(bonsai)
 
 theme_set(theme_minimal())
+tidymodels_prefer()
 
 load_tidytuesday_dataset <- function(tt_date, dataset_name, parquet_url) {
   if (requireNamespace("tidytuesdayR", quietly = TRUE)) {
@@ -62,329 +68,270 @@ load_tidytuesday_dataset <- function(tt_date, dataset_name, parquet_url) {
   arrow::read_parquet(parquet_file) |> tibble::as_tibble()
 }
 
-compose_ggplot <- function(plot, ...) {
-  layers <- list(...)
+prepare_longbeach_adoption_data <- function(longbeach) {
+  weekday_levels <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 
-  for (i in seq_along(layers)) {
-    plot <- ggplot2:::add_ggplot(plot, layers[[i]], paste0("layer_", i))
-  }
-
-  plot
+  longbeach |>
+    filter(
+      animal_type %in% c("dog", "cat"),
+      !is.na(outcome_type)
+    ) |>
+    mutate(
+      dob = as.Date(dob),
+      intake_date = as.Date(intake_date),
+      age_days = as.numeric(intake_date - dob),
+      age_days = if_else(is.na(age_days) | age_days < 0, NA_real_, age_days),
+      age_years = pmin(coalesce(age_days, stats::median(age_days, na.rm = TRUE)), 3650) / 365.25,
+      has_name = if_else(is.na(animal_name) | animal_name == "", "No", "Yes"),
+      intake_year = factor(format(intake_date, "%Y")),
+      intake_month = factor(format(intake_date, "%b"), levels = month.abb),
+      intake_weekday = factor(weekdays(intake_date), levels = weekday_levels),
+      is_adopted = factor(
+        if_else(outcome_type == "adoption", "Adopted", "Other"),
+        levels = c("Other", "Adopted")
+      )
+    ) |>
+    transmute(
+      is_adopted,
+      animal_type = factor(animal_type),
+      sex = factor(coalesce(na_if(sex, ""), "Unknown")),
+      primary_color = factor(coalesce(na_if(primary_color, ""), "Unknown")),
+      intake_condition = factor(coalesce(na_if(intake_condition, ""), "Unknown")),
+      intake_type = factor(coalesce(na_if(intake_type, ""), "Unknown")),
+      intake_subtype = factor(coalesce(na_if(intake_subtype, ""), "Unknown")),
+      has_name = factor(has_name),
+      intake_year,
+      intake_month,
+      intake_weekday,
+      age_years
+    )
 }
-```
 
-## 1. Recipe ingredients as transactions
-
-The lecture used a TidyTuesday dataset of recipes grouped by cuisine.
-Each recipe will be treated as one transaction, and each ingredient as
-an item.
-
-```{r}
-cuisines_raw <- load_tidytuesday_dataset(
-  tt_date = "2025-09-16",
-  dataset_name = "cuisines",
-  parquet_url = "https://knowlton.co.nz/161324/data/cuisines.parquet"
+longbeach <- load_tidytuesday_dataset(
+  tt_date = "2025-03-04",
+  dataset_name = "longbeach",
+  parquet_url = "https://knowlton.co.nz/161324/data/longbeach.parquet"
 )
 
-cuisines_raw |> glimpse()
+adoption_data <- prepare_longbeach_adoption_data(longbeach)
 ```
 
-The `ingredients` column is a comma-separated string, so we need to turn
-it into one ingredient per row before creating the transaction matrix.
+## 1. Inspect the modelling data
+
+We are predicting whether a cat or dog ends up in the `Adopted` class,
+using intake-time variables only.
 
 ```{r}
-not_ingredients <- c(
-  "chopped", "minced", "diced", "sliced", "grated", "shredded", "crushed",
-  "julienned", "cubed", "halved", "quartered", "peeled", "seeded", "stemmed",
-  "trimmed", "cleaned", "rinsed", "drained", "thawed", "softened", "melted",
-  "beaten", "divided", "separated", "sifted", "crumbled", "toasted",
-  "mashed", "pureed", "blanched", "boiled", "roasted", "juiced",
-  "thinly sliced", "finely chopped", "coarsely chopped",
-  "finely", "coarsely", "thinly",
-  "to taste", "as needed", "or to taste", "or as needed",
-  "or more", "or more to taste", "or more as needed",
-  "salt to taste", "salt and pepper to taste",
-  "salt and ground black pepper to taste",
-  "salt and ground black pepper",
-  "salt and pepper", "if desired", "for garnish",
-  "salt", "pepper", "kosher salt", "ground black pepper",
-  "freshly ground black pepper",
-  "skinless", "cooking spray", "room temperature", "needed", "taste"
-)
+adoption_data |> glimpse()
 
-unit_rx <- regex(
-  paste0(
-    "^(cups?|tablespoons?|tbsp|teaspoons?|tsp|pounds?|lbs?|ounces?|oz|",
-    "cans?|packages?|pkgs?|envelopes?|pinch(es)?|cloves?|slices?|",
-    "stalks?|heads?|bunche?s?|pieces?|strips?|sprigs?)\\s+(of\\s+)?"
-  ),
-  ignore_case = TRUE
-)
-
-recipe_items <- cuisines_raw |>
-  select(name, country, ingredients) |>
-  mutate(recipe_id = row_number()) |>
-  separate_longer_delim(ingredients, delim = ", ") |>
-  mutate(
-    ingredient = ingredients |>
-      str_to_lower() |>
-      str_trim() |>
-      str_remove_all("\\(.*?\\)") |>
-      str_remove("^[0-9\\u00bd\\u00bc\\u00be\\u2153\\u2154\\u215b\\u215c\\u215d\\u215e/\\. ]+") |>
-      str_remove(unit_rx) |>
-      str_remove(regex("^(large|medium|small|extra-?large)\\s+", ignore_case = TRUE)) |>
-      str_remove(regex("\\s+(to taste|as needed|if desired|or more to taste|or more)$",
-                       ignore_case = TRUE)) |>
-      str_remove(regex(",\\s*(divided|optional|drained|thawed|softened|melted|beaten)$",
-                       ignore_case = TRUE)) |>
-      str_trim() |>
-      str_replace_all("^unsalted butter$", "butter") |>
-      str_replace_all("^garlic powder$", "garlic") |>
-      str_replace_all("^minced garlic$", "garlic") |>
-      str_replace_all("^eggs$", "egg") |>
-      str_replace_all("^onions$", "onion") |>
-      str_replace_all("^potatoes$", "potato") |>
-      str_replace_all("^tomatoes$", "tomato") |>
-      str_replace_all("^carrots$", "carrot") |>
-      str_replace_all("^lemons$", "lemon") |>
-      str_replace_all("^limes$", "lime") |>
-      str_replace_all("^mushrooms$", "mushroom") |>
-      str_replace_all("^bananas$", "banana") |>
-      str_replace_all("^green onions$", "green onion") |>
-      str_replace_all("^cloves$", "clove")
-  ) |>
-  filter(
-    nchar(ingredient) > 2,
-    !ingredient %in% not_ingredients
-  )
+adoption_data |>
+  count(is_adopted) |>
+  mutate(prop = n / sum(n))
 ```
 
 ### Try yourself
 
-1. Count the most common ingredients in `recipe_items`.
+1. Which predictors are numeric, and which are categorical?
+2. Why is `accuracy` not enough on its own for this task?
+3. Which variables do you think might be most predictive of adoption?
 
-2. Do the common ingredients seem globally useful, or are some likely to
-   inflate confidence without being especially informative?
-
-3. How might that affect your later interpretation of lift?
+## 2. Training/test split and resampling
 
 ```{r}
-recipe_items |>
-  count(ingredient, sort = TRUE) |>
-  slice_head(n = 20)
+set.seed(161324)
+adoption_split <- initial_split(adoption_data, prop = 0.8, strata = is_adopted)
+adoption_train <- training(adoption_split)
+adoption_test <- testing(adoption_split)
+
+adoption_folds <- vfold_cv(adoption_train, v = 3, strata = is_adopted)
+adoption_folds
 ```
 
-## 2. Converting to a transaction database
+We will compare models using:
 
-To keep the rules interpretable, we restrict attention to the 75 most
-common ingredients.
+- `roc_auc`
+- `pr_auc`
+- `accuracy`
 
 ```{r}
-top_ingredients <- recipe_items |>
-  count(ingredient, sort = TRUE) |>
-  slice_head(n = 75) |>
-  pull(ingredient)
-
-recipe_items_filtered <- recipe_items |>
-  filter(ingredient %in% top_ingredients)
-
-recipe_trans <- recipe_items_filtered |>
-  select(recipe_id, ingredient) |>
-  distinct() |>
-  mutate(present = TRUE) |>
-  pivot_wider(
-    names_from = ingredient,
-    values_from = present,
-    values_fill = FALSE
-  ) |>
-  select(-recipe_id) |>
-  as.matrix() |>
-  as("transactions")
-
-recipe_trans
+ensemble_metrics <- metric_set(roc_auc, pr_auc, accuracy)
 ```
 
-### Try yourself
+## 3. One recipe for all workflows
 
-1. Inspect the first ten transactions using `inspect()`.
-
-2. Compare `inspect()` with `DATAFRAME()`. Which would you use for
-   exploratory work?
+We will use one recipe across all models so the comparison is fair.
 
 ```{r}
-recipe_trans |>
-  head(n = 10) |>
-  inspect()
-```
+adoption_recipe <- recipe(is_adopted ~ ., data = adoption_train) |>
+  step_other(primary_color, intake_subtype, threshold = 0.03) |>
+  step_novel(all_nominal_predictors()) |>
+  step_unknown(all_nominal_predictors()) |>
+  step_dummy(all_nominal_predictors()) |>
+  step_zv(all_predictors())
 
-## 3. Item frequencies
-
-```{r}
-itemFrequencyPlot(recipe_trans, topN = 25, type = "relative")
+adoption_recipe
 ```
 
 ### Try yourself
 
-1. Recreate the item-frequency plot using `ggplot2`.
+1. Why is `step_other()` useful here?
+2. Why is `step_dummy()` needed before `xgboost`?
+3. Which parts of the recipe are protecting us against new categories in test data?
 
-2. Which ingredients are common enough that a high-confidence rule with
-   that ingredient on the right-hand side might still be uninteresting?
+## 4. Define model specifications
 
-```{r}
-recipe_freq <- recipe_trans |>
-  itemFrequency() |>
-  enframe(name = "ingredient", value = "support") |>
-  arrange(desc(support)) |>
-  slice_head(n = 25)
+We will compare:
 
-compose_ggplot(
-  ggplot(recipe_freq, aes(x = support, y = fct_reorder(ingredient, support))),
-  geom_col()
-)
-```
-
-## 4. Mining rules with Apriori
-
-We now mine rules with moderate support and confidence thresholds.
+- a single decision tree
+- a bagged tree
+- a boosted tree with `xgboost`
 
 ```{r}
-recipe_rules <- apriori(
-  recipe_trans,
-  parameter = list(support = 0.05, confidence = 0.40, minlen = 2, maxlen = 4),
-  control = list(verbose = FALSE)
-)
+tree_spec <- decision_tree(
+  cost_complexity = tune(),
+  tree_depth = tune(),
+  min_n = tune()
+) |>
+  set_engine("rpart") |>
+  set_mode("classification")
 
-recipe_rules
-summary(recipe_rules)
+bag_spec <- bag_tree(
+  cost_complexity = tune(),
+  tree_depth = tune(),
+  min_n = tune()
+) |>
+  set_engine("rpart", times = 10) |>
+  set_mode("classification")
+
+xgb_spec <- boost_tree(
+  trees = tune(),
+  tree_depth = tune(),
+  learn_rate = tune(),
+  min_n = tune(),
+  loss_reduction = tune(),
+  sample_size = tune()
+) |>
+  set_engine("xgboost") |>
+  set_mode("classification")
 ```
 
-### Try yourself
-
-1. How many rules were found?
-
-2. Inspect the top ten rules by support, by confidence, and by lift.
-
-3. Which ranking would you use first if the goal is to find genuinely
-   informative associations rather than merely common ones?
+Now attach the recipe to each model:
 
 ```{r}
-recipe_rules |>
-  sort(by = "support") |>
-  head(n = 10) |>
-  inspect()
+tree_wf <- workflow() |>
+  add_recipe(adoption_recipe) |>
+  add_model(tree_spec)
 
-recipe_rules |>
-  sort(by = "confidence") |>
-  head(n = 10) |>
-  inspect()
+bag_wf <- workflow() |>
+  add_recipe(adoption_recipe) |>
+  add_model(bag_spec)
 
-recipe_rules |>
-  sort(by = "lift") |>
-  head(n = 10) |>
-  inspect()
+xgb_wf <- workflow() |>
+  add_recipe(adoption_recipe) |>
+  add_model(xgb_spec)
 ```
 
-## 5. Misleading high-confidence rules
+## 5. Tune the models
 
-High confidence on its own can be misleading when the consequent is very
-common. The code below looks for rules with high confidence but lift
-close to one.
+Use intentionally small grids so the workflow stays fast and inspectable in a workshop setting.
 
 ```{r}
-recipe_rules |>
-  subset(confidence >= 0.75 & lift <= 1.05) |>
-  sort(by = "confidence") |>
-  head(n = 10) |>
-  inspect()
-```
-
-### Try yourself
-
-1. Pick one rule from the output above and explain why it is not very
-   interesting despite its high confidence.
-
-2. Compare it with a rule that has slightly lower confidence but much
-   higher lift.
-
-## 6. Filtering rules
-
-Use `subset()` together with `%in%`, `%ain%`, and `%pin%` to focus on a
-particular ingredient or collection of ingredients.
-
-```{r}
-garlic_rules <- recipe_rules |>
-  subset(lhs %in% "garlic" & lift > 1.1)
-
-garlic_rules |>
-  sort(by = "lift") |>
-  head(n = 10) |>
-  inspect()
-```
-
-### Try yourself
-
-1. Find rules with `olive oil` on the left-hand side.
-
-2. Find rules where both `garlic` and `onion` appear on the left-hand
-   side.
-
-3. Find one ingredient whose rules look cuisine-specific rather than
-   globally common.
-
-## 7. Optional interactive inspection
-
-If you have `arulesViz` available, interactive inspection is useful once
-you have reduced the rule set to something manageable.
-
-```{r, eval=FALSE}
-library(arulesViz)
-
-recipe_rules |>
-  sort(by = "lift") |>
-  head(n = 100) |>
-  inspectDT()
-```
-
-## 8. Extension: bank-service rules
-
-The bank dataset is already stored locally in `../data/bank-rules.csv`.
-Each row is one account-service combination.
-
-```{r}
-bank <- read_csv("../data/bank-rules.csv", show_col_types = FALSE) |>
-  transactions(format = "long", cols = c("ACCOUNT", "SERVICE"))
-
-bank_rules <- apriori(
-  bank,
-  parameter = list(support = 0.005, confidence = 0.4),
-  control = list(verbose = FALSE)
+tree_grid <- grid_regular(cost_complexity(), tree_depth(), min_n(), levels = 3)
+bag_grid <- grid_regular(cost_complexity(), tree_depth(), min_n(), levels = 2)
+xgb_grid <- grid_latin_hypercube(
+  trees(),
+  tree_depth(),
+  learn_rate(),
+  min_n(),
+  loss_reduction(),
+  sample_prop(),
+  size = 6
 )
 ```
 
 ### Try yourself
 
-1. Find rules with `CCRD` on the right-hand side. Which services look
-   useful for cross-selling a credit card?
-
-2. Find rules that contain both `MTG` and `HMEQLC`.
-
-3. Compare the bank rules with the recipe rules. Which dataset gives
-   more obviously actionable associations?
+Tune each workflow on the same folds:
 
 ```{r}
-bank_rules |>
-  subset(rhs %in% "CCRD") |>
-  sort(by = "lift") |>
-  head(n = 10) |>
-  inspect()
+set.seed(161324)
+tree_res <- tune_grid(
+  tree_wf,
+  resamples = adoption_folds,
+  grid = tree_grid,
+  metrics = ensemble_metrics,
+  control = control_stack_grid()
+)
+
+set.seed(161324)
+bag_res <- tune_grid(
+  bag_wf,
+  resamples = adoption_folds,
+  grid = bag_grid,
+  metrics = ensemble_metrics,
+  control = control_stack_grid()
+)
+
+set.seed(161324)
+xgb_res <- tune_grid(
+  xgb_wf,
+  resamples = adoption_folds,
+  grid = xgb_grid,
+  metrics = ensemble_metrics,
+  control = control_stack_grid()
+)
 ```
 
-### Final questions
+Compare the best results:
 
-1. In the recipe data, what kinds of items produce high confidence but
-   uninformative rules?
+```{r}
+bind_rows(
+  show_best(tree_res, metric = "roc_auc", n = 3) |> mutate(model = "tree"),
+  show_best(bag_res, metric = "roc_auc", n = 3) |> mutate(model = "bagged"),
+  show_best(xgb_res, metric = "roc_auc", n = 3) |> mutate(model = "xgboost")
+) |>
+  select(model, .metric, mean, everything())
+```
 
-2. Which filtering tools in `arules` did you find most useful?
+## 6. Finalise the best settings
 
-3. If you had to recommend one metric for ranking candidate rules in an
-   exploratory analysis, would you choose support, confidence, or lift?
+Choose the best tuning parameters for each model and evaluate them on
+the held-out test set.
+
+```{r}
+best_tree <- select_best(tree_res, metric = "roc_auc")
+best_bag <- select_best(bag_res, metric = "roc_auc")
+best_xgb <- select_best(xgb_res, metric = "roc_auc")
+
+final_tree <- finalize_workflow(tree_wf, best_tree)
+final_bag <- finalize_workflow(bag_wf, best_bag)
+final_xgb <- finalize_workflow(xgb_wf, best_xgb)
+```
+
+### Try yourself
+
+1. Fit each final workflow to `adoption_train`.
+2. Use `augment()` or `predict()` on `adoption_test`.
+3. Compare the final test metrics.
+4. Which model would you deploy if:
+   - you only care about predictive performance?
+   - you want a more explainable model?
+
+## 7. Optional capstone: stack the tuned models
+
+If you have time, use the tuning results to build a stacked ensemble.
+
+```{r}
+model_stack <- stacks() |>
+  add_candidates(tree_res) |>
+  add_candidates(bag_res) |>
+  add_candidates(xgb_res) |>
+  blend_predictions(metric = metric_set(roc_auc)) |>
+  fit_members()
+```
+
+### Try yourself
+
+1. Compare the stack against the best single model on the test set.
+2. Which member models get non-zero weight?
+3. Does stacking buy enough extra performance to justify the extra complexity?

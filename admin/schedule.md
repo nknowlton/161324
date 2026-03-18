@@ -46,25 +46,7 @@ Week 9: Classification: (Trees, Forests, light on Neural Nets)
 
 ** Nick takes over here **
 
-## Week 10: Ensemble Learning
-
-### Lecture focus
-- Bagging as an extension of tree based modelling
-- Why bagging reduces variance and improves stability
-- Boosting as sequential error correction
-- Conceptual difference between bagging and boosting
-- Gradient boosting intuition
-- XGBoost as a practical high performance boosting framework
-- Comparing single trees, bagged trees, random forests, and boosted trees
-- Stacked ensembles as a way to blend different model families
-- Trade off between predictive performance and interpretability
-- Cross validation and tuning for ensemble methods
-- AutoML as a real system for model comparison, tuning, and selection
-- Limits of AutoML and the continued need for human judgement
-
-<Assignment 2 (Prediction, Classification) due end of week 11/start of week 12?>
-
-## Week 11: Clustering
+## Week 10: Clustering
 
 ### Lecture focus
 - Clustering as unsupervised learning
@@ -79,7 +61,9 @@ Week 9: Classification: (Trees, Forests, light on Neural Nets)
 - Interpreting clusters cautiously in applied settings
 - Sensitivity of clustering results to scaling, outliers, and variable choice
 
-## Week 12: Market Basket Analysis / Association Rules
+<Assignment 2 (Prediction, Classification) due end of week 11/start of week 12?>
+
+## Week 11: Market Basket Analysis / Association Rules
 
 ### Lecture focus
 - Association rule mining as pattern discovery in transactional data
@@ -95,6 +79,22 @@ Week 9: Classification: (Trees, Forests, light on Neural Nets)
 
 
 - Brief Review or Table of supervised learning, unsupervised learning, and association pattern mining
+
+## Week 12: Ensemble Learning
+
+### Lecture focus
+- Bagging as an extension of tree based modelling
+- Why bagging reduces variance and improves stability
+- Boosting as sequential error correction
+- Conceptual difference between bagging and boosting
+- Gradient boosting intuition
+- XGBoost as a practical high performance boosting framework
+- Comparing single trees, bagged trees, random forests, and boosted trees
+- Stacked ensembles as a way to blend different model families
+- Trade off between predictive performance and interpretability
+- Cross validation and tuning for ensemble methods
+- AutoML as a real system for model comparison, tuning, and selection
+- Limits of AutoML and the continued need for human judgement
 
 
 
