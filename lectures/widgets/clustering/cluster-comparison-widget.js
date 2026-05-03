@@ -122,12 +122,16 @@ function drawAxes(svg, width, height, margin, xTicks, yTicks, xScale, yScale, xL
   svg.appendChild(yAxisLabel)
 }
 
-export function clusterComparisonWidget(pointsData, assignmentsData, axisXLabel = "UMAP 1", axisYLabel = "UMAP 2") {
+export function clusterComparisonWidget(pointsData, assignmentsData) {
   const points = toRows(pointsData).map((point) => ({
     ...point,
     id: Number(point.id),
-    x: Number(point.x),
-    y: Number(point.y)
+    x: point.x == null || point.x === "" ? null : Number(point.x),
+    y: point.y == null || point.y === "" ? null : Number(point.y),
+    pc1: point.pc1 == null || point.pc1 === "" ? null : Number(point.pc1),
+    pc2: point.pc2 == null || point.pc2 === "" ? null : Number(point.pc2),
+    umap1: point.umap1 == null || point.umap1 === "" ? null : Number(point.umap1),
+    umap2: point.umap2 == null || point.umap2 === "" ? null : Number(point.umap2)
   }))
   const assignments = toRows(assignmentsData).map((row) => ({
     ...row,
@@ -138,7 +142,25 @@ export function clusterComparisonWidget(pointsData, assignmentsData, axisXLabel 
     cluster_id: Number(row.cluster_id)
   }))
 
-  const state = { method: "hierarchical", linkage: "complete", k: 5, eps: 1, minPts: 5, hovered: null, hoveredType: null }
+  const hasPca = points.every((point) => Number.isFinite(point.pc1) && Number.isFinite(point.pc2))
+  const hasUmap = points.every((point) => Number.isFinite(point.umap1) && Number.isFinite(point.umap2))
+  const hasLegacyXY = points.every((point) => Number.isFinite(point.x) && Number.isFinite(point.y))
+  const displayOptions = [
+    hasUmap ? { value: "umap", label: "UMAP" } : null,
+    hasPca ? { value: "pca", label: "PCA" } : null,
+    !hasUmap && !hasPca && hasLegacyXY ? { value: "xy", label: "Display" } : null
+  ].filter(Boolean)
+
+  const state = {
+    method: "hierarchical",
+    linkage: "complete",
+    k: 5,
+    eps: 1,
+    minPts: 5,
+    display: displayOptions[0]?.value ?? "xy",
+    hovered: null,
+    hoveredType: null
+  }
   const kOptions = [...new Set(assignments.filter((row) => row.k != null).map((row) => row.k))].sort((a, b) => a - b)
   const epsOptions = [...new Set(assignments.filter((row) => row.eps != null).map((row) => row.eps))].sort((a, b) => a - b)
   const minPtsOptions = [...new Set(assignments.filter((row) => row.min_pts != null).map((row) => row.min_pts))].sort((a, b) => a - b)
@@ -167,6 +189,20 @@ export function clusterComparisonWidget(pointsData, assignmentsData, axisXLabel 
     if (item.value === state.method) option.selected = true
     method.appendChild(option)
   })
+
+  const displayWrap = document.createElement("label")
+  displayWrap.style.display = "flex"
+  displayWrap.style.alignItems = "center"
+  displayWrap.style.gap = "8px"
+  const display = document.createElement("select")
+  displayOptions.forEach((item) => {
+    const option = document.createElement("option")
+    option.value = item.value
+    option.textContent = item.label
+    if (item.value === state.display) option.selected = true
+    display.appendChild(option)
+  })
+  displayWrap.append("Display", display)
 
   const linkageWrap = document.createElement("label")
   linkageWrap.style.display = "flex"
@@ -221,7 +257,7 @@ export function clusterComparisonWidget(pointsData, assignmentsData, axisXLabel 
   const minPtsLabel = document.createElement("strong")
   minPtsWrap.append("MinPts", minPtsSlider, minPtsLabel)
 
-  controls.append("Method", method, linkageWrap, kWrap, epsWrap, minPtsWrap)
+  controls.append("Method", method, displayWrap, linkageWrap, kWrap, epsWrap, minPtsWrap)
 
   const svg = svgEl("svg", { viewBox: "0 0 760 400", width: "100%", height: "400" })
   const summary = document.createElement("div")
@@ -256,7 +292,35 @@ export function clusterComparisonWidget(pointsData, assignmentsData, axisXLabel 
     if (state.method === "kmedoids") {
       return `PAM / K-medoids with K = ${state.k} on the scaled monster features. ${clusterCount} displayed clusters.`
     }
-    return `DBSCAN with eps = ${state.eps.toFixed(1)} and MinPts = ${state.minPts} on the scaled monster features. ${clusterCount} clusters and ${noiseCount} noise points.`
+    return `DBSCAN with eps = ${state.eps.toFixed(1)} and MinPts = ${state.minPts} on the scaled monster features. ${clusterCount} clusters and ${noiseCount} noise points, with the cluster count discovered from the density settings rather than chosen in advance.`
+  }
+
+  function displayConfig() {
+    if (state.display === "pca") {
+      return {
+        label: "PCA",
+        xLabel: "PC1",
+        yLabel: "PC2",
+        xKey: "pc1",
+        yKey: "pc2"
+      }
+    }
+    if (state.display === "umap") {
+      return {
+        label: "UMAP",
+        xLabel: "UMAP 1",
+        yLabel: "UMAP 2",
+        xKey: "umap1",
+        yKey: "umap2"
+      }
+    }
+    return {
+      label: "display",
+      xLabel: "x",
+      yLabel: "y",
+      xKey: "x",
+      yKey: "y"
+    }
   }
 
   function render() {
@@ -273,6 +337,10 @@ export function clusterComparisonWidget(pointsData, assignmentsData, axisXLabel 
     const clusterIds = rows.map((row) => row.cluster_id).filter((value) => value > 0)
     const clusterCount = new Set(clusterIds).size
     const noiseCount = rows.filter((row) => row.cluster_id < 0).length
+    const currentDisplay = displayConfig()
+    const displayPoints = points.filter(
+      (point) => Number.isFinite(point[currentDisplay.xKey]) && Number.isFinite(point[currentDisplay.yKey])
+    )
 
     clearNode(svg)
     svg.appendChild(svgEl("rect", { x: 0, y: 0, width: 760, height: 400, fill: "rgba(255,255,255,0.74)" }))
@@ -280,8 +348,8 @@ export function clusterComparisonWidget(pointsData, assignmentsData, axisXLabel 
     const width = 760
     const height = 400
     const margin = { top: 24, right: 24, bottom: 52, left: 58 }
-    const [minX, maxX] = extent(points.map((point) => point.x))
-    const [minY, maxY] = extent(points.map((point) => point.y))
+    const [minX, maxX] = extent(displayPoints.map((point) => point[currentDisplay.xKey]))
+    const [minY, maxY] = extent(displayPoints.map((point) => point[currentDisplay.yKey]))
     const xScale = linearScale(minX, maxX, margin.left, width - margin.right)
     const yScale = linearScale(minY, maxY, height - margin.bottom, margin.top)
 
@@ -294,18 +362,18 @@ export function clusterComparisonWidget(pointsData, assignmentsData, axisXLabel 
       ticks(minY, maxY, 5),
       xScale,
       yScale,
-      axisXLabel,
-      axisYLabel
+      currentDisplay.xLabel,
+      currentDisplay.yLabel
     )
 
-    points.forEach((point) => {
+    displayPoints.forEach((point) => {
       const cluster = assignmentMap.get(point.id) ?? -1
       const hovered = state.hovered === point.id
       const highlighted = state.hoveredType != null && point.type === state.hoveredType
       const dimmed = state.hoveredType != null && point.type !== state.hoveredType
       const circle = svgEl("circle", {
-        cx: xScale(point.x),
-        cy: yScale(point.y),
+        cx: xScale(point[currentDisplay.xKey]),
+        cy: yScale(point[currentDisplay.yKey]),
         r: hovered ? 7.4 : highlighted ? 6.4 : 5.4,
         fill: cluster < 0 ? "#a1a8ae" : palette[(cluster - 1) % palette.length],
         stroke: hovered || highlighted ? "#111827" : "rgba(255,255,255,0.9)",
@@ -352,13 +420,20 @@ export function clusterComparisonWidget(pointsData, assignmentsData, axisXLabel 
     summary.textContent =
       state.method === "dbscan"
         ? `${clusterCount} clusters | ${noiseCount} noise points`
-        : `${clusterCount} clusters shown on the same ${axisXLabel}/${axisYLabel} display`
+        : `${clusterCount} clusters shown on the ${currentDisplay.label} display`
     note.textContent =
-      `${methodSummary(clusterCount, noiseCount)} The display uses ${axisXLabel} and ${axisYLabel}, but the clustering itself is fit on the full scaled monster feature set.`
+      `${methodSummary(clusterCount, noiseCount)} The display uses ${currentDisplay.xLabel} and ${currentDisplay.yLabel}, but the clustering itself is fit on the full scaled monster feature set.`
   }
 
   method.addEventListener("change", () => {
     state.method = method.value
+    state.hovered = null
+    state.hoveredType = null
+    render()
+  })
+
+  display.addEventListener("change", () => {
+    state.display = display.value
     state.hovered = null
     state.hoveredType = null
     render()

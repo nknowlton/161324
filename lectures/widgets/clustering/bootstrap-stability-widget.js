@@ -64,7 +64,7 @@ export function bootstrapStabilityWidget() {
   note.style.fontSize = "0.92rem"
   note.style.color = "#425565"
 
-  controls.append("Linkage", linkage, "Summary resamples", reps, "View draw", draw, labels)
+  controls.append("Linkage", linkage, "View draw", draw, "Summary resamples", reps, labels)
 
   const layout = document.createElement("div")
   layout.style.display = "grid"
@@ -295,6 +295,7 @@ export function bootstrapStabilityWidget() {
       `Bootstrap resampling draws the whole dataset with replacement. In this draw, ` +
       `${stabilityPoints.length} picks produced ${distinctCount} distinct points; repeated observations are larger and labelled x2/x3. ` +
       `The tree updates for the selected draw, while the matrix changes only when the summary resample count or linkage changes because it aggregates across all ${state.reps} resamples. ` +
+      `The bars on the right summarise average within-cluster stability for the baseline clusters. ` +
       `Mean ARI = ${meanAri.toFixed(2)}, selected draw ARI = ${selected.ari.toFixed(2)}.`
   }
 

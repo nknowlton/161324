@@ -154,9 +154,9 @@ function makeCentroidDemoData(seed = 32410) {
 }
 
 export const centroidPoints = makeCentroidDemoData()
-export const densityPoints = syntheticPoints
-  .filter((point) => point.source === "crescent" || point.source === "ring" || point.source === "noise")
-  .slice(0, 38)
+export const densityPoints = syntheticPoints.filter(
+  (point) => point.source === "crescent" || point.source === "ring" || point.source === "noise"
+)
 export const stabilityPoints = [
   ...syntheticPoints.filter((point) => point.source === "blob_a").slice(0, 8),
   ...syntheticPoints.filter((point) => point.source === "ellipse").slice(0, 8),
