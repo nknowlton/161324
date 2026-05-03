@@ -19,6 +19,6 @@ jobs:
               owner: 'nknowlton',
               repo: 'nknowlton.github.io',
               workflow_id: 'deploy.yml',
-              ref: 'main'
+              ref: 'master'
             });
             console.log('Hub deploy workflow triggered.');
