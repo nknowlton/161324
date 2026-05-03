@@ -35,6 +35,8 @@ jobs:
 
       - name: Install R packages
         shell: Rscript {0}
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           install.packages("remotes", repos = "https://packagemanager.posit.co/cran/__linux__/noble/latest")
           source("notes/install_packages.R")
