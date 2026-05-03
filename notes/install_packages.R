@@ -26,6 +26,12 @@ cran_packages <- c(
   # tidymodels (meta-package covers rsample, recipes, parsnip, yardstick, ...)
   "tidymodels",      # 05-tidymodels, 06-classification
   "discrim",         # 06-classification (LDA/QDA via parsnip; not in core tidymodels)
+  "rsample",         # resampling utilities
+  "stacks",          # ensemble stacking
+
+  # Dimensionality reduction / visualization
+  "uwot",            # UMAP embeddings
+  "arrow",           # parquet file I/O
 
   # Prediction / modelling engines
   "MASS",            # 06-classification (lda, qda)
@@ -36,8 +42,12 @@ cran_packages <- c(
   "naivebayes",      # 06-classification (naive Bayes engine for parsnip)
   "kknn",            # 06-classification (k-NN engine for parsnip)
   "ranger",          # 04-prediction (random forest engine for parsnip)
+  "xgboost",         # gradient boosting
+  "vip",             # variable importance plots
+  "irlba",           # fast PCA for large matrices
   "cluster",         # 07-clustering (pam, silhouette)
   "dbscan",          # 07-clustering
+  "skimr",           # 02-data (summary statistics)
 
   # Association rules
   "arules",          # 08-associationrules
