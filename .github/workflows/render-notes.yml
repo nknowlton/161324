@@ -36,13 +36,8 @@ jobs:
       - name: Install R packages
         shell: Rscript {0}
         run: |
-          pkgs <- c(
-            "bookdown", "tidyverse", "tidymodels", "baguette", "ranger",
-            "xgboost", "stacks", "arules", "arulesViz", "cluster", "dbscan",
-            "uwot", "arrow", "vip", "Matrix", "irlba", "patchwork",
-            "skimr", "rsample", "DT", "knitr", "rmarkdown"
-          )
-          install.packages(pkgs, repos = "https://packagemanager.posit.co/cran/__linux__/jammy/latest")
+          install.packages("remotes", repos = "https://packagemanager.posit.co/cran/__linux__/noble/latest")
+          source("notes/install_packages.R")
 
       - name: Render notes
         shell: Rscript {0}

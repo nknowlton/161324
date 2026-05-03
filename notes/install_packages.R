@@ -1,10 +1,16 @@
 # Install all packages required for the 161.324 Data Mining notes
 # Run this once before rendering the bookdown notes.
 
+# Use Posit Package Manager if no repo is already set (e.g. in CI)
+if (getOption("repos")["CRAN"] == "@CRAN@" || is.na(getOption("repos")["CRAN"])) {
+  options(repos = c(CRAN = "https://packagemanager.posit.co/cran/__linux__/noble/latest"))
+}
+
 # ── CRAN packages ─────────────────────────────────────────────────────────────
 
 cran_packages <- c(
   # Core
+  "bookdown",        # render engine
   "tidyverse",       # index.Rmd, all chapters
   "patchwork",       # 01-intro, 06-classification, 07-clustering
   "broom",           # 04-prediction, 06-classification, 07-clustering
@@ -36,7 +42,10 @@ cran_packages <- c(
   # Association rules
   "arules",          # 08-associationrules
   "arulesViz",        # 08-associationrules
-  "baguette"         # 08-associationrules (word cloud visualization for itemsets/rules
+  "baguette",        # 08-associationrules (word cloud visualization for itemsets/rules
+  "DT",              # interactive tables in rendered HTML
+  "knitr",           # chunk rendering
+  "rmarkdown"        # base render engine
 )
 
 install.packages(cran_packages)
