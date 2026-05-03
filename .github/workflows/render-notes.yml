@@ -1,0 +1,55 @@
+name: Render notes
+
+on:
+  push:
+    paths:
+      - 'notes/**/*.Rmd'
+      - 'notes/_bookdown.yml'
+      - 'notes/_output.yml'
+      - 'notes/style.css'
+      - 'common/*.R'
+      - 'data/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+          use-public-rspm: true
+
+      - name: Install system libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libglpk40 libcurl4-openssl-dev libssl-dev libxml2-dev libfontconfig1-dev
+
+      - name: Install R packages
+        shell: Rscript {0}
+        run: |
+          pkgs <- c(
+            "bookdown", "tidyverse", "tidymodels", "baguette", "ranger",
+            "xgboost", "stacks", "arules", "arulesViz", "cluster", "dbscan",
+            "uwot", "arrow", "vip", "Matrix", "irlba", "patchwork",
+            "skimr", "rsample", "DT", "knitr", "rmarkdown"
+          )
+          install.packages(pkgs, repos = "https://packagemanager.posit.co/cran/__linux__/jammy/latest")
+
+      - name: Render notes
+        shell: Rscript {0}
+        run: |
+          setwd("notes")
+          bookdown::render_book("index.Rmd", output_format = "bookdown::gitbook")
+
+      - name: Commit rendered notes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "ci: render notes [skip ci]"
+          file_pattern: "notes/_book/**"
