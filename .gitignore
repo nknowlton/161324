@@ -17,5 +17,6 @@ lectures/preview_*.txt
 notes/*.md
 notes/*.knit.md
 notes/*.utf8.md
+notes/_book/
 notes/_main.Rmd
 notes/_main.md

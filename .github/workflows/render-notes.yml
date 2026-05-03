@@ -48,8 +48,13 @@ jobs:
           setwd("notes")
           bookdown::render_book("index.Rmd", output_format = "bookdown::gitbook")
 
+      - name: Copy _book to docs/
+        run: |
+          rm -rf docs
+          cp -r notes/_book/. docs/
+
       - name: Commit rendered notes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "ci: render notes [skip ci]"
-          file_pattern: "notes/_book/**"
+          file_pattern: "docs/**"
