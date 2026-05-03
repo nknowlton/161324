@@ -1,0 +1,398 @@
+1/3        
+2/3 [setup]
+3/3        
+1/7                  
+2/7 [unnamed-chunk-1]
+3/7                  
+4/7 [goats]          
+5/7                  
+6/7 [amazon]         
+7/7                  
+1/19                  
+2/19 [unnamed-chunk-1]
+3/19                  
+4/19 [unnamed-chunk-2]
+5/19                  
+6/19 [unnamed-chunk-3]
+7/19                  
+8/19 [unnamed-chunk-4]
+9/19                  
+10/19 [unnamed-chunk-5]
+11/19                  
+12/19 [unnamed-chunk-6]
+13/19                  
+14/19 [unnamed-chunk-7]
+15/19                  
+16/19 [unnamed-chunk-8]
+17/19                  
+18/19 [unnamed-chunk-9]
+19/19                  
+1/19                  
+2/19 [unnamed-chunk-1]
+3/19                  
+4/19 [unnamed-chunk-2]
+5/19                  
+6/19 [unnamed-chunk-3]
+7/19                  
+8/19 [unnamed-chunk-4]
+9/19                  
+10/19 [unnamed-chunk-5]
+11/19                  
+12/19 [unnamed-chunk-6]
+13/19                  
+14/19 [impute1]        
+15/19                  
+16/19 [unnamed-chunk-7]
+17/19                  
+18/19 [imputeknn]      
+19/19                  
+1/107                   
+2/107 [unnamed-chunk-1] 
+3/107                   
+4/107 [unnamed-chunk-2] 
+5/107                   
+6/107 [unnamed-chunk-3] 
+7/107                   
+8/107 [unnamed-chunk-4] 
+9/107                   
+10/107 [unnamed-chunk-5] 
+11/107                   
+12/107 [unnamed-chunk-6] 
+13/107                   
+14/107 [unnamed-chunk-7] 
+15/107                   
+16/107 [unnamed-chunk-8] 
+17/107                   
+18/107 [unnamed-chunk-9] 
+19/107                   
+20/107 [unnamed-chunk-10]
+21/107                   
+22/107 [unnamed-chunk-11]
+23/107                   
+24/107 [unnamed-chunk-12]
+25/107                   
+26/107 [unnamed-chunk-13]
+27/107                   
+28/107 [unnamed-chunk-14]
+29/107                   
+30/107 [unnamed-chunk-15]
+31/107                   
+32/107 [wagepred1]       
+33/107                   
+34/107 [wagepred2]       
+35/107                   
+36/107 [unnamed-chunk-16]
+37/107                   
+38/107 [unnamed-chunk-17]
+39/107                   
+40/107 [unnamed-chunk-18]
+41/107                   
+42/107 [unnamed-chunk-19]
+43/107                   
+44/107 [toytree1]        
+45/107                   
+46/107 [toytree2]        
+47/107                   
+48/107 [toytree3]        
+49/107                   
+50/107 [splits]          
+51/107                   
+52/107 [unnamed-chunk-20]
+53/107                   
+54/107 [unnamed-chunk-21]
+55/107                   
+56/107 [wagetree]        
+57/107                   
+58/107 [unnamed-chunk-22]
+59/107                   
+60/107 [unnamed-chunk-23]
+61/107                   
+62/107 [treebiasvariance]
+63/107                   
+64/107 [unnamed-chunk-24]
+65/107                   
+66/107 [wagetree2]       
+67/107                   
+68/107 [unnamed-chunk-25]
+69/107 [unnamed-chunk-26]
+70/107                   
+71/107 [unnamed-chunk-27]
+72/107                   
+73/107 [unnamed-chunk-28]
+74/107                   
+75/107 [unnamed-chunk-29]
+76/107                   
+77/107 [unnamed-chunk-30]
+78/107                   
+79/107 [wageresample]    
+80/107                   
+81/107 [wageunstable]    
+82/107                   
+83/107 [unnamed-chunk-31]
+84/107                   
+85/107 [unnamed-chunk-32]
+86/107                   
+87/107 [nnetdiag]        
+88/107                   
+89/107 [activation]      
+90/107                   
+91/107 [unnamed-chunk-33]
+92/107                   
+93/107 [unnamed-chunk-34]
+94/107                   
+95/107 [unnamed-chunk-35]
+96/107 [unnamed-chunk-36]
+97/107                   
+98/107 [unnamed-chunk-37]
+99/107                   
+100/107 [unnamed-chunk-38]
+101/107                   
+102/107 [unnamed-chunk-39]
+103/107                   
+104/107 [unnamed-chunk-40]
+105/107                   
+106/107 [unnamed-chunk-41]
+107/107                   
+1/43                   
+2/43 [unnamed-chunk-1] 
+3/43                   
+4/43 [unnamed-chunk-2] 
+5/43                   
+6/43 [unnamed-chunk-3] 
+7/43                   
+8/43 [unnamed-chunk-4] 
+9/43                   
+10/43 [unnamed-chunk-5] 
+11/43                   
+12/43 [unnamed-chunk-6] 
+13/43                   
+14/43 [unnamed-chunk-7] 
+15/43                   
+16/43 [unnamed-chunk-8] 
+17/43                   
+18/43 [unnamed-chunk-9] 
+19/43                   
+20/43 [unnamed-chunk-10]
+21/43                   
+22/43 [unnamed-chunk-11]
+23/43                   
+24/43 [unnamed-chunk-12]
+25/43                   
+26/43 [unnamed-chunk-13]
+27/43                   
+28/43 [unnamed-chunk-14]
+29/43                   
+30/43 [unnamed-chunk-15]
+31/43                   
+32/43 [unnamed-chunk-16]
+33/43                   
+34/43 [wagepredictions] 
+35/43                   
+36/43 [unnamed-chunk-17]
+37/43                   
+38/43 [unnamed-chunk-18]
+39/43                   
+40/43 [unnamed-chunk-19]
+41/43                   
+42/43 [unnamed-chunk-20]
+43/43                   
+1/97                   
+2/97 [unnamed-chunk-1] 
+3/97                   
+4/97 [wineclass]       
+5/97                   
+6/97 [unnamed-chunk-2] 
+7/97                   
+8/97 [toylda]          
+9/97                   
+10/97 [toylda2]         
+11/97                   
+12/97 [unnamed-chunk-3] 
+13/97                   
+14/97 [unnamed-chunk-4] 
+15/97                   
+16/97 [unnamed-chunk-5] 
+17/97                   
+18/97 [unnamed-chunk-6] 
+19/97                   
+20/97 [unnamed-chunk-7] 
+21/97                   
+22/97 [unnamed-chunk-8] 
+23/97                   
+24/97 [unnamed-chunk-9] 
+25/97                   
+26/97 [circledata]      
+27/97                   
+28/97 [unnamed-chunk-10]
+29/97                   
+30/97 [unnamed-chunk-11]
+31/97                   
+32/97 [unnamed-chunk-12]
+33/97                   
+34/97 [unnamed-chunk-13]
+35/97                   
+36/97 [unnamed-chunk-14]
+37/97                   
+38/97 [logistic]        
+39/97                   
+40/97 [unnamed-chunk-15]
+41/97                   
+42/97 [unnamed-chunk-16]
+43/97                   
+44/97 [unnamed-chunk-17]
+45/97                   
+46/97 [unnamed-chunk-18]
+47/97                   
+48/97 [unnamed-chunk-19]
+49/97 [unnamed-chunk-20]
+50/97                   
+51/97 [unnamed-chunk-21]
+52/97                   
+53/97 [unnamed-chunk-22]
+54/97                   
+55/97 [unnamed-chunk-23]
+56/97                   
+57/97 [swiss5]          
+58/97                   
+59/97 [unnamed-chunk-24]
+60/97                   
+61/97 [unnamed-chunk-25]
+62/97                   
+63/97 [unnamed-chunk-26]
+64/97                   
+65/97 [unnamed-chunk-27]
+66/97                   
+67/97 [unnamed-chunk-28]
+68/97                   
+69/97 [unnamed-chunk-29]
+70/97                   
+71/97 [unnamed-chunk-30]
+72/97                   
+73/97 [unnamed-chunk-31]
+74/97                   
+75/97 [roc-swiss]       
+76/97                   
+77/97 [unnamed-chunk-32]
+78/97                   
+79/97 [unnamed-chunk-33]
+80/97                   
+81/97 [unnamed-chunk-34]
+82/97 [unnamed-chunk-35]
+83/97                   
+84/97 [winetree]        
+85/97                   
+86/97 [unnamed-chunk-36]
+87/97                   
+88/97 [unnamed-chunk-37]
+89/97                   
+90/97 [unnamed-chunk-38]
+91/97                   
+92/97 [unnamed-chunk-39]
+93/97                   
+94/97 [unnamed-chunk-40]
+95/97                   
+96/97 [unnamed-chunk-41]
+97/97                   
+1/66                   
+2/66 [unnamed-chunk-1] 
+3/66                   
+4/66 [unnamed-chunk-2] 
+5/66                   
+6/66 [unnamed-chunk-3] 
+7/66                   
+8/66 [repubstars]      
+9/66                   
+10/66 [unnamed-chunk-4] 
+11/66                   
+12/66 [repubsingle]     
+13/66 [repubcomplete]   
+14/66                   
+15/66 [unnamed-chunk-5] 
+16/66                   
+17/66 [unnamed-chunk-6] 
+18/66                   
+19/66 [unnamed-chunk-7] 
+20/66                   
+21/66 [kmeans1]         
+22/66                   
+23/66 [kmeans2]         
+24/66                   
+25/66 [kmeans3]         
+26/66                   
+27/66 [unnamed-chunk-8] 
+28/66                   
+29/66 [peng1]           
+30/66                   
+31/66 [unnamed-chunk-9] 
+32/66                   
+33/66 [peng2]           
+34/66                   
+35/66 [peng3]           
+36/66                   
+37/66 [unnamed-chunk-10]
+38/66                   
+39/66 [cartoon]         
+40/66                   
+41/66 [unnamed-chunk-11]
+42/66                   
+43/66 [unnamed-chunk-12]
+44/66                   
+45/66 [unnamed-chunk-13]
+46/66                   
+47/66 [silhouette]      
+48/66                   
+49/66 [silhouetterepub] 
+50/66                   
+51/66 [unnamed-chunk-14]
+52/66                   
+53/66 [unnamed-chunk-15]
+54/66                   
+55/66 [unnamed-chunk-16]
+56/66                   
+57/66 [silhouettepeng]  
+58/66                   
+59/66 [unnamed-chunk-17]
+60/66                   
+61/66 [unnamed-chunk-18]
+62/66                   
+63/66 [unnamed-chunk-19]
+64/66                   
+65/66 [unnamed-chunk-20]
+66/66                   
+1/31                   
+2/31 [unnamed-chunk-1] 
+3/31                   
+4/31 [market1]         
+5/31                   
+6/31 [market2]         
+7/31                   
+8/31 [coffeetea]       
+9/31                   
+10/31 [unnamed-chunk-2] 
+11/31                   
+12/31 [income1]         
+13/31                   
+14/31 [unnamed-chunk-3] 
+15/31                   
+16/31 [unnamed-chunk-4] 
+17/31                   
+18/31 [unnamed-chunk-5] 
+19/31                   
+20/31 [unnamed-chunk-6] 
+21/31                   
+22/31 [unnamed-chunk-7] 
+23/31                   
+24/31 [unnamed-chunk-8] 
+25/31                   
+26/31 [unnamed-chunk-9] 
+27/31                   
+28/31 [unnamed-chunk-10]
+29/31                   
+30/31 [unnamed-chunk-11]
+31/31                   
+1/19                  
+2/19 [unnamed-chunk-1]
+3/19                  
+4/19 [ensemble-setup] 
+5/19                  
+6/19 [unnamed-chunk-2]

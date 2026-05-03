@@ -236,6 +236,282 @@ export function hierarchicalComparison() {
   return container
 }
 
+function toRows(data) {
+  if (Array.isArray(data)) return data
+  if (!data || typeof data !== "object") return []
+
+  const keys = Object.keys(data)
+  const size = keys.length === 0 ? 0 : Math.max(...keys.map((key) => (Array.isArray(data[key]) ? data[key].length : 0)))
+  return Array.from({ length: size }, (_, index) =>
+    Object.fromEntries(keys.map((key) => [key, Array.isArray(data[key]) ? data[key][index] : data[key]]))
+  )
+}
+
+function linearScale(domainMin, domainMax, rangeMin, rangeMax) {
+  const span = domainMax - domainMin || 1
+  return (value) => rangeMin + ((value - domainMin) / span) * (rangeMax - rangeMin)
+}
+
+export function hierarchicalCutWidget(pointsData, mergesData, orderData, axisLabelsData) {
+  const points = toRows(pointsData).map((row, index) => ({
+    id: Number(row.id ?? index + 1),
+    name: String(row.name ?? `Obs ${index + 1}`),
+    type: String(row.type ?? ""),
+    x: Number(row.x),
+    y: Number(row.y)
+  }))
+  const merges = toRows(mergesData)
+    .map((row) => ({
+      step: Number(row.step),
+      left: Number(row.left),
+      right: Number(row.right),
+      height: Number(row.height)
+    }))
+    .sort((left, right) => left.step - right.step)
+
+  const order = (Array.isArray(orderData) ? orderData : []).map((value) => Number(value))
+  const axisLabels = Array.isArray(axisLabelsData) && axisLabelsData.length >= 2
+    ? axisLabelsData.map((value) => String(value))
+    : ["x", "y"]
+
+  const n = points.length
+  const levels = [0, ...merges.map((merge) => merge.height)]
+  const nodes = new Map()
+  const parent = new Map()
+
+  for (let leaf = 1; leaf <= n; leaf += 1) {
+    nodes.set(leaf, { id: leaf, left: null, right: null, height: 0, members: [leaf] })
+  }
+
+  const resolveChild = (value) => {
+    if (value < 0) return -value
+    return n + value
+  }
+
+  merges.forEach((merge, index) => {
+    const leftId = resolveChild(merge.left)
+    const rightId = resolveChild(merge.right)
+    const nodeId = n + index + 1
+    const node = {
+      id: nodeId,
+      left: leftId,
+      right: rightId,
+      height: merge.height,
+      members: nodes.get(leftId).members.concat(nodes.get(rightId).members)
+    }
+    nodes.set(nodeId, node)
+    parent.set(leftId, nodeId)
+    parent.set(rightId, nodeId)
+  })
+
+  const rootId = n + merges.length
+  const leafOrder = order.length === n ? order : Array.from({ length: n }, (_, index) => index + 1)
+  const xByLeaf = new Map(leafOrder.map((leafId, index) => [leafId, index]))
+  const xByNode = new Map()
+
+  const locateX = (nodeId) => {
+    if (xByNode.has(nodeId)) return xByNode.get(nodeId)
+    const node = nodes.get(nodeId)
+    if (!node) return 0
+    if (node.left == null) {
+      const x = xByLeaf.get(nodeId) ?? 0
+      xByNode.set(nodeId, x)
+      return x
+    }
+    const x = (locateX(node.left) + locateX(node.right)) / 2
+    xByNode.set(nodeId, x)
+    return x
+  }
+  if (rootId > n) locateX(rootId)
+
+  const state = {
+    cutIndex: Math.max(0, Math.min(levels.length - 1, n - 5))
+  }
+
+  const container = document.createElement("div")
+  container.className = "widget-shell"
+  container.style.display = "grid"
+  container.style.gap = "12px"
+
+  const controls = document.createElement("div")
+  controls.style.display = "flex"
+  controls.style.flexWrap = "wrap"
+  controls.style.alignItems = "center"
+  controls.style.gap = "10px"
+
+  const slider = document.createElement("input")
+  slider.type = "range"
+  slider.min = "0"
+  slider.max = String(Math.max(levels.length - 1, 0))
+  slider.step = "1"
+  slider.value = String(state.cutIndex)
+  slider.style.width = "320px"
+
+  const label = document.createElement("strong")
+  controls.append("Cut height", slider, label)
+
+  const panel = document.createElement("div")
+  panel.style.display = "grid"
+  panel.style.gridTemplateColumns = "1fr 1fr"
+  panel.style.gap = "14px"
+
+  const scatterSvg = svgEl("svg", { viewBox: "0 0 560 360", width: "100%", height: "360" })
+  const dendroSvg = svgEl("svg", { viewBox: "0 0 560 360", width: "100%", height: "360" })
+  panel.append(scatterSvg, dendroSvg)
+
+  const note = document.createElement("div")
+  note.style.fontSize = "0.9rem"
+  note.style.color = "#425565"
+
+  container.append(controls, panel, note)
+
+  const clustersAtHeight = (cutHeight) => {
+    const frontier = []
+    nodes.forEach((node) => {
+      if (node.height > cutHeight) return
+      const parentId = parent.get(node.id)
+      if (parentId == null || nodes.get(parentId).height > cutHeight) {
+        frontier.push(node)
+      }
+    })
+
+    frontier.sort((left, right) => Math.min(...left.members) - Math.min(...right.members))
+    const assignments = Array(n).fill(-1)
+    frontier.forEach((node, clusterIndex) => {
+      node.members.forEach((member) => {
+        assignments[member - 1] = clusterIndex
+      })
+    })
+
+    return { assignments, clusters: frontier.length }
+  }
+
+  const renderScatter = (assignments) => {
+    clearNode(scatterSvg)
+    const width = 560
+    const height = 360
+    const margin = { top: 24, right: 22, bottom: 54, left: 58 }
+    scatterSvg.appendChild(svgEl("rect", { x: 0, y: 0, width, height, fill: "rgba(255,255,255,0.74)" }))
+
+    const xs = points.map((point) => point.x)
+    const ys = points.map((point) => point.y)
+    const minX = Math.min(...xs)
+    const maxX = Math.max(...xs)
+    const minY = Math.min(...ys)
+    const maxY = Math.max(...ys)
+    const xScale = linearScale(minX, maxX, margin.left, width - margin.right)
+    const yScale = linearScale(minY, maxY, height - margin.bottom, margin.top)
+
+    scatterSvg.appendChild(svgEl("line", { x1: margin.left, y1: height - margin.bottom, x2: width - margin.right, y2: height - margin.bottom, stroke: "#6b7280", "stroke-width": 1.2 }))
+    scatterSvg.appendChild(svgEl("line", { x1: margin.left, y1: margin.top, x2: margin.left, y2: height - margin.bottom, stroke: "#6b7280", "stroke-width": 1.2 }))
+
+    const xAxisLabel = svgEl("text", { x: (margin.left + width - margin.right) / 2, y: height - 10, "text-anchor": "middle", "font-size": "12", fill: "#334155" })
+    xAxisLabel.textContent = axisLabels[0]
+    scatterSvg.appendChild(xAxisLabel)
+
+    const yAxisLabel = svgEl("text", {
+      x: 16,
+      y: (margin.top + height - margin.bottom) / 2,
+      transform: `rotate(-90 16 ${(margin.top + height - margin.bottom) / 2})`,
+      "text-anchor": "middle",
+      "font-size": "12",
+      fill: "#334155"
+    })
+    yAxisLabel.textContent = axisLabels[1]
+    scatterSvg.appendChild(yAxisLabel)
+
+    points.forEach((point, index) => {
+      const cluster = assignments[index]
+      scatterSvg.appendChild(
+        svgEl("circle", {
+          cx: xScale(point.x),
+          cy: yScale(point.y),
+          r: 5.4,
+          fill: cluster < 0 ? "#a4a9ad" : palette[cluster % palette.length],
+          stroke: "rgba(255,255,255,0.9)",
+          "stroke-width": 1.2,
+          opacity: 0.92
+        })
+      )
+    })
+  }
+
+  const renderDendrogram = (cutHeight) => {
+    clearNode(dendroSvg)
+    const width = 560
+    const height = 360
+    const paddingX = 40
+    const top = 30
+    const bottom = 32
+    const maxHeight = Math.max(...merges.map((merge) => merge.height), 1)
+    const usableWidth = width - 2 * paddingX
+    const usableHeight = height - top - bottom
+    const scaleX = (value) => paddingX + (value / Math.max(n - 1, 1)) * usableWidth
+    const scaleY = (value) => height - bottom - (value / maxHeight) * usableHeight
+
+    dendroSvg.appendChild(svgEl("rect", { x: 0, y: 0, width, height, fill: "rgba(255,255,255,0.74)" }))
+
+    merges.forEach((merge, index) => {
+      const nodeId = n + index + 1
+      const node = nodes.get(nodeId)
+      const leftNode = nodes.get(node.left)
+      const rightNode = nodes.get(node.right)
+
+      dendroSvg.appendChild(svgEl("line", {
+        x1: scaleX(locateX(leftNode.id)),
+        y1: scaleY(leftNode.height),
+        x2: scaleX(locateX(leftNode.id)),
+        y2: scaleY(node.height),
+        stroke: "#64748b",
+        "stroke-width": 1.8
+      }))
+      dendroSvg.appendChild(svgEl("line", {
+        x1: scaleX(locateX(rightNode.id)),
+        y1: scaleY(rightNode.height),
+        x2: scaleX(locateX(rightNode.id)),
+        y2: scaleY(node.height),
+        stroke: "#64748b",
+        "stroke-width": 1.8
+      }))
+      dendroSvg.appendChild(svgEl("line", {
+        x1: scaleX(locateX(leftNode.id)),
+        y1: scaleY(node.height),
+        x2: scaleX(locateX(rightNode.id)),
+        y2: scaleY(node.height),
+        stroke: "#64748b",
+        "stroke-width": 1.8
+      }))
+    })
+
+    dendroSvg.appendChild(svgEl("line", {
+      x1: paddingX,
+      y1: scaleY(cutHeight),
+      x2: width - paddingX,
+      y2: scaleY(cutHeight),
+      stroke: "#cf5d2e",
+      "stroke-width": 2.4,
+      "stroke-dasharray": "8 5"
+    }))
+  }
+
+  const update = () => {
+    const cutHeight = levels[state.cutIndex] ?? 0
+    const { assignments, clusters } = clustersAtHeight(cutHeight)
+    label.textContent = `h = ${cutHeight.toFixed(2)} | clusters = ${clusters}`
+    renderScatter(assignments)
+    renderDendrogram(cutHeight)
+    note.textContent = "Move the slider to shift the horizontal cut line. Point colours update to the partition implied by that cut height."
+  }
+
+  slider.addEventListener("input", () => {
+    state.cutIndex = Number(slider.value)
+    update()
+  })
+
+  update()
+  return container
+}
+
 export function hierarchicalWidget() {
   const state = { linkage: "complete", step: 0 }
   const cache = new Map()

@@ -165,6 +165,13 @@ monster_dist <- monster_scaled |>
 
 monster_hc <- hclust(monster_dist, method = "complete")
 monster_groups <- cutree(monster_hc, k = 5)
+monster_hc_merges <- tibble(
+  step = seq_along(monster_hc$height),
+  left = monster_hc$merge[, 1],
+  right = monster_hc$merge[, 2],
+  height = monster_hc$height
+)
+monster_hc_order <- unname(monster_hc$order)
 monster_kmeans_models <- set_names(
   map(1:8, function(k) {
     set.seed(161324 + k)
@@ -431,29 +438,65 @@ hdbscan_plot_data <- if (requireNamespace("dbscan", quietly = TRUE)) {
   NULL
 }
 
-monster_pam_lookup <- tibble(
-  pam_cluster = unname(monster_pam$clustering),
-  kmeans_cluster = unname(monster_kmeans$cluster)
-) |>
-  count(pam_cluster, kmeans_cluster, sort = TRUE) |>
-  group_by(pam_cluster) |>
-  slice_max(n, n = 1, with_ties = FALSE) |>
-  ungroup()
+pad_limits <- function(values, padding = 0.08) {
+  limits <- range(values, na.rm = TRUE)
+  span <- diff(limits)
+  if (span == 0) span <- 1
+  c(limits[1] - padding * span, limits[2] + padding * span)
+}
 
-monster_partition_compare <- monster_compare_points |>
-  mutate(
-    kmeans_cluster = unname(monster_kmeans$cluster),
-    pam_cluster = unname(monster_pam$clustering)
-) |>
-  left_join(monster_pam_lookup, by = "pam_cluster") |>
-  mutate(
-    agreement = if_else(kmeans_cluster.x == kmeans_cluster.y, "Same cluster after relabelling", "Different cluster"),
-    agreement = factor(agreement, levels = c("Same cluster after relabelling", "Different cluster"))
+monster_partition_compare_k <- map_dfr(2:5, function(k_value) {
+  kmeans_clusters <- unname(monster_kmeans_models[[as.character(k_value)]]$cluster)
+  pam_clusters <- unname(monster_pam_models[[as.character(k_value)]]$clustering)
+
+  pam_lookup <- tibble(
+    pam_cluster = pam_clusters,
+    kmeans_cluster = kmeans_clusters
   ) |>
-  rename(
-    kmeans_cluster = kmeans_cluster.x,
-    pam_relabelled_cluster = kmeans_cluster.y
+    count(pam_cluster, kmeans_cluster, sort = TRUE) |>
+    group_by(pam_cluster) |>
+    arrange(desc(n), kmeans_cluster, .by_group = TRUE) |>
+    slice(1) |>
+    ungroup() |>
+    select(pam_cluster, pam_relabelled_cluster = kmeans_cluster)
+
+  monster_compare_points |>
+    mutate(
+      k = k_value,
+      kmeans_cluster = kmeans_clusters,
+      pam_cluster = pam_clusters
+    ) |>
+    left_join(pam_lookup, by = "pam_cluster") |>
+    mutate(
+      agreement = if_else(
+        kmeans_cluster == pam_relabelled_cluster,
+        "Same cluster after relabelling",
+        "Different cluster"
+      ),
+      agreement = factor(agreement, levels = c("Same cluster after relabelling", "Different cluster"))
+    )
+})
+
+monster_partition_compare <- monster_partition_compare_k |>
+  filter(k == 5)
+
+monster_partition_agreement_table <- monster_partition_compare |>
+  count(agreement, name = "count") |>
+  mutate(
+    percent = 100 * count / sum(count),
+    agreement = as.character(agreement)
   )
+
+monster_compare_axis_limits <- list(
+  x = pad_limits(monster_compare_points$x),
+  y = pad_limits(monster_compare_points$y)
+)
+
+monster_compare_axis_limits_ojs <- tibble(
+  axis = c("x", "y"),
+  min = c(monster_compare_axis_limits$x[1], monster_compare_axis_limits$y[1]),
+  max = c(monster_compare_axis_limits$x[2], monster_compare_axis_limits$y[2])
+)
 
 doc_dir <- getwd()
 csv_out <- file.path(doc_dir, "widgets", "clustering", "synthetic_points.csv")
@@ -732,22 +775,35 @@ hierarchicalComparison()
 
 - `cutree(monster_hc, k = 5)` turns the hierarchy into five explicit cluster labels.
 - Cutting higher or lower would give a different number of clusters.
-- After fitting, we can compare those cluster labels to the known `type` variable to see what structure the clustering recovered.
+- Move the cut-height slider to see how the partition changes as the horizontal cut moves up or down.
 
-::: {.left-code}
+::: {.widget-cell}
 ```{r}
-table(type = monsters$type, cluster = monster_groups)
+#| echo: false
+ojs_define(
+  monster_cut_ojs_points = monster_compare_points,
+  monster_cut_ojs_merges = monster_hc_merges,
+  monster_cut_ojs_order = monster_hc_order,
+  monster_cut_ojs_labels = monster_display_labels
+)
 ```
+
+```{ojs}
+//| echo: false
+import { hierarchicalCutWidget } from "./widgets/clustering/hierarchical-widget.js"
+hierarchicalCutWidget(
+  monster_cut_ojs_points,
+  monster_cut_ojs_merges,
+  monster_cut_ojs_order,
+  monster_cut_ojs_labels
+)
+```
+
+::: {.widget-note}
+- The horizontal line shows the active cut height on the dendrogram.
+- Point colours show the resulting subgroup labels at that height on the same projection used elsewhere in the lecture.
+- Lower cuts produce more clusters; higher cuts merge groups into fewer clusters.
 :::
-
-::: {.right-plot}
-```{r}
-monsters |>
-  mutate(cluster = factor(monster_groups)) |>
-  ggplot(aes(x = hp_number, y = cr, colour = cluster)) +
-  geom_point(alpha = 0.85, size = 2.1) +
-  labs(x = "Hit points", y = "Challenge rating")
-```
 :::
 ---
 
@@ -764,7 +820,7 @@ monsters |>
 
 ## Bootstrap stability on monsters
 
-::: {.widget-note}
+
 - A bootstrap sample is a new dataset made by sampling the monsters with replacement from the original data.
 - The tibble below contains one adjusted Rand index (ARI) value per bootstrap resample; here we used `35` resamples.
 - The adjusted Rand index compares every pair of monsters across two partitions: did that pair stay together, or stay apart, in both clusterings? It then subtracts the agreement expected by chance,
@@ -772,7 +828,6 @@ $$
 \mathrm{ARI} = \frac{\sum_{ij}\binom{n_{ij}}{2} - E}{\frac{1}{2}\left[\sum_i \binom{a_i}{2} + \sum_j \binom{b_j}{2}\right] - E},
 $$
 so `1` means a perfect match to the baseline clustering, `0` means about as much agreement as random assignment, and negative values mean worse than random agreement. Higher values mean more stable cluster structure.
-:::
 
 ```{r}
 #| echo: false
@@ -951,16 +1006,33 @@ Use `K = 2` through `5` and switch between `PCA` and `UMAP` to compare the final
 
 ::: {.left-code}
 ```{r}
-monster_partition_compare |>
-  count(agreement)
+#| echo: false
+monster_partition_agreement_table |>
+  transmute(
+    Agreement = agreement,
+    Count = count,
+    Percent = sprintf("%.1f%%", percent)
+  ) |>
+  knitr::kable(align = c("l", "r", "r"))
 ```
 :::
 
 ::: {.right-plot}
 ```{r}
+#| echo: false
 monster_partition_compare |>
   ggplot(aes(x = x, y = y, colour = agreement)) +
   geom_point(alpha = 0.88, size = 2.1) +
+  scale_colour_manual(
+    values = c(
+      "Same cluster after relabelling" = "#197278",
+      "Different cluster" = "#c44536"
+    )
+  ) +
+  coord_cartesian(
+    xlim = monster_compare_axis_limits$x,
+    ylim = monster_compare_axis_limits$y
+  ) +
   labs(x = monster_display_labels[[1]], y = monster_display_labels[[2]], colour = NULL)
 ```
 :::
@@ -968,6 +1040,35 @@ monster_partition_compare |>
 - Disagreement usually shows up around boundary observations or points affected by outliers.
 - K-means is faster and works well for compact numeric clusters.
 - PAM is more robust when the center should be a real observation or when outliers matter.
+
+---
+
+## Disagreement across K values
+
+```{r}
+#| echo: false
+ojs_define(
+  monster_disagreement_ojs = monster_partition_compare_k,
+  monster_disagreement_axis_labels_ojs = monster_display_labels,
+  monster_disagreement_axis_limits_ojs = monster_compare_axis_limits_ojs
+)
+```
+
+::: {.widget-cell}
+```{ojs}
+//| echo: false
+import { kmeansPamDisagreementWidget } from "./widgets/clustering/cluster-comparison-widget.js"
+kmeansPamDisagreementWidget(
+  monster_disagreement_ojs,
+  monster_disagreement_axis_labels_ojs,
+  monster_disagreement_axis_limits_ojs
+)
+```
+:::
+
+::: {.widget-note}
+Use `K = 2` through `5` to see where K-means and PAM disagree after relabelling PAM clusters to the closest K-means labels. Disagreements are highlighted strongly; agreements stay visible as context.
+:::
 
 # Density Clustering
 
@@ -977,17 +1078,24 @@ monster_partition_compare |>
 
 *DBSCAN* stands for Density-Based Spatial Clustering of Applications with Noise.
 
-It groups points that are packed closely together (densely) and labels isolated points as noise.
+- It groups points that are packed closely together (densely) and labels isolated points as noise.
 
-Unlike K-means, DBSCAN does not require us to choose the number of clusters in advance, and it can recover irregular shapes such as rings, crescents, or curved bands.
+- Unlike K-means, DBSCAN does not require us to choose the number of clusters in advance, and it can recover irregular shapes such as rings, crescents, or curved bands.
 
-Advantages:
+::: {.fragment}
+#### Advantages:
 - Can find clusters of arbitrary shape.
 - Can identify noise points that do not belong to any cluster.
-Disadvantages:
-- Sensitive to the choice of parameters (eps and MinPts).
+:::
 
-Terms to know:
+:::{.fragment}
+#### Disadvantages:
+- Sensitive to the choice of parameters (eps and MinPts).
+:::
+
+:::{.fragment}
+#### Terms to know:
+:::
 
 - *Core point*: at least `MinPts` observations in its `eps`-neighborhood.
 - *Border point*: not core, but within the neighborhood of a core point.
@@ -1030,16 +1138,10 @@ DBSCAN repeats: inspect an unvisited point, test whether it is core, expand thro
 ## HDBSCAN
 
 *HDBSCAN* stands for Hierarchical Density-Based Spatial Clustering of Applications with Noise.
-The "H" in HDBSCAN stands for "hierarchical," which means it builds a hierarchy of clusters based on varying density thresholds.
 
-Advantages:
-- Can handle clusters of varying densities better than DBSCAN.
-- Provides a more robust clustering solution when the data contains clusters of different densities.
-Disadvantages:
-- More complex than DBSCAN and may require more computational resources.
-- Like DBSCAN, it can be sensitive to parameter choices, although it has fewer parameters to tune.
+- The "H" in HDBSCAN stands for "hierarchical," which means it builds a hierarchy of clusters based on varying density thresholds.
 
-
+::: {.right-plot}
 ```{r}
 if (is.null(hdbscan_plot_data)) {
   tibble(status = "Install the dbscan package to render the HDBSCAN example.")
@@ -1050,6 +1152,28 @@ if (is.null(hdbscan_plot_data)) {
 }
 ```
 
+:::
+::: {.left-code}
+
+::: {.fragment}
+#### Advantages:
+
+  - Can handle clusters of varying densities better than DBSCAN.
+  - Provides a more robust clustering solution when the data contains clusters of different densities.
+:::
+
+:::{.fragment}
+#### Disadvantages:
+
+- More complex than DBSCAN and may require more computational resources.
+- Like DBSCAN, it can be sensitive to parameter choices, although it has fewer parameters to tune.
+:::
+:::
+
+
+---
+
+# Wrapping up: comparing methods on the same display
 
 ---
 

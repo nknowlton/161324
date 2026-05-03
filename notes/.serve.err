@@ -1,0 +1,68 @@
+
+
+processing file: index.Rmd
+output file: index.knit.md
+
+
+
+processing file: 01-intro.Rmd
+output file: 01-intro.knit.md
+
+
+
+processing file: 02-data.Rmd
+output file: 02-data.knit.md
+
+
+
+processing file: 03-missingvalues.Rmd
+output file: 03-missingvalues.knit.md
+
+
+
+processing file: 04-prediction.Rmd
+output file: 04-prediction.knit.md
+
+
+
+processing file: 05-tidymodels.Rmd
+output file: 05-tidymodels.knit.md
+
+
+
+processing file: 06-classification.Rmd
+output file: 06-classification.knit.md
+
+
+
+processing file: 07-clustering.Rmd
+output file: 07-clustering.knit.md
+
+
+
+processing file: 08-associationrules.Rmd
+output file: 08-associationrules.knit.md
+
+
+
+processing file: 09-ensembles.Rmd
+Error in `estimate_tune_results()`:
+! All models failed. Run `show_notes(.Last.tune.result)` for more
+  information.
+Backtrace:
+    ▆
+ 1. ├─dplyr::select(...)
+ 2. ├─dplyr::bind_rows(...)
+ 3. │ └─rlang::list2(...)
+ 4. ├─dplyr::mutate(collect_metrics(single_tree_res), model = "single tree")
+ 5. ├─tune::collect_metrics(single_tree_res)
+ 6. └─tune:::collect_metrics.tune_results(single_tree_res)
+ 7.   └─tune::estimate_tune_results(x)
+ 8.     └─cli::cli_abort("All models failed. Run {.code show_notes(.Last.tune.result)} for more\n       information.")
+ 9.       └─rlang::abort(...)
+
+Quitting from 09-ensembles.Rmd:159-186 [unnamed-chunk-2]
+Execution halted
+Error in Rscript_render(f, render_args, render_meta, add1, add2) : 
+  Failed to compile 09-ensembles.Rmd
+Calls: <Anonymous> ... render_book -> render_new_session -> Rscript_render

@@ -31,6 +31,8 @@ available at the time of intake.
 ```{r ensemble-setup, message=FALSE, warning=FALSE}
 library(tidymodels)
 library(baguette)
+library(mirai)
+daemons(10)
 tidymodels_prefer()
 
 source("../common/longbeach.R")

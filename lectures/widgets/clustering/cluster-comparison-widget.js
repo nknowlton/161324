@@ -470,3 +470,188 @@ export function clusterComparisonWidget(pointsData, assignmentsData) {
   render()
   return container
 }
+
+export function kmeansPamDisagreementWidget(disagreementData, axisLabelsData, axisLimitsData) {
+  const rows = toRows(disagreementData).map((row) => ({
+    ...row,
+    id: Number(row.id),
+    k: Number(row.k),
+    x: Number(row.x),
+    y: Number(row.y),
+    kmeans_cluster: Number(row.kmeans_cluster),
+    pam_cluster: Number(row.pam_cluster),
+    pam_relabelled_cluster: Number(row.pam_relabelled_cluster)
+  }))
+
+  const labelRows = toRows(axisLabelsData)
+  const axisLabels = Array.isArray(axisLabelsData)
+    ? axisLabelsData
+    : labelRows.length > 0
+      ? Object.values(labelRows[0])
+      : ["x", "y"]
+
+  const limitsRows = toRows(axisLimitsData)
+  const limitMap = new Map(limitsRows.map((row) => [row.axis, { min: Number(row.min), max: Number(row.max) }]))
+
+  const kOptions = [...new Set(rows.map((row) => row.k))].sort((a, b) => a - b)
+  const state = {
+    k: kOptions.includes(5) ? 5 : kOptions[0],
+    hoveredId: null,
+    hoveredType: null
+  }
+
+  const container = document.createElement("div")
+  container.className = "widget-shell"
+  container.style.display = "grid"
+  container.style.gap = "12px"
+
+  const controls = document.createElement("div")
+  controls.style.display = "flex"
+  controls.style.flexWrap = "wrap"
+  controls.style.alignItems = "center"
+  controls.style.gap = "10px"
+
+  const kSlider = document.createElement("input")
+  kSlider.type = "range"
+  kSlider.min = String(Math.min(...kOptions))
+  kSlider.max = String(Math.max(...kOptions))
+  kSlider.step = "1"
+  kSlider.value = String(state.k)
+  kSlider.style.width = "240px"
+
+  const kLabel = document.createElement("strong")
+  controls.append("Choose K", kSlider, kLabel)
+
+  const legend = document.createElement("div")
+  legend.style.display = "flex"
+  legend.style.gap = "16px"
+  legend.style.alignItems = "center"
+  legend.style.fontSize = "0.84rem"
+  legend.style.color = "#425565"
+
+  const legendDisagree = document.createElement("span")
+  legendDisagree.textContent = "Different cluster"
+  legendDisagree.style.padding = "0.15rem 0.42rem"
+  legendDisagree.style.borderRadius = "999px"
+  legendDisagree.style.background = "rgba(196, 69, 54, 0.16)"
+  legendDisagree.style.border = "1px solid rgba(196, 69, 54, 0.28)"
+
+  const legendAgree = document.createElement("span")
+  legendAgree.textContent = "Same cluster after relabelling"
+  legendAgree.style.padding = "0.15rem 0.42rem"
+  legendAgree.style.borderRadius = "999px"
+  legendAgree.style.background = "rgba(25, 114, 120, 0.13)"
+  legendAgree.style.border = "1px solid rgba(25, 114, 120, 0.24)"
+
+  legend.append(legendDisagree, legendAgree)
+
+  const svg = svgEl("svg", { viewBox: "0 0 760 400", width: "100%", height: "400" })
+  const summary = document.createElement("div")
+  summary.style.fontSize = "0.92rem"
+  summary.style.color = "#425565"
+  const hoverNote = document.createElement("div")
+  hoverNote.style.fontSize = "0.88rem"
+  hoverNote.style.color = "#51616f"
+  hoverNote.style.minHeight = "1.2em"
+  const note = document.createElement("div")
+  note.style.fontSize = "0.92rem"
+  note.style.color = "#425565"
+
+  container.append(controls, legend, svg, summary, hoverNote, note)
+
+  function render() {
+    const currentRows = rows.filter((row) => row.k === state.k)
+    const disagreementRows = currentRows.filter((row) => row.agreement === "Different cluster")
+    const disagreementRate = currentRows.length === 0 ? 0 : (100 * disagreementRows.length) / currentRows.length
+
+    const xValues = rows.map((row) => row.x)
+    const yValues = rows.map((row) => row.y)
+    const xBounds = limitMap.get("x") ?? { min: extent(xValues)[0], max: extent(xValues)[1] }
+    const yBounds = limitMap.get("y") ?? { min: extent(yValues)[0], max: extent(yValues)[1] }
+
+    clearNode(svg)
+    svg.appendChild(svgEl("rect", { x: 0, y: 0, width: 760, height: 400, fill: "rgba(255,255,255,0.74)" }))
+
+    const width = 760
+    const height = 400
+    const margin = { top: 24, right: 24, bottom: 52, left: 58 }
+    const xScale = linearScale(xBounds.min, xBounds.max, margin.left, width - margin.right)
+    const yScale = linearScale(yBounds.min, yBounds.max, height - margin.bottom, margin.top)
+
+    drawAxes(
+      svg,
+      width,
+      height,
+      margin,
+      ticks(xBounds.min, xBounds.max, 5),
+      ticks(yBounds.min, yBounds.max, 5),
+      xScale,
+      yScale,
+      axisLabels[0] ?? "x",
+      axisLabels[1] ?? "y"
+    )
+
+    currentRows.forEach((row) => {
+      const disagreement = row.agreement === "Different cluster"
+      const hovered = state.hoveredId === row.id
+      const highlightedType = state.hoveredType != null && row.type === state.hoveredType
+      const dimmed = state.hoveredType != null && row.type !== state.hoveredType
+
+      const circle = svgEl("circle", {
+        cx: xScale(row.x),
+        cy: yScale(row.y),
+        r: hovered ? 7.2 : disagreement ? 6.1 : 4.7,
+        fill: disagreement ? "#c44536" : "#197278",
+        stroke: hovered || highlightedType ? "#111827" : "rgba(255,255,255,0.9)",
+        "stroke-width": hovered ? 2.2 : disagreement ? 1.5 : 1.2,
+        opacity: dimmed ? 0.18 : disagreement ? 0.96 : 0.26
+      })
+
+      const title = document.createElementNS("http://www.w3.org/2000/svg", "title")
+      title.textContent =
+        `${row.name} (${row.type}) | K-means C${row.kmeans_cluster} vs PAM C${row.pam_cluster} ` +
+        `(relabelled to C${row.pam_relabelled_cluster})`
+      circle.appendChild(title)
+
+      circle.addEventListener("mouseenter", () => {
+        state.hoveredId = row.id
+        state.hoveredType = row.type
+        hoverNote.textContent =
+          `${row.name} | ${shortMonsterType(row.type)} | ` +
+          `${disagreement ? "different" : "same"} cluster after relabelling`
+        render()
+      })
+
+      circle.addEventListener("mouseleave", () => {
+        state.hoveredId = null
+        state.hoveredType = null
+        hoverNote.textContent = "Hover a point to inspect K-means versus PAM assignment details."
+        render()
+      })
+
+      svg.appendChild(circle)
+    })
+
+    hoverNote.textContent = state.hoveredId
+      ? hoverNote.textContent
+      : "Hover a point to inspect K-means versus PAM assignment details."
+
+    kLabel.textContent = `K = ${state.k}`
+    summary.textContent =
+      `${disagreementRows.length} disagreements out of ${currentRows.length} monsters ` +
+      `(${disagreementRate.toFixed(1)}%).`
+    note.textContent =
+      "PAM cluster labels are relabelled to their closest K-means labels before comparison, " +
+      "so highlighted points indicate substantive assignment disagreement rather than label naming differences."
+  }
+
+  kSlider.addEventListener("input", () => {
+    state.k = Number(kSlider.value)
+    state.hoveredId = null
+    state.hoveredType = null
+    render()
+  })
+
+  render()
+  return container
+}
