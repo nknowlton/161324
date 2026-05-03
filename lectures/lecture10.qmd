@@ -805,6 +805,7 @@ hierarchicalCutWidget(
 - Lower cuts produce more clusters; higher cuts merge groups into fewer clusters.
 :::
 :::
+
 ---
 
 
@@ -1212,7 +1213,7 @@ For hierarchical clustering, K-means, and PAM, the cluster count is chosen by us
 | K-means | Fast, familiar, easy to explain | Splits non-convex shapes | Yes |
 | K-medoids | Robust, medoids are real points | Slower than K-means | Usually yes |
 | DBSCAN | Handles noise and shape | Parameter tuning can be awkward | Yes |
-| HDBSCAN | Better with varying density | Extra package, less introductory intuition | Yes |
+| HDBSCAN | Better with varying density | Less  intuitive | Yes |
 
 ::: {.widget-note}
 Chapter 7 of the course notes covers Gower dissimilarity, bootstrap stability, HDBSCAN, and UMAP with more mathematical detail.
