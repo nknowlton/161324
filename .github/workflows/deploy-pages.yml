@@ -1,0 +1,115 @@
+name: Deploy 161324 GitHub Pages site
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - 'lectures-html/**'
+      - 'data/**'
+      - 'labs/**'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Assemble Pages artifact
+        run: |
+          rm -rf _site
+          mkdir -p _site/notes _site/lectures _site/data _site/labs
+
+          cp -r docs/. _site/notes/
+          cp -r lectures-html/. _site/lectures/
+          cp -r labs/. _site/labs/
+
+          shopt -s nullglob
+          csv_files=(data/*.csv)
+          gz_files=(data/*.csv.gz)
+
+          if [ ${#csv_files[@]} -gt 0 ]; then
+            for f in "${csv_files[@]}"; do
+              gzip -c "$f" > "_site/data/$(basename "$f").gz"
+            done
+          fi
+
+          if [ ${#gz_files[@]} -gt 0 ]; then
+            cp data/*.csv.gz _site/data/
+          fi
+
+          cat > _site/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>161.324 Data Mining</title>
+            <style>
+              body {
+                font-family: system-ui, sans-serif;
+                max-width: 760px;
+                margin: 3rem auto;
+                padding: 0 1.5rem;
+                color: #1f2933;
+                line-height: 1.55;
+              }
+              h1 {
+                margin-bottom: 0.25rem;
+              }
+              p {
+                margin-top: 0.25rem;
+              }
+              ul {
+                padding-left: 1.25rem;
+              }
+              a {
+                color: #0f766e;
+              }
+            </style>
+          </head>
+          <body>
+            <h1>161.324 Data Mining</h1>
+            <p>Course materials published from the teaching repository.</p>
+            <ul>
+              <li><a href="./notes/">Notes</a></li>
+              <li><a href="./lectures/">Lectures</a></li>
+              <li><a href="./data/">Data</a></li>
+              <li><a href="./labs/">Labs</a></li>
+            </ul>
+          </body>
+          </html>
+          EOF
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
