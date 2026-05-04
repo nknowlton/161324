@@ -96,15 +96,3 @@ jobs:
         with:
           commit_message: "ci: render lectures 10-12 [skip ci]"
           file_pattern: "lectures-html/**"
-
-      - name: Trigger knowlton.co.nz rebuild
-        env:
-          GH_TOKEN: ${{ secrets['324_Deploy_token'] || secrets.HUB_DEPLOY_TOKEN }}
-        run: |
-          if [ -z "$GH_TOKEN" ]; then
-            echo "Hub deploy token missing; skipping knowlton.co.nz rebuild trigger."
-            exit 0
-          fi
-
-          gh api repos/nknowlton/nknowlton.github.io/dispatches \
-            -f event_type=deploy-course-content
