@@ -118,6 +118,7 @@ exm:unlabeled-div-52
 eq:umap-aff
 eq:umap-loss
 exm:unlabeled-div-53
+fig:umappeng
 tab:market1
 tab:market2
 exm:coffeetea
