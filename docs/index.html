@@ -10,7 +10,7 @@
 
   <meta property="og:title" content="Data mining" />
   <meta property="og:type" content="book" />
-  
+  <meta property="og:image" content="/graphics/Datamining_cover.png" />
   <meta property="og:description" content="Data mining notes" />
   <meta name="github-repo" content="jmarshallnz/161324" />
 
@@ -18,12 +18,12 @@
   <meta name="twitter:title" content="Data mining" />
   
   <meta name="twitter:description" content="Data mining notes" />
-  
+  <meta name="twitter:image" content="/graphics/Datamining_cover.png" />
 
 <meta name="author" content="Jonathan Marshall, Martin Hazelton, Nick Knowlton" />
 
 
-<meta name="date" content="2026-05-03" />
+<meta name="date" content="2026-05-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -154,7 +154,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="./">161.324 Data Mining</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="0.1" data-path="index.html"><a href="index.html#course-structure"><i class="fa fa-check"></i><b>0.1</b> Course structure</a></li>
+<li class="chapter" data-level="0.2" data-path="index.html"><a href="index.html#prerequisites"><i class="fa fa-check"></i><b>0.2</b> Prerequisites</a></li>
+<li class="chapter" data-level="0.3" data-path="index.html"><a href="index.html#how-to-use-these-notes"><i class="fa fa-check"></i><b>0.3</b> How to use these notes</a></li>
+<li class="chapter" data-level="0.4" data-path="index.html"><a href="index.html#acknowledgements"><i class="fa fa-check"></i><b>0.4</b> Acknowledgements</a></li>
+</ul></li>
 <li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
 <ul>
 <li class="chapter" data-level="1.1" data-path="introduction.html"><a href="introduction.html#sec:intro1"><i class="fa fa-check"></i><b>1.1</b> What is Data Mining?</a></li>
@@ -349,15 +355,54 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="header">
 <h1 class="title">Data mining</h1>
 <p class="author"><em>Jonathan Marshall, Martin Hazelton, Nick Knowlton</em></p>
-<p class="date"><em>2026-05-03</em></p>
+<p class="date"><em>2026-05-04</em></p>
 </div>
 <div id="preface" class="section level1 unnumbered hasAnchor">
 <h1>Preface<a href="index.html#preface" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>This is the study guide for 161.324 Data Mining and 161.777 Practical Data Mining at Massey University.</p>
-<p>It is put together based on existing notes from previous courses, updated in 2022 to utilise
-the tidyverse suite of packages.</p>
-<p>It will be progressively updated over time.</p>
+<p>This is the study guide for <strong>161.324 Data Mining</strong> (undergraduate) and
+<strong>161.777 Practical Data Mining</strong> (postgraduate) at Massey University.</p>
+<p>Data mining sits at the intersection of statistics, machine learning, and
+computing. These notes take a statistician’s approach to the subject,
+emphasising a principled workflow: understanding the data, choosing an
+appropriate method, evaluating results, and communicating findings.</p>
+<div id="course-structure" class="section level2 hasAnchor" number="0.1">
+<h2><span class="header-section-number">0.1</span> Course structure<a href="index.html#course-structure" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The course is divided into two main parts:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Prediction and classification</strong> (weeks 1–9): data wrangling, missing
+value imputation, linear models, regression trees, random forests, neural
+networks, linear discriminant analysis, logistic regression, classification
+trees, and ensemble methods.</li>
+<li><strong>Unsupervised learning and pattern discovery</strong> (weeks 10–12): clustering
+(hierarchical, k-means, k-medoids), association rule mining, and ensemble
+learning including bagging, boosting (XGBoost), and stacked ensembles.</li>
+</ol>
+<p>Each topic is accompanied by practical lab sessions in R, using the tidyverse
+and tidymodels ecosystems, along with a range of specialised packages for
+clustering, association rules, and ensemble methods.</p>
+</div>
+<div id="prerequisites" class="section level2 hasAnchor" number="0.2">
+<h2><span class="header-section-number">0.2</span> Prerequisites<a href="index.html#prerequisites" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The notes assume familiarity with introductory statistics and basic R
+programming (data frames, vectors, functions). Some experience with <code>ggplot2</code>
+and <code>dplyr</code> is helpful but not essential—the early weeks include a review of
+these tools.</p>
+</div>
+<div id="how-to-use-these-notes" class="section level2 hasAnchor" number="0.3">
+<h2><span class="header-section-number">0.3</span> How to use these notes<a href="index.html#how-to-use-these-notes" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The notes are designed to be read alongside the lectures and labs. Each chapter
+corresponds to roughly one week of material. Code examples are embedded
+throughout; running them yourself will give you a much deeper understanding than
+reading alone.</p>
+</div>
+<div id="acknowledgements" class="section level2 hasAnchor" number="0.4">
+<h2><span class="header-section-number">0.4</span> Acknowledgements<a href="index.html#acknowledgements" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>These notes build on earlier course materials written by
+<a href="https://www.massey.ac.nz/massey/expertise/profile.cfm?stref=269430">Jonathan Marshall</a>
+and <a href="https://www.linkedin.com/in/martin-hazelton-2baa6b9/">Martin Hazelton</a>, with contributions from
+<a href="https://www.linkedin.com/in/nsknowlton/">Nicholas Knowlton</a>.</p>
 
+</div>
 </div>
             </section>
 

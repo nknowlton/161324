@@ -268,11 +268,6 @@ the group $\{ \textsf{Arkansas}, \textsf{Florida},
 figure is $37.79937$ which can be obtained by inspecting
 `repub.clust.single$height`).
 
-
-```
-#> Warning: package 'ggdendro' was built under R version 4.5.2
-```
-
 <div class="figure">
 <img src="07-clustering_files/figure-html/repubsingle-1.png" alt="Dendrogram for Republican voting data, obtained using single linkage." width="672" />
 <p class="caption">(\#fig:repubsingle)Dendrogram for Republican voting data, obtained using single linkage.</p>
@@ -330,7 +325,7 @@ these groups into fewer clusters.
     the right. This can be viewed as an unwanted lack of robustness with
     single linkage.
     
-    <img src="graphics/linkage_single.png" alt="" width="536" />
+    ![](graphics/linkage_single.png)<!-- -->
 
     The central cluster in Figure \@ref(fig:repubsingle) in
     Example \@ref(exm:repubclust) shows an instance of chaining with real data.
@@ -342,7 +337,7 @@ these groups into fewer clusters.
     intuition is that the middle cluster should first combine with the
     left hand cluster.
 
-    <img src="graphics/linkage_complete.png" alt="" width="563" />
+    ![](graphics/linkage_complete.png)<!-- -->
 
 ## K-means clustering
 
@@ -454,11 +449,6 @@ this for the above example. The majority of the reduction in cluster
 variance occurs by $K=3$, and while things continue to improve, the
 relative improvement is minor.
 
-
-```
-#> Warning: package 'broom' was built under R version 4.5.2
-```
-
 <div class="figure">
 <img src="07-clustering_files/figure-html/kmeans3-1.png" alt="The within cluster variance for one to six clusters for Example \@ref(exm:kmeans)" width="672" />
 <p class="caption">(\#fig:kmeans3)The within cluster variance for one to six clusters for Example \@ref(exm:kmeans)</p>
@@ -505,15 +495,6 @@ We will use the measurements `flipper_length_mm`, `bill_length_mm`, and
 `body_mass_g` to cluster the penguins. Suppose we do not know the
 species labels and want to see whether the $K$-means algorithm can
 recover them from the numeric features alone.
-
-
-```
-#> Warning: package 'palmerpenguins' was built under R version 4.5.2
-```
-
-```
-#> Warning: package 'patchwork' was built under R version 4.5.2
-```
 
 <div class="figure">
 <img src="07-clustering_files/figure-html/peng1-1.png" alt="The actual species (left) and clusters found using $K$-means with 3 clusters (right) for Example \@ref(exm:penguins)." width="672" />
@@ -695,13 +676,6 @@ from example \@ref(exm:repubclust).
 
 ``` r
 library(cluster)
-```
-
-```
-#> Warning: package 'cluster' was built under R version 4.5.2
-```
-
-``` r
 pam(repub, k=3, metric="manhattan")
 ```
 

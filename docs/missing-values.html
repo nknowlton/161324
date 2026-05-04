@@ -10,7 +10,7 @@
 
   <meta property="og:title" content="Chapter 3 Missing values | Data mining" />
   <meta property="og:type" content="book" />
-  
+  <meta property="og:image" content="/graphics/Datamining_cover.png" />
   <meta property="og:description" content="Chapter 3 Missing values | Data mining notes" />
   <meta name="github-repo" content="jmarshallnz/161324" />
 
@@ -18,12 +18,12 @@
   <meta name="twitter:title" content="Chapter 3 Missing values | Data mining" />
   
   <meta name="twitter:description" content="Chapter 3 Missing values | Data mining notes" />
-  
+  <meta name="twitter:image" content="/graphics/Datamining_cover.png" />
 
 <meta name="author" content="Jonathan Marshall, Martin Hazelton, Nick Knowlton" />
 
 
-<meta name="date" content="2026-05-03" />
+<meta name="date" content="2026-05-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -154,7 +154,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="./">161.324 Data Mining</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="0.1" data-path="index.html"><a href="index.html#course-structure"><i class="fa fa-check"></i><b>0.1</b> Course structure</a></li>
+<li class="chapter" data-level="0.2" data-path="index.html"><a href="index.html#prerequisites"><i class="fa fa-check"></i><b>0.2</b> Prerequisites</a></li>
+<li class="chapter" data-level="0.3" data-path="index.html"><a href="index.html#how-to-use-these-notes"><i class="fa fa-check"></i><b>0.3</b> How to use these notes</a></li>
+<li class="chapter" data-level="0.4" data-path="index.html"><a href="index.html#acknowledgements"><i class="fa fa-check"></i><b>0.4</b> Acknowledgements</a></li>
+</ul></li>
 <li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
 <ul>
 <li class="chapter" data-level="1.1" data-path="introduction.html"><a href="introduction.html#sec:intro1"><i class="fa fa-check"></i><b>1.1</b> What is Data Mining?</a></li>
@@ -422,9 +428,8 @@ those rows might be more appropriate. Or a combination thereof!</p>
 <div class="example">
 <p><span id="exm:unlabeled-div-6" class="example"><strong>Example 3.1  </strong></span><strong>Visualising missingness in the airquality data</strong></p>
 <p>We can use <code>vis_miss</code> directly on the <code>airquality</code> data.frame:</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="missing-values.html#cb51-1" tabindex="-1"></a><span class="fu">library</span>(visdat)</span></code></pre></div>
-<pre><code>#&gt; Warning: package &#39;visdat&#39; was built under R version 4.5.2</code></pre>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="missing-values.html#cb53-1" tabindex="-1"></a><span class="fu">vis_miss</span>(airquality)</span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="missing-values.html#cb38-1" tabindex="-1"></a><span class="fu">library</span>(visdat)</span>
+<span id="cb38-2"><a href="missing-values.html#cb38-2" tabindex="-1"></a><span class="fu">vis_miss</span>(airquality)</span></code></pre></div>
 <p><img src="03-missingvalues_files/figure-html/unnamed-chunk-2-1.png" alt="" width="672" />
 From this we see that most of the missingness (4.8% overall) is contained in the <code>Ozone</code> column,
 which is 24.2% missing. The <code>Solar.R</code> column then contains relatively small number of missing rows (7)
@@ -476,7 +481,7 @@ the usual <code>NA</code> convention in R.</p>
 This is a matrix with ones on the long-diagonal (corresponding to a
 perfect correlation of any variable with itself) and pair correlations
 as the off-diagonal elements<a href="#fn13" class="footnote-ref" id="fnref13"><sup>13</sup></a>.</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="missing-values.html#cb54-1" tabindex="-1"></a><span class="fu">cor</span>(husbands)</span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="missing-values.html#cb39-1" tabindex="-1"></a><span class="fu">cor</span>(husbands)</span></code></pre></div>
 <pre><code>#&gt;                     H.Age       H.Ht W.Age       W.Ht H.Age.Marriage
 #&gt; H.Age           1.0000000 -0.2773030    NA -0.2118564             NA
 #&gt; H.Ht           -0.2773030  1.0000000    NA  0.3644337             NA
@@ -492,11 +497,11 @@ correlation between a pair of variables where either one contains
 missing values.</p>
 <p>One way of handling this is to delete all records which are incomplete
 (i.e. contain at least one missing value).</p>
-<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="missing-values.html#cb56-1" tabindex="-1"></a>complete_rows <span class="ot">&lt;-</span> <span class="fu">complete.cases</span>(husbands)</span>
-<span id="cb56-2"><a href="missing-values.html#cb56-2" tabindex="-1"></a>husbands2 <span class="ot">&lt;-</span> husbands <span class="sc">|&gt;</span> <span class="fu">filter</span>(complete_rows)</span>
-<span id="cb56-3"><a href="missing-values.html#cb56-3" tabindex="-1"></a><span class="fu">nrow</span>(husbands2)</span></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="missing-values.html#cb41-1" tabindex="-1"></a>complete_rows <span class="ot">&lt;-</span> <span class="fu">complete.cases</span>(husbands)</span>
+<span id="cb41-2"><a href="missing-values.html#cb41-2" tabindex="-1"></a>husbands2 <span class="ot">&lt;-</span> husbands <span class="sc">|&gt;</span> <span class="fu">filter</span>(complete_rows)</span>
+<span id="cb41-3"><a href="missing-values.html#cb41-3" tabindex="-1"></a><span class="fu">nrow</span>(husbands2)</span></code></pre></div>
 <pre><code>#&gt; [1] 169</code></pre>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="missing-values.html#cb58-1" tabindex="-1"></a><span class="fu">cor</span>(husbands2)</span></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="missing-values.html#cb43-1" tabindex="-1"></a><span class="fu">cor</span>(husbands2)</span></code></pre></div>
 <pre><code>#&gt;                     H.Age       H.Ht      W.Age       W.Ht H.Age.Marriage
 #&gt; H.Age           1.0000000 -0.2251498  0.9382382 -0.1931005      0.3624374
 #&gt; H.Ht           -0.2251498  1.0000000 -0.1563196  0.3041247     -0.1032112
@@ -551,12 +556,11 @@ we would use the mode (i.e. the most frequently occurring category).</p>
 <code>W.Age</code> (wife’s age) and <code>H.Age.Marriage</code> (husband’s age when married).
 The following R code replaces missing values by the variable mean for
 the first of these variables .</p>
-<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="missing-values.html#cb60-1" tabindex="-1"></a><span class="fu">library</span>(naniar)</span></code></pre></div>
-<pre><code>#&gt; Warning: package &#39;naniar&#39; was built under R version 4.5.2</code></pre>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="missing-values.html#cb62-1" tabindex="-1"></a>HusWife <span class="ot">&lt;-</span> husbands <span class="sc">|&gt;</span></span>
-<span id="cb62-2"><a href="missing-values.html#cb62-2" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">W.Age.New =</span> <span class="fu">impute_mean</span>(W.Age),</span>
-<span id="cb62-3"><a href="missing-values.html#cb62-3" tabindex="-1"></a>         <span class="at">H.Age.Marriage.New =</span> <span class="fu">impute_mean</span>(H.Age.Marriage))</span>
-<span id="cb62-4"><a href="missing-values.html#cb62-4" tabindex="-1"></a>HusWife <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="fu">is.na</span>(H.Age.Marriage))</span></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="missing-values.html#cb45-1" tabindex="-1"></a><span class="fu">library</span>(naniar)</span>
+<span id="cb45-2"><a href="missing-values.html#cb45-2" tabindex="-1"></a>HusWife <span class="ot">&lt;-</span> husbands <span class="sc">|&gt;</span></span>
+<span id="cb45-3"><a href="missing-values.html#cb45-3" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">W.Age.New =</span> <span class="fu">impute_mean</span>(W.Age),</span>
+<span id="cb45-4"><a href="missing-values.html#cb45-4" tabindex="-1"></a>         <span class="at">H.Age.Marriage.New =</span> <span class="fu">impute_mean</span>(H.Age.Marriage))</span>
+<span id="cb45-5"><a href="missing-values.html#cb45-5" tabindex="-1"></a>HusWife <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="fu">is.na</span>(H.Age.Marriage))</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 7
 #&gt;   H.Age  H.Ht W.Age  W.Ht H.Age.Marriage W.Age.New H.Age.Marriage.New
 #&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;          &lt;dbl&gt;     &lt;dbl&gt;              &lt;dbl&gt;
@@ -627,10 +631,8 @@ but for in many cases <span class="math inline">\(k=5\)</span> is a reasonable r
 <p><span id="exm:unlabeled-div-9" class="example"><strong>Example 3.4  </strong></span><strong><span class="math inline">\(k\)</span> Nearest Neighbour Imputation for the Husbands and WivesData</strong></p>
 <p>In this example we impute values for the missing data on <code>W.Age</code> and
 <code>H.Age.Marriage</code> using k nearest neighbour imputation.</p>
-<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="missing-values.html#cb64-1" tabindex="-1"></a><span class="fu">library</span>(VIM)</span></code></pre></div>
-<pre><code>#&gt; Warning: package &#39;VIM&#39; was built under R version 4.5.2</code></pre>
-<pre><code>#&gt; Warning: package &#39;colorspace&#39; was built under R version 4.5.2</code></pre>
-<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="missing-values.html#cb67-1" tabindex="-1"></a>husbands.imp <span class="ot">&lt;-</span> husbands <span class="sc">|&gt;</span> <span class="fu">kNN</span>(<span class="at">k =</span> <span class="dv">5</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="missing-values.html#cb47-1" tabindex="-1"></a><span class="fu">library</span>(VIM)</span>
+<span id="cb47-2"><a href="missing-values.html#cb47-2" tabindex="-1"></a>husbands.imp <span class="ot">&lt;-</span> husbands <span class="sc">|&gt;</span> <span class="fu">kNN</span>(<span class="at">k =</span> <span class="dv">5</span>)</span></code></pre></div>
 <p>Points to note:</p>
 <ul>
 <li><p>The <code>library(VIM)</code> command is loading the <code>VIM</code> library.</p></li>

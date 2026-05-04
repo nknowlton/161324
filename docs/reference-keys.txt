@@ -136,6 +136,10 @@ eq:xgboost-obj
 eq:xgboost-leafwt
 exm:unlabeled-div-58
 exm:unlabeled-div-59
+course-structure
+prerequisites
+how-to-use-these-notes
+acknowledgements
 introduction
 sec:intro1
 sec:Rinitial

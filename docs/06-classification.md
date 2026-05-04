@@ -357,13 +357,6 @@ first convert the target variable `Cultivar` to a factor.
 
 ``` r
 library(rsample)
-```
-
-```
-#> Warning: package 'rsample' was built under R version 4.5.2
-```
-
-``` r
 wine <- read_csv("../data/wine.csv") |>
   mutate(Cultivar = factor(Cultivar))
 
@@ -397,25 +390,7 @@ We initially consider prediction with LDA using all the variables.
 
 ``` r
 library(discrim)
-```
-
-```
-#> Warning: package 'discrim' was built under R version 4.5.2
-```
-
-```
-#> Warning: package 'parsnip' was built under R version 4.5.2
-```
-
-``` r
 library(yardstick)
-```
-
-```
-#> Warning: package 'yardstick' was built under R version 4.5.2
-```
-
-``` r
 wine.lda1 <- discrim_linear() |> fit(Cultivar ~ ., data=wine.train)
 wine.lda1
 ```
@@ -908,11 +883,6 @@ $$p(\boldsymbol{x}) = \frac{1}{1+e^{-\theta(\boldsymbol{x})}}.$$ The
 logistic function ensures that the expected outcome is between 0 and 1,
 see the left-hand panel of Figure \@ref(fig:logistic).
 
-
-```
-#> Warning: package 'patchwork' was built under R version 4.5.2
-```
-
 <div class="figure">
 <img src="06-classification_files/figure-html/logistic-1.png" alt="The logistic and logit functions." width="672" />
 <p class="caption">(\#fig:logistic)The logistic and logit functions.</p>
@@ -1212,13 +1182,6 @@ from `glm()` to compute the class probabilities ourselves:
 
 ``` r
 library(broom)
-```
-
-```
-#> Warning: package 'broom' was built under R version 4.5.2
-```
-
-``` r
 swiss.glm.2 |> augment(newdata=swiss.test) |>
   mutate(.pred_genuine = 1/(1 + exp(-.fitted)))
 ```
@@ -1526,7 +1489,7 @@ summary(wine.mn3.refit)
 #> 
 #> Std. Errors:
 #>    (Intercept)    Alcohol         Flav          Hue    Proline
-#> B 0.2640822466 3.23025129 14.678344719 0.2261703773 0.01391875
+#> B 0.2640822467 3.23025129 14.678344719 0.2261703773 0.01391875
 #> C 0.0005947043 0.00824314  0.005362715 0.0003049169 0.19855427
 #> 
 #> Residual Deviance: 0.3720929 
@@ -1721,13 +1684,6 @@ variance. We try $k=1$ and $k=20$ to compare.
 ``` r
 wine.knn1 <- nearest_neighbor(mode="classification", neighbors = 1) |>
   fit(Cultivar ~ ., data=wine.train)
-```
-
-```
-#> Warning: package 'kknn' was built under R version 4.5.2
-```
-
-``` r
 wine.knn1.pred <- wine.knn1 |>
   augment(new_data = wine.test)
 wine.knn1.pred |>
@@ -1921,13 +1877,6 @@ the data first.
 
 ``` r
 library(recipes)
-```
-
-```
-#> Warning: package 'recipes' was built under R version 4.5.2
-```
-
-``` r
 scaling <- recipe(Cultivar ~ ., data=wine.train) |>
   step_normalize(all_numeric_predictors()) |>
   prep(wine.train)

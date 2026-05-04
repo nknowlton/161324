@@ -1,12 +1,12 @@
 --- 
 title: "Data mining"
 author: "Jonathan Marshall, Martin Hazelton, Nick Knowlton"
-date: "2026-05-03"
+date: "2026-05-04"
 site: bookdown::bookdown_site
 documentclass: book
 #bibliography: [packages.bib]
 # url: your book url like https://bookdown.org/yihui/bookdown
-# cover-image: path to the social sharing image like images/cover.jpg
+cover-image: graphics/Datamining_cover.png
 description: |
   Data mining notes
 link-citations: yes
@@ -20,52 +20,12 @@ library(tidyverse)
 ```
 
 ```
-## Warning: package 'tidyverse' was built under R version 4.5.2
-```
-
-```
-## Warning: package 'ggplot2' was built under R version 4.5.2
-```
-
-```
-## Warning: package 'tibble' was built under R version 4.5.2
-```
-
-```
-## Warning: package 'tidyr' was built under R version 4.5.2
-```
-
-```
-## Warning: package 'readr' was built under R version 4.5.2
-```
-
-```
-## Warning: package 'purrr' was built under R version 4.5.2
-```
-
-```
-## Warning: package 'dplyr' was built under R version 4.5.2
-```
-
-```
-## Warning: package 'stringr' was built under R version 4.5.2
-```
-
-```
-## Warning: package 'forcats' was built under R version 4.5.2
-```
-
-```
-## Warning: package 'lubridate' was built under R version 4.5.2
-```
-
-```
 ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-## ✔ dplyr     1.2.0     ✔ readr     2.2.0
+## ✔ dplyr     1.2.1     ✔ readr     2.2.0
 ## ✔ forcats   1.0.1     ✔ stringr   1.6.0
-## ✔ ggplot2   4.0.2     ✔ tibble    3.3.1
+## ✔ ggplot2   4.0.3     ✔ tibble    3.3.1
 ## ✔ lubridate 1.9.5     ✔ tidyr     1.3.2
-## ✔ purrr     1.2.1     
+## ✔ purrr     1.2.2     
 ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()
@@ -80,9 +40,47 @@ options(pillar.sigfig = 5)
 
 # Preface {-}
 
-This is the study guide for 161.324 Data Mining and 161.777 Practical Data Mining at Massey University.
+This is the study guide for **161.324 Data Mining** (undergraduate) and
+**161.777 Practical Data Mining** (postgraduate) at Massey University.
 
-It is put together based on existing notes from previous courses, updated in 2022 to utilise
-the tidyverse suite of packages.
+Data mining sits at the intersection of statistics, machine learning, and
+computing. These notes take a statistician's approach to the subject,
+emphasising a principled workflow: understanding the data, choosing an
+appropriate method, evaluating results, and communicating findings.
 
-It will be progressively updated over time.
+## Course structure
+
+The course is divided into two main parts:
+
+1. **Prediction and classification** (weeks 1--9): data wrangling, missing
+   value imputation, linear models, regression trees, random forests, neural
+   networks, linear discriminant analysis, logistic regression, classification
+   trees, and ensemble methods.
+2. **Unsupervised learning and pattern discovery** (weeks 10--12): clustering
+   (hierarchical, k-means, k-medoids), association rule mining, and ensemble
+   learning including bagging, boosting (XGBoost), and stacked ensembles.
+
+Each topic is accompanied by practical lab sessions in R, using the tidyverse
+and tidymodels ecosystems, along with a range of specialised packages for
+clustering, association rules, and ensemble methods.
+
+## Prerequisites
+
+The notes assume familiarity with introductory statistics and basic R
+programming (data frames, vectors, functions). Some experience with `ggplot2`
+and `dplyr` is helpful but not essential---the early weeks include a review of
+these tools.
+
+## How to use these notes
+
+The notes are designed to be read alongside the lectures and labs. Each chapter
+corresponds to roughly one week of material. Code examples are embedded
+throughout; running them yourself will give you a much deeper understanding than
+reading alone.
+
+## Acknowledgements
+
+These notes build on earlier course materials written by
+[Jonathan Marshall](https://www.massey.ac.nz/massey/expertise/profile.cfm?stref=269430)
+and [Martin Hazelton](https://www.linkedin.com/in/martin-hazelton-2baa6b9/), with contributions from
+[Nicholas Knowlton](https://www.linkedin.com/in/nsknowlton/).

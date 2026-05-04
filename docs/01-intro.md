@@ -72,11 +72,6 @@ words and so on. A scatterplot of two of the variables (number of spaces
 in the review, and number of commas) appears in Figure \@ref(fig:amazon), along
 with histograms displaying the marginal distributions of each variable.
 
-
-```
-#> Warning: package 'patchwork' was built under R version 4.5.2
-```
-
 <div class="figure">
 <img src="01-intro_files/figure-html/amazon-1.png" alt="Plot of number of commas against number of spaces in reviews on Amazon." width="672" />
 <p class="caption">(\#fig:amazon)Plot of number of commas against number of spaces in reviews on Amazon.</p>
