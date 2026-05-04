@@ -11,14 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger hub site rebuild
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets['324_Deploy_token'] || secrets.HUB_DEPLOY_TOKEN }}
-          script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner: 'nknowlton',
-              repo: 'nknowlton.github.io',
-              workflow_id: 'deploy.yml',
-              ref: 'master'
-            });
-            console.log('Hub deploy workflow triggered.');
+        env:
+          GH_TOKEN: ${{ secrets['324_Deploy_token'] || secrets.HUB_DEPLOY_TOKEN }}
+        run: |
+          gh workflow run deploy.yml --repo nknowlton/nknowlton.github.io --ref master
+          echo "Hub deploy workflow triggered."

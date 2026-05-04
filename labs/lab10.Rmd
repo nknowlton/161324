@@ -3,258 +3,65 @@ title: "Workshop 10: Clustering"
 output: html_document
 ---
 
-In this workshop we follow the lecture workflow for clustering:
+In this workshop we follow the lecture workflow for clustering on **two datasets**.
+For each task, the **2020 NZ Election** results are shown as a fully worked
+example. Your job is to adapt the same code to the **D&D Monsters** data — the
+variable names are similar, so the code changes are small.
 
-- build a dissimilarity matrix
-- check the effect of scaling
+- build a dissimilarity matrix and check the effect of scaling
+- use PCA and UMAP to visualise the data in two dimensions
 - compare hierarchical clustering, $K$-means, and PAM
 - use silhouette widths to defend a choice of $K$
-- compare the final results with a second dataset
+- profile clusters
+- apply density-based clustering with DBSCAN
 
-The main dataset is the Qatar Cars TidyTuesday data. The D&D Monsters
-data are used later as a shorter comparison exercise. Use the
-`tidytuesdayR` package to pull both datasets directly from TidyTuesday.
-If RStudio prompts you to install `tidytuesdayR`, let it do so before
-continuing.
+Use the `tidytuesdayR` package to pull the monsters data from TidyTuesday. If
+RStudio prompts you to install `tidytuesdayR`, let it do so before continuing.
 
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(broom)
 library(cluster)
+library(uwot)
+library(dbscan)
+library(plotly)
+library(tidytuesdayR)
+library(scales)
+
 
 theme_set(theme_minimal())
-
-load_tidytuesday_dataset <- function(tt_date, dataset_name, parquet_url) {
-  if (requireNamespace("tidytuesdayR", quietly = TRUE)) {
-    tt_data <- tryCatch(
-      suppressMessages(tidytuesdayR::tt_load(tt_date)),
-      error = function(e) NULL
-    )
-
-    if (!is.null(tt_data) &&
-        dataset_name %in% names(tt_data) &&
-        !is.null(tt_data[[dataset_name]])) {
-      return(tt_data[[dataset_name]] |> tibble::as_tibble())
-    }
-  }
-
-  if (!requireNamespace("arrow", quietly = TRUE)) {
-    stop(
-      "Install the 'tidytuesdayR' package (RStudio will usually prompt you), ",
-      "or install 'arrow' to use the backup data file.",
-      call. = FALSE
-    )
-  }
-
-  parquet_file <- tempfile(fileext = ".parquet")
-  on.exit(unlink(parquet_file), add = TRUE)
-  download_status <- tryCatch(
-    utils::download.file(parquet_url, parquet_file, mode = "wb", quiet = TRUE),
-    error = function(e) 1L
-  )
-
-  if (!identical(download_status, 0L) || !file.exists(parquet_file)) {
-    stop(
-      "Could not load the dataset from TidyTuesday or the course backup file.",
-      call. = FALSE
-    )
-  }
-
-  arrow::read_parquet(parquet_file) |> tibble::as_tibble()
-}
-
-compose_ggplot <- function(plot, ...) {
-  layers <- list(...)
-
-  for (i in seq_along(layers)) {
-    plot <- ggplot2:::add_ggplot(plot, layers[[i]], paste0("layer_", i))
-  }
-
-  plot
-}
-
-qatarcars <- load_tidytuesday_dataset(
-  tt_date = "2025-12-09",
-  dataset_name = "qatarcars",
-  parquet_url = "https://knowlton.co.nz/161324/data/qatarcars.parquet"
-)
-monsters <- load_tidytuesday_dataset(
-  tt_date = "2025-05-27",
-  dataset_name = "monsters",
-  parquet_url = "https://knowlton.co.nz/161324/data/monsters.parquet"
-)
 ```
 
-## 1. Warm-up: distances and scaling
+## The two datasets
 
-For the clustering analysis we will use the following numeric variables:
+### 2020 New Zealand General Election
 
-```{r}
-car_vars <- c(
-  "length", "width", "height", "mass", "horsepower",
-  "price", "performance", "economy", "trunk", "seating"
-)
+In the 2020 general election each voter casts two votes: a **party vote** (for a
+political party) and a **candidate vote** (for a local MP). We cluster the 72
+electorates by party vote shares to see how regions group together politically.
 
-cars <- qatarcars |>
-  select(type, enginetype, all_of(car_vars)) |>
-  drop_na() |>
-  mutate(car_id = row_number(), .before = 1)
+```{r import-election-data}
+party <- read_csv("https://www.massey.ac.nz/~jcmarsha/data/nzelect/2020_party.csv")
 
-cars_raw <- cars |>
-  select(all_of(car_vars))
+party_mat <- party |>
+  column_to_rownames("Electorate")
 
-cars_scaled <- cars_raw |>
+party_scaled <- party_mat |>
   mutate(across(everything(), ~ as.numeric(scale(.x))))
 
-cars |> glimpse()
+party |> summarise(across(-Electorate, mean))
 ```
 
-### Try yourself
+### D&D Monsters
 
-1. Use `summary()` on `cars_raw`. Which variables appear to be on very
-   different scales?
+Each row is a monster with a `type` label plus combat features like strength,
+dexterity, HP, challenge rating, and speed. We cluster on the numeric features
+and use `type` afterward to interpret the clusters.
 
-2. Compute the Euclidean distance matrix for the first six cars before
-   scaling and after scaling.
+```{r load-monsters}
+monsters <- tidytuesdayR::tt_load("2025-05-27")$monsters |>
+  tibble::as_tibble()
 
-3. Which variables do you expect to dominate the unscaled distances?
-
-```{r}
-round(as.matrix(dist(cars_raw |> slice(1:6))), 2)
-round(as.matrix(dist(cars_scaled |> slice(1:6))), 2)
-```
-
-## 2. Hierarchical clustering on Qatar Cars
-
-We start with complete-linkage hierarchical clustering on the scaled
-data.
-
-```{r}
-cars_dist <- dist(cars_scaled, method = "euclidean")
-cars_hc <- hclust(cars_dist, method = "complete")
-
-plot(cars_hc, labels = FALSE, hang = -1, main = "Complete-linkage dendrogram for Qatar Cars")
-```
-
-### Try yourself
-
-1. Cut the dendrogram into `k = 4` and `k = 5` clusters.
-
-2. For each choice of `k`, compare the resulting clusters with `type`
-   and `enginetype`.
-
-3. Which value of `k` looks more interpretable? There is no unique
-   answer here, but for the rest of the worksheet continue with
-   `k = 4` unless you have a strong case for another value.
-
-```{r}
-cars_hc4 <- cars |>
-  mutate(cluster = factor(cutree(cars_hc, k = 4)))
-
-cars_hc5 <- cars |>
-  mutate(cluster = factor(cutree(cars_hc, k = 5)))
-
-cars_hc4 |>
-  count(cluster, type, sort = TRUE)
-
-cars_hc5 |>
-  count(cluster, type, sort = TRUE)
-```
-
-## 3. $K$-means and the elbow heuristic
-
-Next fit $K$-means for several values of $K$ and inspect the total
-within-cluster sum of squares.
-
-```{r}
-set.seed(161324)
-car_elbow <- tibble(k = 1:8) |>
-  mutate(
-    model = map(k, ~ kmeans(cars_scaled, centers = .x, nstart = 20)),
-    fit = map(model, glance)
-  ) |>
-  unnest(fit)
-
-car_elbow
-```
-
-### Try yourself
-
-1. Produce an elbow plot of `tot.withinss` against `k`.
-
-2. Where does the main drop occur?
-
-3. Fit a final $K$-means model with `K = 4` and compare the clusters
-   with `type` and `enginetype`.
-
-```{r}
-compose_ggplot(
-  ggplot(car_elbow, aes(x = k, y = tot.withinss)),
-  geom_line(),
-  geom_point(size = 2)
-)
-```
-
-```{r}
-set.seed(161324)
-cars_km4 <- kmeans(cars_scaled, centers = 4, nstart = 25)
-
-cars |>
-  mutate(cluster = factor(cars_km4$cluster)) |>
-  count(cluster, type, sort = TRUE)
-```
-
-### Try yourself
-
-1. Summarise the original car variables within each $K$-means cluster.
-
-2. Which variables seem to separate the clusters most clearly?
-
-3. Do the $K$-means clusters tell a similar story to the hierarchical
-   clusters?
-
-```{r}
-cars |>
-  mutate(cluster = factor(cars_km4$cluster)) |>
-  group_by(cluster) |>
-  summarise(across(all_of(car_vars), mean), n = n())
-```
-
-## 4. PAM and silhouette widths
-
-PAM lets us keep the clustering on the same scaled variables, but with a
-medoid rather than a centroid.
-
-```{r}
-cars_pam4 <- pam(cars_scaled, k = 4)
-plot(silhouette(cars_pam4), border = NA, do.clus.stat = FALSE, do.n.k = FALSE)
-```
-
-### Try yourself
-
-1. Extract the silhouette widths from `cars_pam4`.
-
-2. Compute the average silhouette width in each cluster.
-
-3. Compare the overall clustering quality from PAM with your earlier
-   interpretation of the hierarchical and $K$-means fits.
-
-```{r}
-cars_pam_sil <- cars_pam4 |>
-  pluck("silinfo", "widths") |>
-  as_tibble()
-
-cars_pam_sil |>
-  group_by(cluster) |>
-  summarise(avg_sil = mean(sil_width), n = n())
-```
-
-## 5. Short comparison: D&D Monsters
-
-The lecture used the D&D Monsters data as a second example because the
-known `type` variable gives us a rough truth signal after clustering.
-
-```{r}
 monster_vars <- c(
   "str", "dex", "con", "int", "wis", "cha",
   "hp_number", "cr", "speed_base_number"
@@ -267,64 +74,600 @@ monster_data <- monsters |>
 monster_scaled <- monster_data |>
   select(all_of(monster_vars)) |>
   mutate(across(everything(), ~ as.numeric(scale(.x))))
-
-monster_hc <- monster_scaled |>
-  dist(method = "euclidean") |>
-  hclust(method = "complete")
-
-monster_groups <- cutree(monster_hc, k = 5)
 ```
 
-### Try yourself
+# 1. Distances and scaling
 
-1. Tabulate the 5-cluster monster solution against `type`.
+## Voting — worked example
 
-2. Which monster types are concentrated in one cluster, and which are
-   spread across several clusters?
-
-3. Why is this still an unsupervised task even though we are using
-   `type` for interpretation afterwards?
+Party vote shares are percentages on a common 0–100 scale. Parties with larger
+vote shares (like Labour) naturally have larger variance. We compare raw
+Euclidean distance with z-scored distance for the first six electorates:
 
 ```{r}
-monster_data |>
-  mutate(cluster = factor(monster_groups)) |>
-  count(cluster, type, sort = TRUE)
+round(as.matrix(dist(party_mat |> slice(1:6))), 2)
+round(as.matrix(dist(party_scaled |> slice(1:6))), 2)
 ```
 
-## 6. Optional challenge: DBSCAN on a two-variable view
+## D&D — your turn
 
-If you have the `dbscan` package available, try a density-based
-clustering on two scaled variables. This is only a low-dimensional
-projection, so do not expect it to match the earlier results exactly.
+Compute the raw and z-scored Euclidean distance matrices for the first six
+monsters. Which variables appear to dominate the unscaled distances?
 
-```{r, eval=FALSE}
-library(dbscan)
+```{r}
+# Raw distances
 
-cars_2d <- cars |>
-  select(price, horsepower) |>
-  drop_na() |>
-  mutate(across(everything(), ~ as.numeric(scale(.x))))
 
-dbscan::kNNdistplot(as.matrix(cars_2d), k = 4)
-abline(h = 0.6, lty = 2, col = 2)
+# Z-scored distances
 
-cars_db <- dbscan::dbscan(as.matrix(cars_2d), eps = 0.6, minPts = 5)
+```
 
-cars_db_plot <- bind_cols(cars_2d, cluster = factor(cars_db$cluster))
+# 2. Dimension reduction: PCA and UMAP
 
-compose_ggplot(
-  ggplot(cars_db_plot, aes(x = price, y = horsepower, colour = cluster)),
-  geom_point(alpha = 0.8, size = 2)
+## Voting — worked example
+
+We build PCA (linear) and UMAP (nonlinear) 2D projections so we can inspect the
+electorate structure before clustering.
+
+```{r}
+
+party_pca <- prcomp(party_scaled, center = TRUE, scale. = TRUE)
+party_pca_points <- as_tibble(party_pca$x) |>
+  select(pc1 = PC1, pc2 = PC2) |>
+  (
+    function(scores) {
+      bind_cols(party |> transmute(Electorate), scores)
+    }
+  )()
+set.seed(8675309)
+party_umap_points <- uwot::umap(
+  party_scaled,
+  n_neighbors = 15,
+  min_dist = 0.1,
+  n_components = 2,
+  metric = "euclidean"
+) |>
+  as_tibble() |>
+  set_names(c("umap1", "umap2")) |>
+  (
+    function(embedding) {
+      bind_cols(party |> transmute(Electorate), embedding)
+    }
+  )()
+
+p_pca <- ggplot(
+  party_pca_points,
+  aes(x = pc1, y = pc2, label = Electorate, text = Electorate)
+) +
+  geom_point() +
+  labs(x = "PC1", y = "PC2", title = "Voting: PCA")
+
+p_umap <- ggplot(
+  party_umap_points,
+  aes(x = umap1, y = umap2, label = Electorate, text = Electorate)
+) +
+  geom_point() +
+  labs(x = "UMAP 1", y = "UMAP 2", title = "Voting: UMAP")
+
+ggplotly(p_pca, tooltip = "text")
+ggplotly(p_umap, tooltip = "text")
+
+```
+
+Try to change the seed and see how UMAP changes. 
+
+## D&D — your turn
+
+Fit PCA and UMAP on `monster_scaled`. Use `set.seed(161324)` for UMAP. The code
+follows the same pattern as the voting example — swap the data and variable
+names. Use `name` as the point identifier.
+
+```{r}
+# PCA
+
+
+# UMAP
+
+```
+
+Plot both projections side-by-side with linked highlighting (`key = name`).
+
+```{r}
+# Linked PCA vs UMAP plot
+
+```
+
+# 3. Hierarchical clustering
+
+## Voting — worked example
+
+Average-linkage hierarchical clustering on scaled party data:
+
+```{r}
+party_dist <- dist(party_scaled, method = "euclidean")
+party_hc <- hclust(party_dist, method = "average")
+
+plot(party_hc, labels = FALSE, hang = -1,
+     main = "Average-linkage dendrogram for NZ 2020 party vote")
+```
+
+Try single, complete, and average linkage side by side:
+
+```{r}
+party_hc_single   <- hclust(party_dist, method = "single")
+party_hc_complete <- hclust(party_dist, method = "complete")
+party_hc_average  <- hclust(party_dist, method = "average")
+
+plot(party_hc_single,   labels = FALSE, hang = -1, main = "Single linkage")
+plot(party_hc_complete, labels = FALSE, hang = -1, main = "Complete linkage")
+plot(party_hc_average,  labels = FALSE, hang = -1, main = "Average linkage")
+```
+
+Use the silhouette measure to choose $K$, then cut the tree:
+
+```{r}
+library(factoextra)
+
+party_scaled |>
+  fviz_nbclust(FUNcluster = factoextra::hcut, hc_method = "average", k.max = 10,
+               method = "silhouette") |>
+  ggplotly()
+
+party_groups <- cutree(party_hc, k = 2)
+```
+
+Cluster means:
+
+```{r}
+party_clustered <- party |>
+  mutate(Cluster = factor(party_groups))
+
+party_clustered |>
+  group_by(Cluster) |>
+  summarise(across(-Electorate, mean), n_electorates = n()) |>
+  arrange(desc(n_electorates))
+```
+
+Which electorates are in each cluster?
+
+```{r}
+party_clustered |>
+  select(Electorate, Cluster) |>
+  arrange(Cluster, Electorate) |>
+  print(n = 72)
+```
+
+## D&D — your turn
+
+Fit hierarchical clustering on `monster_scaled`. Try single, complete, and
+average linkage. Which gives the most balanced cluster sizes?
+
+```{r}
+# Distance matrix
+
+
+# Three linkage methods
+
+```
+
+```{r}
+# Silhouette to choose K
+
+
+# Cut the tree at your chosen K
+
+```
+
+```{r}
+# Cluster means by monster type (hint: join back to monster_data)
+
+```
+
+# 4. $K$-means and the elbow heuristic
+
+## Voting — worked example
+
+```{r}
+set.seed(67)
+party_elbow <- tibble(k = 1:10) |>
+  mutate(
+    model = map(k, ~ kmeans(party_scaled, centers = .x, nstart = 20)),
+    fit = map(model, glance)
+  ) |>
+  unnest(fit)
+
+party_elbow
+```
+
+```{r}
+p<-party_elbow |>
+  ggplot(aes(x = k, y = tot.withinss)) +
+  geom_line() +
+  geom_point(aes(text = paste0("k = ", k, "<br>Total WSS = ", round(tot.withinss))), size = 2)
+
+ggplotly(p, tooltip = "text")
+```
+
+Fit $K$-means with $k = 6$:
+
+```{r}
+set.seed(67)
+party_km6 <- kmeans(party_scaled, centers = 6, nstart = 25)
+
+party |>
+  mutate(Cluster = factor(party_km6$cluster)) |>
+  group_by(Cluster) |>
+  summarise(across(-Electorate, mean), n = n()) |>
+  arrange(desc(n))
+```
+
+Let's plot this out on the PCA projection:
+```{r}
+# no legend, just colour by cluster
+party_km6_points <- party_pca_points |>
+  mutate(Cluster = factor(party_km6$cluster))
+
+p_km_pca <- party_km6_points |>
+  ggplot(aes(x = pc1, y = pc2, colour = Cluster,
+             label = Electorate, key = Electorate)) +
+  geom_point(aes(text = Electorate), alpha = 0.8, size
+             = 2) +
+  labs(x = "PC1", y = "PC2", title = "Voting:
+K-means clusters on PCA")
+
+ggplotly(p_km_pca, tooltip = "text")
+
+# lets add a UMAP cluster
+party_umap_km6_points <- party_umap_points |>
+  mutate(Cluster = factor(party_km6$cluster))
+
+
+p_km_umap <- party_umap_km6_points |>
+  ggplot(aes(x = umap1, y = umap2, colour = Cluster,
+             label = Electorate, key = Electorate)) +
+  geom_point(aes(text = Electorate), alpha = 0.8, size
+             = 2) +
+  labs(x = "UMAP 1", y = "UMAP 2", title = "Voting:
+K-means")
+
+ggplotly(p_km_umap, tooltip = "text")
+
+
+```
+
+
+## D&D — your turn
+
+Fit $K$-means for several values of $k$, produce an elbow plot, then fit a final
+model with your chosen $k$.
+
+```{r}
+# Elbow tibble
+
+
+# Elbow plot
+
+```
+
+```{r}
+# Final K-means fit and cluster means
+
+# PCA plot coloured by K-means cluster
+
+```
+
+# 5. PAM and silhouette widths
+
+## Voting — worked example
+
+PAM fits $K$-medoids for $K = 2$ through $K = 8$. We compare average silhouette
+widths:
+
+```{r}
+pam_sil_summary <- map_dfr(2:8, function(k_value) {
+  pam_fit <- pam(party_scaled, k = k_value)
+  sil <- silhouette(pam_fit)
+  widths <- sil[, "sil_width"]
+  tibble(
+    k = k_value,
+    avg_silhouette = mean(widths)
+  )
+})
+
+pam_sil_summary |>
+  arrange(desc(avg_silhouette))
+```
+
+Fit PAM with $k = 4$ and produce the silhouette plot:
+
+```{r}
+party_pam4 <- pam(party_scaled, k = 4)
+plot(silhouette(party_pam4), border = NA, do.clus.stat = FALSE, do.n.k = FALSE)
+```
+
+Per-cluster average silhouette widths and boxplots:
+
+```{r}
+party_pam_sil <- party_pam4 |>
+  pluck("silinfo", "widths") |>
+  as_tibble()
+
+party_pam_sil |>
+  group_by(cluster) |>
+  summarise(avg_sil = mean(sil_width), n_electorates = n())
+
+pps<- party_pam_sil |>
+  ggplot(aes(x = factor(cluster), y = sil_width)) +
+  geom_boxplot() +
+  labs(x = "Cluster", y = "Silhouette width")
+  
+ggplotly(pps, tooltip = "y")
+```
+
+Which electorates are the medoids?
+
+```{r}
+medoid_rows <- party_pam4$id.med
+party_mat |>
+  slice(medoid_rows) |>
+  rownames_to_column("Electorate") |>
+  mutate(Cluster = 1:4) |>
+  select(Cluster, Electorate, everything())
+
+party_medoid_ids <- rownames(party_mat)[medoid_rows]
+
+pca_medoid_plot <- party_pca_points |>
+  mutate(
+    is_medoid = Electorate %in% party_medoid_ids,
+    hover = paste0(
+      Electorate,
+      "<br>Medoid: ", if_else(is_medoid, "Yes", "No")
+    )
+  ) |>
+  ggplot(aes(x = pc1, y = pc2)) +
+  geom_point(
+    data = ~ filter(.x, !is_medoid),
+    aes(text = hover),
+    alpha = 0.5,
+    size = 2,
+    colour = "grey50"
+  ) +
+  geom_point(
+    data = ~ filter(.x, is_medoid),
+    aes(text = hover),
+    alpha = 1,
+    size = 4,
+    shape = 21,
+    stroke = 1.2,
+    fill = "#2C7FB8",
+    colour = "black"
+  ) +
+  labs(
+    x = "PC1",
+    y = "PC2",
+    title = "PCA: PAM medoids highlighted"
+  )
+
+umap_medoid_plot <- party_umap_points |>
+  mutate(
+    is_medoid = Electorate %in% party_medoid_ids,
+    hover = paste0(
+      Electorate,
+      "<br>Medoid: ", if_else(is_medoid, "Yes", "No")
+    )
+  ) |>
+  ggplot(aes(x = umap1, y = umap2)) +
+  geom_point(
+    data = ~ filter(.x, !is_medoid),
+    aes(text = hover),
+    alpha = 0.5,
+    size = 2,
+    colour = "grey50"
+  ) +
+  geom_point(
+    data = ~ filter(.x, is_medoid),
+    aes(text = hover),
+    alpha = 1,
+    size = 4,
+    shape = 21,
+    stroke = 1.2,
+    fill = "#2C7FB8",
+    colour = "black"
+  ) +
+  labs(
+    x = "UMAP 1",
+    y = "UMAP 2",
+    title = "UMAP: PAM medoids highlighted"
+  )
+
+subplot(
+  ggplotly(pca_medoid_plot, tooltip = "text"),
+  ggplotly(umap_medoid_plot, tooltip = "text"),
+  nrows = 1
 )
 ```
+
+## D&D — your turn
+
+Fit PAM for $K = 2$ through $K = 8$, identify the best $K$ by average silhouette
+width, produce the silhouette plot, boxplots, and extract the medoids.
+
+```{r}
+# PAM silhouette summary for K = 2 to 8
+
+```
+
+```{r}
+# PAM with best K, silhouette plot
+
+```
+
+```{r}
+# Per-cluster silhouettes and boxplots
+
+```
+
+```{r}
+# Medoid monsters
+
+```
+
+# 6. Cluster profiles
+
+## Voting — worked example
+
+We rescale each party column to $[0,1]$ within each party, then average within
+each cluster. This profile highlights which parties are unusually high or low
+for each group:
+
+```{r}
+party_radar <- party_clustered |>
+  mutate(across(Act:Other, rescale)) |>
+  group_by(Cluster) |>
+  summarise(across(-Electorate, mean),
+            n = n(), .groups = "drop") |>
+  mutate(Cluster = paste0("Cluster ", Cluster, " (n=", n, ")")) |>
+  select(-n)
+
+pr <- party_radar |>
+  pivot_longer(-Cluster, names_to = "Party", values_to = "ScaledVote") |>
+  ggplot(aes(x = Party, y = ScaledVote, group = Cluster)) +
+  geom_col() +
+  facet_wrap(~ Cluster) +
+  coord_flip() +
+  labs(y = "Vote share rescaled within party", x = NULL)
+
+ggplotly(pr, tooltip = "y")
+```
+
+## D&D — your turn
+
+Rescale each monster variable within itself (using `scales::rescale`), average
+within each cluster, and produce a faceted bar chart. Use your hierarchical
+cluster labels from Section 3.
+
+```{r}
+# Join cluster labels to monster_data
+
+
+# Rescale and summarise
+
+```
+
+```{r}
+# Faceted bar chart of cluster profiles
+
+```
+
+# 7. DBSCAN: density-based clustering
+
+DBSCAN groups dense points and labels isolated points as **noise**. It has two
+parameters: `eps` (neighbourhood radius) and `minPts` (minimum points for a core
+point). Unlike $K$-means and PAM, DBSCAN does not need $K$ in advance — it
+discovers the number of clusters from the data.
+
+## Voting — worked example
+
+Choose `eps` with a kNN distance plot:
+
+```{r}
+dbscan::kNNdistplot(as.matrix(party_scaled), k = 3)
+abline(h = 1.7, lty = 2, col = 2)
+```
+**Note: If you were going to fit minPts to 5 then you would do a kNNdistplot with k = 5 and choose eps accordingly.**
+
+Fit DBSCAN:
+
+```{r}
+party_db <- dbscan::dbscan(as.matrix(party_scaled), eps = 1.7, minPts = 3)
+table(party_db$cluster)
+```
+
+Colour the PCA projection by DBSCAN cluster:
+
+```{r}
+party_db_points <- party_pca_points |>
+  mutate(cluster = factor(party_db$cluster))
+
+p_db <- party_db_points |>
+  ggplot(aes(x = pc1, y = pc2, colour = cluster, label = Electorate)) +
+  geom_point(aes(text = paste0(Electorate, "<br>Cluster: ", cluster)),
+             alpha = 0.8, size = 2) +
+  labs(x = "PC1", y = "PC2", title = "Voting: DBSCAN clusters on PCA") +
+  scale_colour_viridis_d()
+
+ggplotly(p_db, tooltip = "text")
+
+```
+
+What happens with different `eps` and `minPts`?
+
+```{r}
+try_params <- function(eps_val, minpts_val) {
+  db <- dbscan::dbscan(as.matrix(party_scaled), eps = eps_val, minPts = minpts_val)
+  labs <- db$cluster
+  tibble(
+    eps = eps_val,
+    minPts = minpts_val,
+    n_clusters = length(setdiff(unique(labs), 0L)),
+    n_noise = sum(labs == 0L),
+    n_total = length(labs)
+  )
+}
+
+bind_rows(
+  try_params(1.5, 5),
+  try_params(1, 3),
+  try_params(2, 4),
+  try_params(1.8, 3),
+  try_params(2, 3)
+)
+```
+
+## D&D — your turn
+
+Apply DBSCAN to the monster data. Use `kNNdistplot` to choose `eps`, fit the
+model, tabulate clusters against monster `type`, and experiment with different
+parameter values.
+
+```{r}
+# kNN distance plot to choose eps
+
+```
+
+```{r}
+# Fit DBSCAN and tabulate cluster counts
+
+```
+
+```{r}
+# Tabulate DBSCAN clusters against monster type
+
+```
+
+```{r}
+# Experiment with different eps and minPts values
+
+```
+
+# 8. Wrap-up
 
 ### Final questions
 
 1. Which clustering method gave the most interpretable segmentation of
-   the Qatar Cars data?
+   the election data? Of the D&D monsters?
 
-2. How important was scaling for this problem?
+2. How important was scaling for the monsters data? Would your
+   conclusions change if you used the raw values instead of z-scores?
 
-3. If you had to explain your final clustering to a non-technical
-   audience, which output would you show: a dendrogram, cluster means,
-   medoids, or silhouette widths?
+3. How do party-vote clusters differ from the political narrative you
+   expected? Which electorates surprised you?
+
+4. For the monsters, did DBSCAN find a different number of clusters
+   than your chosen $K$ from the other methods? What does that tell you
+   about the data structure?
+
+5. If you had to explain your final clustering of D&D monsters to
+   someone who has never played D&D, which output would you show: a
+   dendrogram, cluster means, medoids, silhouette widths, the profile
+   bars, or the DBSCAN plot?
