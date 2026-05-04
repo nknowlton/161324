@@ -10,7 +10,7 @@
 
   <meta property="og:title" content="Chapter 4 Prediction | Data mining" />
   <meta property="og:type" content="book" />
-  
+  <meta property="og:image" content="/graphics/Datamining_cover.png" />
   <meta property="og:description" content="Chapter 4 Prediction | Data mining notes" />
   <meta name="github-repo" content="jmarshallnz/161324" />
 
@@ -18,12 +18,12 @@
   <meta name="twitter:title" content="Chapter 4 Prediction | Data mining" />
   
   <meta name="twitter:description" content="Chapter 4 Prediction | Data mining notes" />
-  
+  <meta name="twitter:image" content="/graphics/Datamining_cover.png" />
 
 <meta name="author" content="Jonathan Marshall, Martin Hazelton, Nick Knowlton" />
 
 
-<meta name="date" content="2026-05-03" />
+<meta name="date" content="2026-05-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -154,7 +154,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="./">161.324 Data Mining</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="0.1" data-path="index.html"><a href="index.html#course-structure"><i class="fa fa-check"></i><b>0.1</b> Course structure</a></li>
+<li class="chapter" data-level="0.2" data-path="index.html"><a href="index.html#prerequisites"><i class="fa fa-check"></i><b>0.2</b> Prerequisites</a></li>
+<li class="chapter" data-level="0.3" data-path="index.html"><a href="index.html#how-to-use-these-notes"><i class="fa fa-check"></i><b>0.3</b> How to use these notes</a></li>
+<li class="chapter" data-level="0.4" data-path="index.html"><a href="index.html#acknowledgements"><i class="fa fa-check"></i><b>0.4</b> Acknowledgements</a></li>
+</ul></li>
 <li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
 <ul>
 <li class="chapter" data-level="1.1" data-path="introduction.html"><a href="introduction.html#sec:intro1"><i class="fa fa-check"></i><b>1.1</b> What is Data Mining?</a></li>
@@ -555,10 +561,10 @@ variables (e.g. <code>EDU</code>, <code>AGE</code>) and some are categorical (e
 <code>OCCUP</code>).</p>
 <p>The training set comprises data on 400 employees, which can be
 downloaded into R by</p>
-<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="prediction.html#cb68-1" tabindex="-1"></a>wage.train <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../data/wage-train.csv&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="prediction.html#cb48-1" tabindex="-1"></a>wage.train <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../data/wage-train.csv&quot;</span>)</span></code></pre></div>
 <p>A test dataset of 134 observations is also available, which can be
 downloaded into R by</p>
-<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="prediction.html#cb69-1" tabindex="-1"></a>wage.test <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../data/wage-test.csv&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="prediction.html#cb49-1" tabindex="-1"></a>wage.test <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../data/wage-test.csv&quot;</span>)</span></code></pre></div>
 <p>Notice that in this case the we actually have the values for the target
 <code>WAGE</code> in the test data. This artificial situation means we can use the
 test dataset to assess the performance of the prediction methodology
@@ -634,7 +640,7 @@ abbreviated to RSS. Hence</p>
 \tag{4.3}\end{equation}\]</span></p>
 <p>Regression models can be fitted in R using the <code>lm</code> function<a href="#fn24" class="footnote-ref" id="fnref24"><sup>24</sup></a>. The
 basic syntax is</p>
-<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="prediction.html#cb70-1" tabindex="-1"></a><span class="fu">lm</span>(formula, data)</span></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="prediction.html#cb50-1" tabindex="-1"></a><span class="fu">lm</span>(formula, data)</span></code></pre></div>
 <p>where</p>
 <ul>
 <li><p><code>formula</code> is the <em>model formula</em> (a required argument)</p></li>
@@ -645,7 +651,7 @@ basic syntax is</p>
 <p>If the target variable is stored as the object <code>y</code> in R, and there are
 two predictor variables stored as <code>x1</code>, <code>x2</code>, then the aforementioned
 model formula will be</p>
-<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="prediction.html#cb71-1" tabindex="-1"></a>y <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> x1 <span class="sc">+</span> x2</span></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="prediction.html#cb51-1" tabindex="-1"></a>y <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> x1 <span class="sc">+</span> x2</span></code></pre></div>
 <p>The number <code>1</code> on the right hand side of the formula tells R that you
 want to include an intercept (i.e. a <span class="math inline">\(\hat \beta_0\)</span>) term in your model.
 In fact you can omit the <code>1 +</code> from the formula since R includes an
@@ -661,17 +667,17 @@ variable names in different datasets.</p>
 right-hand side of the formula represents all variables in the data
 frame excluding the target. For instance, if the data frame <code>my.df</code>
 contains variables <code>y</code>, <code>x1</code> and <code>x2</code>, then</p>
-<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="prediction.html#cb72-1" tabindex="-1"></a>my.lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x1 <span class="sc">+</span> x2, <span class="at">data=</span>my.df)</span></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="prediction.html#cb52-1" tabindex="-1"></a>my.lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x1 <span class="sc">+</span> x2, <span class="at">data=</span>my.df)</span></code></pre></div>
 <p>and</p>
-<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="prediction.html#cb73-1" tabindex="-1"></a>my.lm2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> . , <span class="at">data=</span>my.df)</span></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="prediction.html#cb53-1" tabindex="-1"></a>my.lm2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> . , <span class="at">data=</span>my.df)</span></code></pre></div>
 <p>produce identical fitted models, saved as <code>my.lm</code> and <code>my.lm2</code>
 respectively in the above code.</p>
 <div class="example">
 <p><span id="exm:unlabeled-div-11" class="example"><strong>Example 4.2  </strong></span><strong>Regression Modelling for the Wage Data</strong></p>
 <p>In this example we fit a regression model to the training data from the
 wage dataset.</p>
-<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="prediction.html#cb74-1" tabindex="-1"></a>wage.lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(WAGE <span class="sc">~</span> . , <span class="at">data=</span>wage.train)</span>
-<span id="cb74-2"><a href="prediction.html#cb74-2" tabindex="-1"></a><span class="fu">summary</span>(wage.lm)</span></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="prediction.html#cb54-1" tabindex="-1"></a>wage.lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(WAGE <span class="sc">~</span> . , <span class="at">data=</span>wage.train)</span>
+<span id="cb54-2"><a href="prediction.html#cb54-2" tabindex="-1"></a><span class="fu">summary</span>(wage.lm)</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Call:
 #&gt; lm(formula = WAGE ~ ., data = wage.train)
@@ -754,8 +760,8 @@ multiple <span class="math inline">\(R^2\)</span>, overall <span class="math inl
 (and other models) in a consistent way. The two functions for summarising model
 fit are <code>tidy()</code>, which produces a tidy data frame for the coefficients of the
 model:</p>
-<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="prediction.html#cb76-1" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
-<span id="cb76-2"><a href="prediction.html#cb76-2" tabindex="-1"></a><span class="fu">tidy</span>(wage.lm)</span></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="prediction.html#cb56-1" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb56-2"><a href="prediction.html#cb56-2" tabindex="-1"></a><span class="fu">tidy</span>(wage.lm)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 17 × 5
 #&gt;    term                 estimate std.error statistic     p.value
 #&gt;    &lt;chr&gt;                   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;
@@ -778,7 +784,7 @@ model:</p>
 #&gt; 17 MARRIEDYes           0.059039   0.47013  0.12558  0.90013</code></pre>
 <p>And <code>glance()</code> which provides a single row data frame with summary statistics
 of model fit:</p>
-<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="prediction.html#cb78-1" tabindex="-1"></a><span class="fu">glance</span>(wage.lm)</span></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="prediction.html#cb58-1" tabindex="-1"></a><span class="fu">glance</span>(wage.lm)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 1 × 12
 #&gt;   r.squared adj.r.squared  sigma statistic    p.value    df  logLik    AIC
 #&gt;       &lt;dbl&gt;         &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;
@@ -786,8 +792,8 @@ of model fit:</p>
 #&gt; # ℹ 4 more variables: BIC &lt;dbl&gt;, deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;</code></pre>
 <p>The nice thing about the <code>glance</code> output is you can use it directly as if it is
 a list object, and use the <code>$</code> operator (complete with tab auto-completion!)</p>
-<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="prediction.html#cb80-1" tabindex="-1"></a>wage.modfit <span class="ot">&lt;-</span> <span class="fu">glance</span>(wage.lm)</span>
-<span id="cb80-2"><a href="prediction.html#cb80-2" tabindex="-1"></a>wage.modfit<span class="sc">$</span>r.squared</span></code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="prediction.html#cb60-1" tabindex="-1"></a>wage.modfit <span class="ot">&lt;-</span> <span class="fu">glance</span>(wage.lm)</span>
+<span id="cb60-2"><a href="prediction.html#cb60-2" tabindex="-1"></a>wage.modfit<span class="sc">$</span>r.squared</span></code></pre></div>
 <pre><code>#&gt; [1] 0.3317438</code></pre>
 </div>
 </div>
@@ -813,12 +819,12 @@ single prediction. Also useful are <em>prediction intervals</em>, which specify
 a range of values with an associated level of confidence.</p>
 <p>Prediction for linear models in R can be carried out using the <code>predict</code>
 command. The syntax for computing point predictions is as follows:</p>
-<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb82-1"><a href="prediction.html#cb82-1" tabindex="-1"></a><span class="fu">predict</span>(my.lm, <span class="at">newdata=</span>my.test.predictors)</span></code></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="prediction.html#cb62-1" tabindex="-1"></a><span class="fu">predict</span>(my.lm, <span class="at">newdata=</span>my.test.predictors)</span></code></pre></div>
 <p>where <code>my.lm</code> is the fitted regression model to perform the prediction,
 and <code>my.test.predictors</code> is a data frame containing (as rows) the sets
 of predictors for which we wish to make predictions<a href="#fn26" class="footnote-ref" id="fnref26"><sup>26</sup></a>. We can obtain
 predictions intervals (in addition to the point predictions) by</p>
-<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="prediction.html#cb83-1" tabindex="-1"></a><span class="fu">predict</span>(my.lm, <span class="at">newdata=</span>my.test.predictors, <span class="at">interval=</span><span class="st">&quot;prediction&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="prediction.html#cb63-1" tabindex="-1"></a><span class="fu">predict</span>(my.lm, <span class="at">newdata=</span>my.test.predictors, <span class="at">interval=</span><span class="st">&quot;prediction&quot;</span>)</span></code></pre></div>
 <p>By default the prediction interval will be at the 95% level (so that
 there is probability 0.95 that each prediction interval will contain the
 true target value, assuming that the model is adequate). This percentage
@@ -827,8 +833,8 @@ can be changed through the optional <code>level</code> argument to <code>predict
 <p><span id="exm:unlabeled-div-13" class="example"><strong>Example 4.4  </strong></span><strong>Prediction for the Wage Data</strong></p>
 <p>Here we use the model fitted in the previous example to make predictions
 for the target variable (hourly wage) in the test data set.</p>
-<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb84-1"><a href="prediction.html#cb84-1" tabindex="-1"></a>wage.pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(wage.lm, <span class="at">newdata=</span>wage.test, <span class="at">interval=</span><span class="st">&quot;prediction&quot;</span>)</span>
-<span id="cb84-2"><a href="prediction.html#cb84-2" tabindex="-1"></a><span class="fu">head</span>(wage.pred)</span></code></pre></div>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="prediction.html#cb64-1" tabindex="-1"></a>wage.pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(wage.lm, <span class="at">newdata=</span>wage.test, <span class="at">interval=</span><span class="st">&quot;prediction&quot;</span>)</span>
+<span id="cb64-2"><a href="prediction.html#cb64-2" tabindex="-1"></a><span class="fu">head</span>(wage.pred)</span></code></pre></div>
 <pre><code>#&gt;         fit        lwr      upr
 #&gt; 1  8.377106 -0.1071914 16.86140
 #&gt; 2  9.016646  0.6028001 17.43049
@@ -844,8 +850,8 @@ it works not just for the <code>lm()</code> function but for many others. As the
 suggests, instead of just returning the prediction information, it <strong>augments</strong>
 the data we supply with the predictions. The augmented columns all start with a
 period (<code>.</code>).</p>
-<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="prediction.html#cb86-1" tabindex="-1"></a>wage.tidypred <span class="ot">&lt;-</span> <span class="fu">augment</span>(wage.lm, <span class="at">newdata=</span>wage.test, <span class="at">interval=</span><span class="st">&quot;prediction&quot;</span>)</span>
-<span id="cb86-2"><a href="prediction.html#cb86-2" tabindex="-1"></a>wage.tidypred <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">&quot;.&quot;</span>), <span class="fu">everything</span>())</span></code></pre></div>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="prediction.html#cb66-1" tabindex="-1"></a>wage.tidypred <span class="ot">&lt;-</span> <span class="fu">augment</span>(wage.lm, <span class="at">newdata=</span>wage.test, <span class="at">interval=</span><span class="st">&quot;prediction&quot;</span>)</span>
+<span id="cb66-2"><a href="prediction.html#cb66-2" tabindex="-1"></a>wage.tidypred <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">&quot;.&quot;</span>), <span class="fu">everything</span>())</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 134 × 15
 #&gt;    .fitted   .lower .upper  .resid   EDU SOUTH SEX     EXP UNION  WAGE   AGE
 #&gt;      &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
@@ -864,10 +870,10 @@ period (<code>.</code>).</p>
 <p>As this is tidy, we can quite happily use <code>ggplot2</code> to do plots, e.g. a plot
 of the true target values (i.e. <code>WAGE</code>) against predictions (i.e. <code>.fitted</code>) based
 on the linear model <code>wage.lm</code>:</p>
-<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="prediction.html#cb88-1" tabindex="-1"></a><span class="fu">ggplot</span>(wage.tidypred) <span class="sc">+</span></span>
-<span id="cb88-2"><a href="prediction.html#cb88-2" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x=</span>.fitted, <span class="at">y=</span>WAGE)) <span class="sc">+</span></span>
-<span id="cb88-3"><a href="prediction.html#cb88-3" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">&quot;Predicted wage&quot;</span>,</span>
-<span id="cb88-4"><a href="prediction.html#cb88-4" tabindex="-1"></a>       <span class="at">y=</span><span class="st">&quot;True wage&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="prediction.html#cb68-1" tabindex="-1"></a><span class="fu">ggplot</span>(wage.tidypred) <span class="sc">+</span></span>
+<span id="cb68-2"><a href="prediction.html#cb68-2" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x=</span>.fitted, <span class="at">y=</span>WAGE)) <span class="sc">+</span></span>
+<span id="cb68-3"><a href="prediction.html#cb68-3" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">&quot;Predicted wage&quot;</span>,</span>
+<span id="cb68-4"><a href="prediction.html#cb68-4" tabindex="-1"></a>       <span class="at">y=</span><span class="st">&quot;True wage&quot;</span>)</span></code></pre></div>
 <div class="figure"><span style="display:block;" id="fig:wagepred1"></span>
 <img src="04-prediction_files/figure-html/wagepred1-1.png" alt="Scatterplot of true wages against predicted wages." width="672" />
 <p class="caption">
@@ -877,11 +883,11 @@ Figure 4.1: Scatterplot of true wages against predicted wages.
 <p>A second plot embellishes this by adding the range of
 95% prediction intervals, as depicted by vertical lines for each
 observation in the test set.</p>
-<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb89-1"><a href="prediction.html#cb89-1" tabindex="-1"></a><span class="fu">ggplot</span>(wage.tidypred) <span class="sc">+</span></span>
-<span id="cb89-2"><a href="prediction.html#cb89-2" tabindex="-1"></a>  <span class="fu">geom_linerange</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x=</span>.fitted, <span class="at">ymin=</span>.lower, <span class="at">ymax=</span>.upper)) <span class="sc">+</span></span>
-<span id="cb89-3"><a href="prediction.html#cb89-3" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x=</span>.fitted, <span class="at">y=</span>WAGE), <span class="at">col=</span><span class="st">&#39;red&#39;</span>) <span class="sc">+</span></span>
-<span id="cb89-4"><a href="prediction.html#cb89-4" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">&quot;Predicted wage&quot;</span>,</span>
-<span id="cb89-5"><a href="prediction.html#cb89-5" tabindex="-1"></a>       <span class="at">y=</span><span class="st">&quot;True wage&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="prediction.html#cb69-1" tabindex="-1"></a><span class="fu">ggplot</span>(wage.tidypred) <span class="sc">+</span></span>
+<span id="cb69-2"><a href="prediction.html#cb69-2" tabindex="-1"></a>  <span class="fu">geom_linerange</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x=</span>.fitted, <span class="at">ymin=</span>.lower, <span class="at">ymax=</span>.upper)) <span class="sc">+</span></span>
+<span id="cb69-3"><a href="prediction.html#cb69-3" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x=</span>.fitted, <span class="at">y=</span>WAGE), <span class="at">col=</span><span class="st">&#39;red&#39;</span>) <span class="sc">+</span></span>
+<span id="cb69-4"><a href="prediction.html#cb69-4" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">&quot;Predicted wage&quot;</span>,</span>
+<span id="cb69-5"><a href="prediction.html#cb69-5" tabindex="-1"></a>       <span class="at">y=</span><span class="st">&quot;True wage&quot;</span>)</span></code></pre></div>
 <div class="figure"><span style="display:block;" id="fig:wagepred2"></span>
 <img src="04-prediction_files/figure-html/wagepred2-1.png" alt="Scatterplot of true wages against predicted wages, with 95% prediction intervals depicted by vertical lines." width="672" />
 <p class="caption">
@@ -1017,18 +1023,18 @@ the predictors are not statistically significant. We might therefore try
 removing one or more of these variables from the model in order to
 improve prediction performance courtesy of a bias-variance trade-off.
 Here we consider removing <code>RACE</code> from the model.</p>
-<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="prediction.html#cb90-1" tabindex="-1"></a>wage.lm<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">lm</span>(WAGE <span class="sc">~</span> . <span class="sc">-</span>RACE, <span class="at">data=</span>wage.train)</span>
-<span id="cb90-2"><a href="prediction.html#cb90-2" tabindex="-1"></a>wage.pred.test <span class="ot">&lt;-</span> <span class="fu">augment</span>(wage.lm, <span class="at">newdata=</span>wage.test)</span>
-<span id="cb90-3"><a href="prediction.html#cb90-3" tabindex="-1"></a>wage.pred.test<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">augment</span>(wage.lm<span class="fl">.2</span>, <span class="at">newdata=</span>wage.test)</span>
-<span id="cb90-4"><a href="prediction.html#cb90-4" tabindex="-1"></a>wage.pred.train <span class="ot">&lt;-</span> <span class="fu">augment</span>(wage.lm, <span class="at">newdata=</span>wage.train)</span>
-<span id="cb90-5"><a href="prediction.html#cb90-5" tabindex="-1"></a>wage.pred.train<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">augment</span>(wage.lm<span class="fl">.2</span>, <span class="at">newdata=</span>wage.train)</span>
-<span id="cb90-6"><a href="prediction.html#cb90-6" tabindex="-1"></a>wage.pred.all <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(<span class="fu">list</span>(<span class="at">test1 =</span> wage.pred.test,</span>
-<span id="cb90-7"><a href="prediction.html#cb90-7" tabindex="-1"></a>                                <span class="at">test2 =</span> wage.pred.test<span class="fl">.2</span>,</span>
-<span id="cb90-8"><a href="prediction.html#cb90-8" tabindex="-1"></a>                                <span class="at">train1 =</span> wage.pred.train,</span>
-<span id="cb90-9"><a href="prediction.html#cb90-9" tabindex="-1"></a>                                <span class="at">train2 =</span> wage.pred.train<span class="fl">.2</span>), <span class="at">.id=</span><span class="st">&quot;Prediction&quot;</span>)</span>
-<span id="cb90-10"><a href="prediction.html#cb90-10" tabindex="-1"></a>wage.pred.all <span class="sc">|&gt;</span></span>
-<span id="cb90-11"><a href="prediction.html#cb90-11" tabindex="-1"></a>  <span class="fu">group_by</span>(Prediction) <span class="sc">|&gt;</span></span>
-<span id="cb90-12"><a href="prediction.html#cb90-12" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">MSE =</span> <span class="fu">mean</span>((.fitted <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="prediction.html#cb70-1" tabindex="-1"></a>wage.lm<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">lm</span>(WAGE <span class="sc">~</span> . <span class="sc">-</span>RACE, <span class="at">data=</span>wage.train)</span>
+<span id="cb70-2"><a href="prediction.html#cb70-2" tabindex="-1"></a>wage.pred.test <span class="ot">&lt;-</span> <span class="fu">augment</span>(wage.lm, <span class="at">newdata=</span>wage.test)</span>
+<span id="cb70-3"><a href="prediction.html#cb70-3" tabindex="-1"></a>wage.pred.test<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">augment</span>(wage.lm<span class="fl">.2</span>, <span class="at">newdata=</span>wage.test)</span>
+<span id="cb70-4"><a href="prediction.html#cb70-4" tabindex="-1"></a>wage.pred.train <span class="ot">&lt;-</span> <span class="fu">augment</span>(wage.lm, <span class="at">newdata=</span>wage.train)</span>
+<span id="cb70-5"><a href="prediction.html#cb70-5" tabindex="-1"></a>wage.pred.train<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">augment</span>(wage.lm<span class="fl">.2</span>, <span class="at">newdata=</span>wage.train)</span>
+<span id="cb70-6"><a href="prediction.html#cb70-6" tabindex="-1"></a>wage.pred.all <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(<span class="fu">list</span>(<span class="at">test1 =</span> wage.pred.test,</span>
+<span id="cb70-7"><a href="prediction.html#cb70-7" tabindex="-1"></a>                                <span class="at">test2 =</span> wage.pred.test<span class="fl">.2</span>,</span>
+<span id="cb70-8"><a href="prediction.html#cb70-8" tabindex="-1"></a>                                <span class="at">train1 =</span> wage.pred.train,</span>
+<span id="cb70-9"><a href="prediction.html#cb70-9" tabindex="-1"></a>                                <span class="at">train2 =</span> wage.pred.train<span class="fl">.2</span>), <span class="at">.id=</span><span class="st">&quot;Prediction&quot;</span>)</span>
+<span id="cb70-10"><a href="prediction.html#cb70-10" tabindex="-1"></a>wage.pred.all <span class="sc">|&gt;</span></span>
+<span id="cb70-11"><a href="prediction.html#cb70-11" tabindex="-1"></a>  <span class="fu">group_by</span>(Prediction) <span class="sc">|&gt;</span></span>
+<span id="cb70-12"><a href="prediction.html#cb70-12" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">MSE =</span> <span class="fu">mean</span>((.fitted <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 2
 #&gt;   Prediction    MSE
 #&gt;   &lt;chr&gt;       &lt;dbl&gt;
@@ -1126,14 +1132,14 @@ would be meaningless to include some of its levels (e.g. management)
 while excluding others.</p></li>
 <li><p>Backwards variable selection in R can be conducted using the <code>step</code>
 command. The required syntax is</p>
-<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="prediction.html#cb92-1" tabindex="-1"></a><span class="fu">step</span>(my.full.model)</span></code></pre></div>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="prediction.html#cb72-1" tabindex="-1"></a><span class="fu">step</span>(my.full.model)</span></code></pre></div>
 <p>where <code>my.full.model</code> is a fitted linear model containing all the
 predictors<a href="#fn31" class="footnote-ref" id="fnref31"><sup>31</sup></a>.</p></li>
 </ul>
 <div class="example">
 <p><span id="exm:unlabeled-div-15" class="example"><strong>Example 4.6  </strong></span><strong>Model Selection for the Wage Data</strong></p>
 <p>We perform model selection for the wage data as follows.</p>
-<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="prediction.html#cb93-1" tabindex="-1"></a>wage.lm.step <span class="ot">&lt;-</span> <span class="fu">step</span>(wage.lm)</span></code></pre></div>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="prediction.html#cb73-1" tabindex="-1"></a>wage.lm.step <span class="ot">&lt;-</span> <span class="fu">step</span>(wage.lm)</span></code></pre></div>
 <pre><code>#&gt; Start:  AIC=1158.11
 #&gt; WAGE ~ EDU + SOUTH + SEX + EXP + UNION + AGE + RACE + OCCUP + 
 #&gt;     SECTOR + MARRIED
@@ -1193,7 +1199,7 @@ predictors<a href="#fn31" class="footnote-ref" id="fnref31"><sup>31</sup></a>.</
 #&gt; - EXP     1    325.89 7014.3 1169.7
 #&gt; - OCCUP   5    619.40 7307.8 1178.1
 #&gt; - EDU     1    508.20 7196.6 1180.0</code></pre>
-<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="prediction.html#cb95-1" tabindex="-1"></a><span class="fu">summary</span>(wage.lm.step)</span></code></pre></div>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="prediction.html#cb75-1" tabindex="-1"></a><span class="fu">summary</span>(wage.lm.step)</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Call:
 #&gt; lm(formula = WAGE ~ EDU + SOUTH + SEX + EXP + UNION + OCCUP + 
@@ -1238,9 +1244,9 @@ single predictor.</p>
 </div>
 <p>Finally, we note that while model selection using AIC is generally well
 regarded, it will not guarantee improved prediction accuracy.</p>
-<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="prediction.html#cb97-1" tabindex="-1"></a>wage.lm.step <span class="sc">|&gt;</span></span>
-<span id="cb97-2"><a href="prediction.html#cb97-2" tabindex="-1"></a>  <span class="fu">augment</span>(<span class="at">newdata =</span> wage.test) <span class="sc">|&gt;</span></span>
-<span id="cb97-3"><a href="prediction.html#cb97-3" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">MSE =</span> <span class="fu">mean</span>((.fitted <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="prediction.html#cb77-1" tabindex="-1"></a>wage.lm.step <span class="sc">|&gt;</span></span>
+<span id="cb77-2"><a href="prediction.html#cb77-2" tabindex="-1"></a>  <span class="fu">augment</span>(<span class="at">newdata =</span> wage.test) <span class="sc">|&gt;</span></span>
+<span id="cb77-3"><a href="prediction.html#cb77-3" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">MSE =</span> <span class="fu">mean</span>((.fitted <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 1 × 1
 #&gt;      MSE
 #&gt;    &lt;dbl&gt;
@@ -1282,7 +1288,6 @@ linear regression.</p>
 Figure 4.3: Scatterplot of toy dataset.
 </p>
 </div>
-<pre><code>#&gt; Warning: package &#39;rpart&#39; was built under R version 4.5.2</code></pre>
 <p>A tree based method works by systematically splitting the data into
 groups according to <span class="math inline">\(x\)</span>, and then predicting the target using the means
 within each group. The recursive partitioning of the data (i.e. the
@@ -1407,7 +1412,7 @@ enabled in a greedy algorithm.</p>
 This is part of the <code>rpart</code> library, which must be pre-loaded before the
 functions therein can be used. The basic syntax for <code>rpart</code> mirrors that
 for <code>lm</code>: for example,</p>
-<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb100-1"><a href="prediction.html#cb100-1" tabindex="-1"></a><span class="fu">rpart</span>(y <span class="sc">~</span> x1 <span class="sc">+</span> x2, <span class="at">data=</span>mydata)</span></code></pre></div>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="prediction.html#cb79-1" tabindex="-1"></a><span class="fu">rpart</span>(y <span class="sc">~</span> x1 <span class="sc">+</span> x2, <span class="at">data=</span>mydata)</span></code></pre></div>
 <p>will fit a regression tree with target variable <code>y</code> and predictors <code>x1</code>
 and <code>x2</code>, with R searching first the data frame <code>mydata</code> when looking
 for these variables.</p>
@@ -1416,9 +1421,9 @@ for these variables.</p>
 <p>Here we build a regression tree from the US wage training data, and then
 use it to make predictions on the test set. The code below constructs
 the tree, then summarises and plots it.</p>
-<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="prediction.html#cb101-1" tabindex="-1"></a><span class="fu">library</span>(rpart)</span>
-<span id="cb101-2"><a href="prediction.html#cb101-2" tabindex="-1"></a>wage.rp <span class="ot">&lt;-</span> <span class="fu">rpart</span>(WAGE <span class="sc">~</span> . ,<span class="at">data=</span>wage.train)</span>
-<span id="cb101-3"><a href="prediction.html#cb101-3" tabindex="-1"></a><span class="fu">summary</span>(wage.rp)</span></code></pre></div>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="prediction.html#cb80-1" tabindex="-1"></a><span class="fu">library</span>(rpart)</span>
+<span id="cb80-2"><a href="prediction.html#cb80-2" tabindex="-1"></a>wage.rp <span class="ot">&lt;-</span> <span class="fu">rpart</span>(WAGE <span class="sc">~</span> . ,<span class="at">data=</span>wage.train)</span>
+<span id="cb80-3"><a href="prediction.html#cb80-3" tabindex="-1"></a><span class="fu">summary</span>(wage.rp)</span></code></pre></div>
 <pre><code>#&gt; Call:
 #&gt; rpart(formula = WAGE ~ ., data = wage.train)
 #&gt;   n= 400 
@@ -1650,8 +1655,8 @@ sum of squares at each one. For example, there is a leaf (node 30)
 with 11 observations and mean target value <span class="math inline">\(12.18\)</span>.</p></li>
 </ul>
 <p>We can plot the structure of the tree using</p>
-<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="prediction.html#cb103-1" tabindex="-1"></a><span class="fu">plot</span>(wage.rp, <span class="at">compress=</span><span class="cn">TRUE</span>, <span class="at">margin=</span><span class="fl">0.1</span>)</span>
-<span id="cb103-2"><a href="prediction.html#cb103-2" tabindex="-1"></a><span class="fu">text</span>(wage.rp)</span></code></pre></div>
+<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb82-1"><a href="prediction.html#cb82-1" tabindex="-1"></a><span class="fu">plot</span>(wage.rp, <span class="at">compress=</span><span class="cn">TRUE</span>, <span class="at">margin=</span><span class="fl">0.1</span>)</span>
+<span id="cb82-2"><a href="prediction.html#cb82-2" tabindex="-1"></a><span class="fu">text</span>(wage.rp)</span></code></pre></div>
 <div class="figure"><span style="display:block;" id="fig:wagetree"></span>
 <img src="04-prediction_files/figure-html/wagetree-1.png" alt="Regression tree for the US wage data." width="672" />
 <p class="caption">
@@ -1668,9 +1673,9 @@ letters to represent the factor levels (i.e. ‘a’ for level 1, ‘b’
 for level 2 and so forth).</p>
 <p>We can obtain predictions from the fitted regression tree by applying
 the <code>predict</code> command<a href="#fn36" class="footnote-ref" id="fnref36"><sup>36</sup></a>.</p>
-<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb104-1"><a href="prediction.html#cb104-1" tabindex="-1"></a>wage.rp.pred <span class="ot">&lt;-</span> wage.test <span class="sc">|&gt;</span></span>
-<span id="cb104-2"><a href="prediction.html#cb104-2" tabindex="-1"></a>  <span class="fu">bind_cols</span>(<span class="at">.pred =</span> <span class="fu">predict</span>(wage.rp, <span class="at">newdata=</span>wage.test))</span>
-<span id="cb104-3"><a href="prediction.html#cb104-3" tabindex="-1"></a>wage.rp.pred <span class="sc">|&gt;</span> <span class="fu">select</span>(.pred, WAGE, <span class="fu">everything</span>())</span></code></pre></div>
+<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="prediction.html#cb83-1" tabindex="-1"></a>wage.rp.pred <span class="ot">&lt;-</span> wage.test <span class="sc">|&gt;</span></span>
+<span id="cb83-2"><a href="prediction.html#cb83-2" tabindex="-1"></a>  <span class="fu">bind_cols</span>(<span class="at">.pred =</span> <span class="fu">predict</span>(wage.rp, <span class="at">newdata=</span>wage.test))</span>
+<span id="cb83-3"><a href="prediction.html#cb83-3" tabindex="-1"></a>wage.rp.pred <span class="sc">|&gt;</span> <span class="fu">select</span>(.pred, WAGE, <span class="fu">everything</span>())</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 134 × 12
 #&gt;      .pred  WAGE   EDU SOUTH SEX     EXP UNION   AGE RACE  OCCUP  SECTOR MARRIED
 #&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  
@@ -1685,8 +1690,8 @@ the <code>predict</code> command<a href="#fn36" class="footnote-ref" id="fnref36
 #&gt;  9 10.880   9.86    15     0 M        13     0    34 White Profe… Other  Yes    
 #&gt; 10 16.884   6.25    18     0 M        27     0    51 Other Profe… Other  Yes    
 #&gt; # ℹ 124 more rows</code></pre>
-<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb106-1"><a href="prediction.html#cb106-1" tabindex="-1"></a>wage.rp.pred <span class="sc">|&gt;</span></span>
-<span id="cb106-2"><a href="prediction.html#cb106-2" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">MSE =</span> <span class="fu">mean</span>((.pred <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb85-1"><a href="prediction.html#cb85-1" tabindex="-1"></a>wage.rp.pred <span class="sc">|&gt;</span></span>
+<span id="cb85-2"><a href="prediction.html#cb85-2" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">MSE =</span> <span class="fu">mean</span>((.pred <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 1 × 1
 #&gt;      MSE
 #&gt;    &lt;dbl&gt;
@@ -1775,8 +1780,8 @@ was constructed using the default value of the complexity parameter
 <span class="math inline">\(cp = 0.01\)</span>. We here build trees using <span class="math inline">\(cp=0.1\)</span> and <span class="math inline">\(cp=0.001\)</span>, and use
 them for prediction on the wage test data. The resulting trees are
 plotted in Figure <a href="prediction.html#fig:wagetree2">4.9</a>.</p>
-<div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb108-1"><a href="prediction.html#cb108-1" tabindex="-1"></a>wage.rp<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">rpart</span>(WAGE <span class="sc">~</span> ., <span class="at">data=</span>wage.train, <span class="at">cp=</span><span class="fl">0.1</span>)</span>
-<span id="cb108-2"><a href="prediction.html#cb108-2" tabindex="-1"></a>wage.rp<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">rpart</span>(WAGE <span class="sc">~</span> ., <span class="at">data=</span>wage.train, <span class="at">cp=</span><span class="fl">0.001</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="prediction.html#cb87-1" tabindex="-1"></a>wage.rp<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">rpart</span>(WAGE <span class="sc">~</span> ., <span class="at">data=</span>wage.train, <span class="at">cp=</span><span class="fl">0.1</span>)</span>
+<span id="cb87-2"><a href="prediction.html#cb87-2" tabindex="-1"></a>wage.rp<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">rpart</span>(WAGE <span class="sc">~</span> ., <span class="at">data=</span>wage.train, <span class="at">cp=</span><span class="fl">0.001</span>)</span></code></pre></div>
 <div class="figure"><span style="display:block;" id="fig:wagetree2"></span>
 <img src="04-prediction_files/figure-html/wagetree2-1.png" alt="Regression trees for the US wage data with complexity parameters $cp=0.1$ (left-hand panel) and $cp=0.001$ right-hand panel) respectively." width="672" />
 <p class="caption">
@@ -1788,14 +1793,14 @@ to a hugely simple tree
 (with just a single split) while <span class="math inline">\(cp=0.001\)</span> generates a much more
 complex tree.</p>
 <p>We can also compute mean square error on the test data.</p>
-<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="prediction.html#cb109-1" tabindex="-1"></a>wage.rp.pred<span class="fl">.2</span> <span class="ot">&lt;-</span> wage.test <span class="sc">|&gt;</span></span>
-<span id="cb109-2"><a href="prediction.html#cb109-2" tabindex="-1"></a>  <span class="fu">bind_cols</span>(</span>
-<span id="cb109-3"><a href="prediction.html#cb109-3" tabindex="-1"></a>    <span class="at">.pred1 =</span> <span class="fu">predict</span>(wage.rp<span class="fl">.1</span>, <span class="at">newdata=</span>wage.test),</span>
-<span id="cb109-4"><a href="prediction.html#cb109-4" tabindex="-1"></a>    <span class="at">.pred2 =</span> <span class="fu">predict</span>(wage.rp<span class="fl">.2</span>, <span class="at">newdata=</span>wage.test)</span>
-<span id="cb109-5"><a href="prediction.html#cb109-5" tabindex="-1"></a>  )</span>
-<span id="cb109-6"><a href="prediction.html#cb109-6" tabindex="-1"></a>wage.rp.pred<span class="fl">.2</span> <span class="sc">|&gt;</span></span>
-<span id="cb109-7"><a href="prediction.html#cb109-7" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">MSE.1 =</span> <span class="fu">mean</span>((.pred1 <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>),</span>
-<span id="cb109-8"><a href="prediction.html#cb109-8" tabindex="-1"></a>            <span class="at">MSE.2 =</span> <span class="fu">mean</span>((.pred2 <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="prediction.html#cb88-1" tabindex="-1"></a>wage.rp.pred<span class="fl">.2</span> <span class="ot">&lt;-</span> wage.test <span class="sc">|&gt;</span></span>
+<span id="cb88-2"><a href="prediction.html#cb88-2" tabindex="-1"></a>  <span class="fu">bind_cols</span>(</span>
+<span id="cb88-3"><a href="prediction.html#cb88-3" tabindex="-1"></a>    <span class="at">.pred1 =</span> <span class="fu">predict</span>(wage.rp<span class="fl">.1</span>, <span class="at">newdata=</span>wage.test),</span>
+<span id="cb88-4"><a href="prediction.html#cb88-4" tabindex="-1"></a>    <span class="at">.pred2 =</span> <span class="fu">predict</span>(wage.rp<span class="fl">.2</span>, <span class="at">newdata=</span>wage.test)</span>
+<span id="cb88-5"><a href="prediction.html#cb88-5" tabindex="-1"></a>  )</span>
+<span id="cb88-6"><a href="prediction.html#cb88-6" tabindex="-1"></a>wage.rp.pred<span class="fl">.2</span> <span class="sc">|&gt;</span></span>
+<span id="cb88-7"><a href="prediction.html#cb88-7" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">MSE.1 =</span> <span class="fu">mean</span>((.pred1 <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb88-8"><a href="prediction.html#cb88-8" tabindex="-1"></a>            <span class="at">MSE.2 =</span> <span class="fu">mean</span>((.pred2 <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 1 × 2
 #&gt;    MSE.1  MSE.2
 #&gt;    &lt;dbl&gt;  &lt;dbl&gt;
@@ -1866,7 +1871,7 @@ part of the output that we obtain when using the <code>summary</code> function o
 regression tree.) The argument for <code>printcp</code> is the most complex model
 to be assessed (i.e. the one corresponding to the smallest value of
 <span class="math inline">\(cp\)</span>).</p>
-<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb111-1"><a href="prediction.html#cb111-1" tabindex="-1"></a><span class="fu">printcp</span>(wage.rp<span class="fl">.2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="prediction.html#cb90-1" tabindex="-1"></a><span class="fu">printcp</span>(wage.rp<span class="fl">.2</span>)</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Regression tree:
 #&gt; rpart(formula = WAGE ~ ., data = wage.train, cp = 0.001)
@@ -1920,9 +1925,9 @@ and 31 vertices.</p>
 <p>Finally, we compute the mean squared prediction error on the test data,
 using an optimal cross-validation value of the complexity parameter of
 <span class="math inline">\(cp=0.023\)</span>.</p>
-<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb113-1"><a href="prediction.html#cb113-1" tabindex="-1"></a>wage.rp<span class="fl">.3</span> <span class="ot">&lt;-</span> <span class="fu">rpart</span>(WAGE <span class="sc">~</span> ., <span class="at">data=</span>wage.train, <span class="at">cp=</span><span class="fl">0.023</span>)</span>
-<span id="cb113-2"><a href="prediction.html#cb113-2" tabindex="-1"></a>wage.rp.pred<span class="fl">.3</span> <span class="ot">&lt;-</span> wage.test <span class="sc">|&gt;</span> <span class="fu">bind_cols</span>(<span class="at">.pred =</span> <span class="fu">predict</span>(wage.rp<span class="fl">.3</span>, <span class="at">newdata=</span>wage.test))</span>
-<span id="cb113-3"><a href="prediction.html#cb113-3" tabindex="-1"></a>wage.rp.pred<span class="fl">.3</span> <span class="sc">|&gt;</span> <span class="fu">summarise</span>(<span class="at">MSE =</span> <span class="fu">mean</span>((.pred <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="prediction.html#cb92-1" tabindex="-1"></a>wage.rp<span class="fl">.3</span> <span class="ot">&lt;-</span> <span class="fu">rpart</span>(WAGE <span class="sc">~</span> ., <span class="at">data=</span>wage.train, <span class="at">cp=</span><span class="fl">0.023</span>)</span>
+<span id="cb92-2"><a href="prediction.html#cb92-2" tabindex="-1"></a>wage.rp.pred<span class="fl">.3</span> <span class="ot">&lt;-</span> wage.test <span class="sc">|&gt;</span> <span class="fu">bind_cols</span>(<span class="at">.pred =</span> <span class="fu">predict</span>(wage.rp<span class="fl">.3</span>, <span class="at">newdata=</span>wage.test))</span>
+<span id="cb92-3"><a href="prediction.html#cb92-3" tabindex="-1"></a>wage.rp.pred<span class="fl">.3</span> <span class="sc">|&gt;</span> <span class="fu">summarise</span>(<span class="at">MSE =</span> <span class="fu">mean</span>((.pred <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 1 × 1
 #&gt;      MSE
 #&gt;    &lt;dbl&gt;
@@ -1942,8 +1947,8 @@ certain to identify the best model.</p>
 <div class="example">
 <p><span id="exm:unlabeled-div-21" class="example"><strong>Example 4.12  </strong></span><strong>Unstable trees for the WAGE data</strong></p>
 <p>Consider the following code snippet that produces a bootstrap resample of the <code>wage-train</code> data:</p>
-<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb115-1"><a href="prediction.html#cb115-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">5</span>)</span>
-<span id="cb115-2"><a href="prediction.html#cb115-2" tabindex="-1"></a>wage.train.bs <span class="ot">&lt;-</span> <span class="fu">slice_sample</span>(wage.train, <span class="at">n=</span><span class="dv">400</span>, <span class="at">replace=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="prediction.html#cb94-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">5</span>)</span>
+<span id="cb94-2"><a href="prediction.html#cb94-2" tabindex="-1"></a>wage.train.bs <span class="ot">&lt;-</span> <span class="fu">slice_sample</span>(wage.train, <span class="at">n=</span><span class="dv">400</span>, <span class="at">replace=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <p>This dataset has the same (or very similar) relationships between <code>WAGE</code> and the other numeric variables, as we can see in Figure <a href="prediction.html#fig:wageresample">4.10</a>.</p>
 <div class="figure"><span style="display:block;" id="fig:wageresample"></span>
 <img src="04-prediction_files/figure-html/wageresample-1.png" alt="Relationships between `WAGE` and the numeric variables from the  `wage.train` and `wage.train.bs` datasets." width="672" />
@@ -2006,13 +2011,13 @@ examples.</p>
 <p><span id="exm:unlabeled-div-22" class="example"><strong>Example 4.13  </strong></span><strong>Random forest for the WAGE data</strong></p>
 <p>A random forest model is fit to the WAGE data with default arguments as follows, and prediction
 on the test set is performed:</p>
-<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="prediction.html#cb116-1" tabindex="-1"></a><span class="fu">library</span>(ranger)</span>
-<span id="cb116-2"><a href="prediction.html#cb116-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1945</span>)</span>
-<span id="cb116-3"><a href="prediction.html#cb116-3" tabindex="-1"></a>wage.rf<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">ranger</span>(WAGE <span class="sc">~</span> ., <span class="at">data =</span> wage.train, <span class="at">num.trees =</span> <span class="dv">500</span>)</span>
-<span id="cb116-4"><a href="prediction.html#cb116-4" tabindex="-1"></a>wage.rf.<span class="fl">1.</span>pred <span class="ot">&lt;-</span> wage.test <span class="sc">|&gt;</span></span>
-<span id="cb116-5"><a href="prediction.html#cb116-5" tabindex="-1"></a>  <span class="fu">bind_cols</span>(<span class="at">.pred =</span> <span class="fu">predict</span>(wage.rf<span class="fl">.1</span>, <span class="at">data =</span> wage.test)<span class="sc">$</span>predictions)</span>
-<span id="cb116-6"><a href="prediction.html#cb116-6" tabindex="-1"></a>wage.rf.<span class="fl">1.</span>pred <span class="sc">|&gt;</span></span>
-<span id="cb116-7"><a href="prediction.html#cb116-7" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">MSE =</span> <span class="fu">mean</span>((.pred <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="prediction.html#cb95-1" tabindex="-1"></a><span class="fu">library</span>(ranger)</span>
+<span id="cb95-2"><a href="prediction.html#cb95-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1945</span>)</span>
+<span id="cb95-3"><a href="prediction.html#cb95-3" tabindex="-1"></a>wage.rf<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">ranger</span>(WAGE <span class="sc">~</span> ., <span class="at">data =</span> wage.train, <span class="at">num.trees =</span> <span class="dv">500</span>)</span>
+<span id="cb95-4"><a href="prediction.html#cb95-4" tabindex="-1"></a>wage.rf.<span class="fl">1.</span>pred <span class="ot">&lt;-</span> wage.test <span class="sc">|&gt;</span></span>
+<span id="cb95-5"><a href="prediction.html#cb95-5" tabindex="-1"></a>  <span class="fu">bind_cols</span>(<span class="at">.pred =</span> <span class="fu">predict</span>(wage.rf<span class="fl">.1</span>, <span class="at">data =</span> wage.test)<span class="sc">$</span>predictions)</span>
+<span id="cb95-6"><a href="prediction.html#cb95-6" tabindex="-1"></a>wage.rf.<span class="fl">1.</span>pred <span class="sc">|&gt;</span></span>
+<span id="cb95-7"><a href="prediction.html#cb95-7" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">MSE =</span> <span class="fu">mean</span>((.pred <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 1 × 1
 #&gt;      MSE
 #&gt;    &lt;dbl&gt;
@@ -2029,18 +2034,18 @@ which is a common default choice.</p></li>
 the number of predictors to consider for each split in the tree. Another
 possible tuning parameter governs the depth of the tree, given in
 <code>ranger</code> by <code>min.node.size</code>. Smaller values allow deeper trees.</p>
-<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb118-1"><a href="prediction.html#cb118-1" tabindex="-1"></a>wage.rf<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">ranger</span>(WAGE <span class="sc">~</span> ., <span class="at">data =</span> wage.train, <span class="at">num.trees =</span> <span class="dv">500</span>,</span>
-<span id="cb118-2"><a href="prediction.html#cb118-2" tabindex="-1"></a>                    <span class="at">mtry =</span> <span class="dv">2</span>)</span>
-<span id="cb118-3"><a href="prediction.html#cb118-3" tabindex="-1"></a>wage.rf<span class="fl">.3</span> <span class="ot">&lt;-</span> <span class="fu">ranger</span>(WAGE <span class="sc">~</span> ., <span class="at">data =</span> wage.train, <span class="at">num.trees =</span> <span class="dv">500</span>,</span>
-<span id="cb118-4"><a href="prediction.html#cb118-4" tabindex="-1"></a>                    <span class="at">mtry =</span> <span class="dv">2</span>, <span class="at">min.node.size =</span> <span class="dv">1</span>)</span>
-<span id="cb118-5"><a href="prediction.html#cb118-5" tabindex="-1"></a>wage.rf.pred <span class="ot">&lt;-</span> wage.test <span class="sc">|&gt;</span></span>
-<span id="cb118-6"><a href="prediction.html#cb118-6" tabindex="-1"></a>                  <span class="fu">bind_cols</span>(</span>
-<span id="cb118-7"><a href="prediction.html#cb118-7" tabindex="-1"></a>                    <span class="at">.pred2 =</span> <span class="fu">predict</span>(wage.rf<span class="fl">.2</span>, <span class="at">data =</span> wage.test)<span class="sc">$</span>predictions,</span>
-<span id="cb118-8"><a href="prediction.html#cb118-8" tabindex="-1"></a>                    <span class="at">.pred3 =</span> <span class="fu">predict</span>(wage.rf<span class="fl">.3</span>, <span class="at">data =</span> wage.test)<span class="sc">$</span>predictions</span>
-<span id="cb118-9"><a href="prediction.html#cb118-9" tabindex="-1"></a>                  )</span>
-<span id="cb118-10"><a href="prediction.html#cb118-10" tabindex="-1"></a>wage.rf.pred <span class="sc">|&gt;</span></span>
-<span id="cb118-11"><a href="prediction.html#cb118-11" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">MSE.2 =</span> <span class="fu">mean</span>((.pred2 <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>),</span>
-<span id="cb118-12"><a href="prediction.html#cb118-12" tabindex="-1"></a>            <span class="at">MSE.3 =</span> <span class="fu">mean</span>((.pred3 <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="prediction.html#cb97-1" tabindex="-1"></a>wage.rf<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">ranger</span>(WAGE <span class="sc">~</span> ., <span class="at">data =</span> wage.train, <span class="at">num.trees =</span> <span class="dv">500</span>,</span>
+<span id="cb97-2"><a href="prediction.html#cb97-2" tabindex="-1"></a>                    <span class="at">mtry =</span> <span class="dv">2</span>)</span>
+<span id="cb97-3"><a href="prediction.html#cb97-3" tabindex="-1"></a>wage.rf<span class="fl">.3</span> <span class="ot">&lt;-</span> <span class="fu">ranger</span>(WAGE <span class="sc">~</span> ., <span class="at">data =</span> wage.train, <span class="at">num.trees =</span> <span class="dv">500</span>,</span>
+<span id="cb97-4"><a href="prediction.html#cb97-4" tabindex="-1"></a>                    <span class="at">mtry =</span> <span class="dv">2</span>, <span class="at">min.node.size =</span> <span class="dv">1</span>)</span>
+<span id="cb97-5"><a href="prediction.html#cb97-5" tabindex="-1"></a>wage.rf.pred <span class="ot">&lt;-</span> wage.test <span class="sc">|&gt;</span></span>
+<span id="cb97-6"><a href="prediction.html#cb97-6" tabindex="-1"></a>                  <span class="fu">bind_cols</span>(</span>
+<span id="cb97-7"><a href="prediction.html#cb97-7" tabindex="-1"></a>                    <span class="at">.pred2 =</span> <span class="fu">predict</span>(wage.rf<span class="fl">.2</span>, <span class="at">data =</span> wage.test)<span class="sc">$</span>predictions,</span>
+<span id="cb97-8"><a href="prediction.html#cb97-8" tabindex="-1"></a>                    <span class="at">.pred3 =</span> <span class="fu">predict</span>(wage.rf<span class="fl">.3</span>, <span class="at">data =</span> wage.test)<span class="sc">$</span>predictions</span>
+<span id="cb97-9"><a href="prediction.html#cb97-9" tabindex="-1"></a>                  )</span>
+<span id="cb97-10"><a href="prediction.html#cb97-10" tabindex="-1"></a>wage.rf.pred <span class="sc">|&gt;</span></span>
+<span id="cb97-11"><a href="prediction.html#cb97-11" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">MSE.2 =</span> <span class="fu">mean</span>((.pred2 <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb97-12"><a href="prediction.html#cb97-12" tabindex="-1"></a>            <span class="at">MSE.3 =</span> <span class="fu">mean</span>((.pred3 <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 1 × 2
 #&gt;    MSE.2  MSE.3
 #&gt;    &lt;dbl&gt;  &lt;dbl&gt;
@@ -2140,7 +2145,7 @@ fitted using a so-called ‘back propagation algorithm’.</p>
 <p>The R function for fitting a neural network is <code>nnet</code>. This is part of
 the <code>nnet</code> package which must be pre-loaded. The syntax to fit a neural
 network (of the type described above) is of the form</p>
-<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb120-1"><a href="prediction.html#cb120-1" tabindex="-1"></a><span class="fu">nnet</span>(y <span class="sc">~</span> x1 <span class="sc">+</span> x2 <span class="sc">+</span> x3 <span class="sc">+</span> x4, <span class="at">data=</span>mydata, <span class="at">size=</span><span class="dv">2</span>, <span class="at">linout=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="prediction.html#cb99-1" tabindex="-1"></a><span class="fu">nnet</span>(y <span class="sc">~</span> x1 <span class="sc">+</span> x2 <span class="sc">+</span> x3 <span class="sc">+</span> x4, <span class="at">data=</span>mydata, <span class="at">size=</span><span class="dv">2</span>, <span class="at">linout=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <p>The specification of the model formula and data frame is familiar, but
 there are two other arguments that require attention. The <code>size</code>
 argument specifies the number of nodes in the hidden layer. It has no
@@ -2185,10 +2190,9 @@ levels), <code>SECTOR</code> (3 levels) and <code>MARRIAGE</code> (2 levels). Th
 equivalent number of numerical predictors of
 <span class="math inline">\(p = 5 + 1 + 2 + 5 + 2 + 1 = 16\)</span>, and hence suggests that we start by
 trying <span class="math inline">\(p/2 = 8\)</span> nodes in the hidden layer.</p>
-<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="prediction.html#cb121-1" tabindex="-1"></a><span class="fu">library</span>(nnet)</span></code></pre></div>
-<pre><code>#&gt; Warning: package &#39;nnet&#39; was built under R version 4.5.2</code></pre>
-<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb123-1"><a href="prediction.html#cb123-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1069</span>)</span>
-<span id="cb123-2"><a href="prediction.html#cb123-2" tabindex="-1"></a>wage.nn<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">nnet</span>(WAGE <span class="sc">~</span> .,<span class="at">size=</span><span class="dv">8</span>, <span class="at">data=</span>wage.train, <span class="at">linout=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb100-1"><a href="prediction.html#cb100-1" tabindex="-1"></a><span class="fu">library</span>(nnet)</span>
+<span id="cb100-2"><a href="prediction.html#cb100-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1069</span>)</span>
+<span id="cb100-3"><a href="prediction.html#cb100-3" tabindex="-1"></a>wage.nn<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">nnet</span>(WAGE <span class="sc">~</span> .,<span class="at">size=</span><span class="dv">8</span>, <span class="at">data=</span>wage.train, <span class="at">linout=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>#&gt; # weights:  145
 #&gt; initial  value 35238.295276 
 #&gt; iter  10 value 9797.535740
@@ -2196,18 +2200,18 @@ trying <span class="math inline">\(p/2 = 8\)</span> nodes in the hidden layer.</
 #&gt; iter  30 value 8407.104646
 #&gt; iter  40 value 7137.560954
 #&gt; iter  50 value 6409.347535
-#&gt; iter  60 value 6055.671849
-#&gt; iter  70 value 5653.071634
-#&gt; iter  80 value 5458.214737
-#&gt; iter  90 value 5339.341183
-#&gt; iter 100 value 5294.443408
-#&gt; final  value 5294.443408 
+#&gt; iter  60 value 6055.671851
+#&gt; iter  70 value 5653.071563
+#&gt; iter  80 value 5458.217813
+#&gt; iter  90 value 5339.338424
+#&gt; iter 100 value 5294.441153
+#&gt; final  value 5294.441153 
 #&gt; stopped after 100 iterations</code></pre>
 <p>Notice that this network stopped training after 100 iterations, the default.</p>
 <p>We should increase the number of iterations to ensure convergence. We’ll also
 try varying the <code>decay</code> and <code>size</code> parameters:</p>
-<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb125-1"><a href="prediction.html#cb125-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1069</span>)</span>
-<span id="cb125-2"><a href="prediction.html#cb125-2" tabindex="-1"></a>wage.nn<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">nnet</span>(WAGE <span class="sc">~</span> .,<span class="at">size=</span><span class="dv">8</span>, <span class="at">data=</span>wage.train, <span class="at">linout=</span><span class="cn">TRUE</span>, <span class="at">maxit=</span><span class="dv">250</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="prediction.html#cb102-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1069</span>)</span>
+<span id="cb102-2"><a href="prediction.html#cb102-2" tabindex="-1"></a>wage.nn<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">nnet</span>(WAGE <span class="sc">~</span> .,<span class="at">size=</span><span class="dv">8</span>, <span class="at">data=</span>wage.train, <span class="at">linout=</span><span class="cn">TRUE</span>, <span class="at">maxit=</span><span class="dv">250</span>)</span></code></pre></div>
 <pre><code>#&gt; # weights:  145
 #&gt; initial  value 35238.295276 
 #&gt; iter  10 value 9797.535740
@@ -2215,28 +2219,28 @@ try varying the <code>decay</code> and <code>size</code> parameters:</p>
 #&gt; iter  30 value 8407.104646
 #&gt; iter  40 value 7137.560954
 #&gt; iter  50 value 6409.347535
-#&gt; iter  60 value 6055.671849
-#&gt; iter  70 value 5653.071634
-#&gt; iter  80 value 5458.214737
-#&gt; iter  90 value 5339.341183
-#&gt; iter 100 value 5294.443408
-#&gt; iter 110 value 5277.262956
-#&gt; iter 120 value 5259.472925
-#&gt; iter 130 value 5221.372400
-#&gt; iter 140 value 5213.260196
-#&gt; iter 150 value 5204.724066
-#&gt; iter 160 value 5186.121214
-#&gt; iter 170 value 5181.475745
-#&gt; iter 180 value 5180.836619
-#&gt; iter 190 value 5180.712366
-#&gt; iter 200 value 5180.680071
-#&gt; iter 210 value 5180.664910
-#&gt; iter 220 value 5180.656683
-#&gt; iter 230 value 5180.649097
-#&gt; final  value 5180.648910 
+#&gt; iter  60 value 6055.671851
+#&gt; iter  70 value 5653.071563
+#&gt; iter  80 value 5458.217813
+#&gt; iter  90 value 5339.338424
+#&gt; iter 100 value 5294.441153
+#&gt; iter 110 value 5277.264786
+#&gt; iter 120 value 5259.477058
+#&gt; iter 130 value 5221.375520
+#&gt; iter 140 value 5213.262776
+#&gt; iter 150 value 5204.729204
+#&gt; iter 160 value 5186.140067
+#&gt; iter 170 value 5181.490169
+#&gt; iter 180 value 5180.836426
+#&gt; iter 190 value 5180.713899
+#&gt; iter 200 value 5180.681210
+#&gt; iter 210 value 5180.664533
+#&gt; iter 220 value 5180.656824
+#&gt; iter 230 value 5180.649072
+#&gt; final  value 5180.648896 
 #&gt; converged</code></pre>
-<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb127-1"><a href="prediction.html#cb127-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1069</span>)</span>
-<span id="cb127-2"><a href="prediction.html#cb127-2" tabindex="-1"></a>wage.nn<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">nnet</span>(WAGE <span class="sc">~</span> .,<span class="at">size=</span><span class="dv">8</span>, <span class="at">data=</span>wage.train, <span class="at">linout=</span><span class="cn">TRUE</span>, <span class="at">maxit=</span><span class="dv">1000</span>, <span class="at">decay=</span><span class="fl">0.01</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb104-1"><a href="prediction.html#cb104-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1069</span>)</span>
+<span id="cb104-2"><a href="prediction.html#cb104-2" tabindex="-1"></a>wage.nn<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">nnet</span>(WAGE <span class="sc">~</span> .,<span class="at">size=</span><span class="dv">8</span>, <span class="at">data=</span>wage.train, <span class="at">linout=</span><span class="cn">TRUE</span>, <span class="at">maxit=</span><span class="dv">1000</span>, <span class="at">decay=</span><span class="fl">0.01</span>)</span></code></pre></div>
 <pre><code>#&gt; # weights:  145
 #&gt; initial  value 35238.563668 
 #&gt; iter  10 value 9791.548415
@@ -2245,81 +2249,85 @@ try varying the <code>decay</code> and <code>size</code> parameters:</p>
 #&gt; iter  40 value 6878.376122
 #&gt; iter  50 value 6481.117353
 #&gt; iter  60 value 6207.284772
-#&gt; iter  70 value 5888.370682
-#&gt; iter  80 value 5679.460910
-#&gt; iter  90 value 5587.557983
-#&gt; iter 100 value 5562.770322
-#&gt; iter 110 value 5549.232128
-#&gt; iter 120 value 5534.737535
-#&gt; iter 130 value 5423.151400
-#&gt; iter 140 value 5006.531549
-#&gt; iter 150 value 4791.212282
-#&gt; iter 160 value 4678.106404
-#&gt; iter 170 value 4604.413260
-#&gt; iter 180 value 4574.261195
-#&gt; iter 190 value 4562.695725
-#&gt; iter 200 value 4532.623415
-#&gt; iter 210 value 4460.599447
-#&gt; iter 220 value 4174.205752
-#&gt; iter 230 value 3777.204565
-#&gt; iter 240 value 3626.401311
-#&gt; iter 250 value 3556.716044
-#&gt; iter 260 value 3477.252873
-#&gt; iter 270 value 3410.639912
-#&gt; iter 280 value 3370.428958
-#&gt; iter 290 value 3356.013428
-#&gt; iter 300 value 3347.590486
-#&gt; iter 310 value 3342.952019
-#&gt; iter 320 value 3338.835662
-#&gt; iter 330 value 3327.244695
-#&gt; iter 340 value 3312.767104
-#&gt; iter 350 value 3307.501743
-#&gt; iter 360 value 3305.657146
-#&gt; iter 370 value 3304.260947
-#&gt; iter 380 value 3303.739138
-#&gt; iter 390 value 3303.609181
-#&gt; iter 400 value 3303.574092
-#&gt; iter 410 value 3303.558593
-#&gt; iter 420 value 3303.491448
-#&gt; iter 430 value 3303.206511
-#&gt; iter 440 value 3303.077402
-#&gt; iter 450 value 3303.009188
-#&gt; iter 460 value 3302.952691
-#&gt; final  value 3302.948490 
+#&gt; iter  70 value 5888.370643
+#&gt; iter  80 value 5679.460865
+#&gt; iter  90 value 5587.558053
+#&gt; iter 100 value 5562.770888
+#&gt; iter 110 value 5549.232998
+#&gt; iter 120 value 5534.746892
+#&gt; iter 130 value 5377.320342
+#&gt; iter 140 value 4956.878840
+#&gt; iter 150 value 4748.302776
+#&gt; iter 160 value 4666.816050
+#&gt; iter 170 value 4641.362805
+#&gt; iter 180 value 4522.339012
+#&gt; iter 190 value 4249.076658
+#&gt; iter 200 value 4148.421313
+#&gt; iter 210 value 4141.294333
+#&gt; iter 220 value 4128.342428
+#&gt; iter 230 value 4113.462752
+#&gt; iter 240 value 4088.338712
+#&gt; iter 250 value 4036.092349
+#&gt; iter 260 value 3885.738552
+#&gt; iter 270 value 3665.268656
+#&gt; iter 280 value 3599.800099
+#&gt; iter 290 value 3598.014247
+#&gt; iter 300 value 3587.143227
+#&gt; iter 310 value 3579.255264
+#&gt; iter 320 value 3558.760159
+#&gt; iter 330 value 3544.988341
+#&gt; iter 340 value 3537.662068
+#&gt; iter 350 value 3526.169481
+#&gt; iter 360 value 3511.864771
+#&gt; iter 370 value 3490.326282
+#&gt; iter 380 value 3471.140803
+#&gt; iter 390 value 3467.922148
+#&gt; iter 400 value 3463.300108
+#&gt; iter 410 value 3459.851024
+#&gt; iter 420 value 3458.404360
+#&gt; iter 430 value 3458.068068
+#&gt; iter 440 value 3457.741192
+#&gt; iter 450 value 3457.539546
+#&gt; iter 460 value 3457.523272
+#&gt; iter 470 value 3457.490380
+#&gt; iter 480 value 3457.378970
+#&gt; iter 490 value 3456.983406
+#&gt; iter 500 value 3456.783995
+#&gt; iter 510 value 3456.677792
+#&gt; iter 520 value 3456.545741
+#&gt; iter 530 value 3456.508321
+#&gt; iter 540 value 3456.497985
+#&gt; iter 550 value 3456.495455
+#&gt; iter 560 value 3456.493827
+#&gt; final  value 3456.493751 
 #&gt; converged</code></pre>
-<div class="sourceCode" id="cb129"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb129-1"><a href="prediction.html#cb129-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1069</span>)</span>
-<span id="cb129-2"><a href="prediction.html#cb129-2" tabindex="-1"></a>wage.nn<span class="fl">.3</span> <span class="ot">&lt;-</span> <span class="fu">nnet</span>(WAGE <span class="sc">~</span> .,<span class="at">size=</span><span class="dv">5</span>, <span class="at">data=</span>wage.train, <span class="at">linout=</span><span class="cn">TRUE</span>, <span class="at">maxit=</span><span class="dv">250</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb106-1"><a href="prediction.html#cb106-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1069</span>)</span>
+<span id="cb106-2"><a href="prediction.html#cb106-2" tabindex="-1"></a>wage.nn<span class="fl">.3</span> <span class="ot">&lt;-</span> <span class="fu">nnet</span>(WAGE <span class="sc">~</span> .,<span class="at">size=</span><span class="dv">5</span>, <span class="at">data=</span>wage.train, <span class="at">linout=</span><span class="cn">TRUE</span>, <span class="at">maxit=</span><span class="dv">250</span>)</span></code></pre></div>
 <pre><code>#&gt; # weights:  91
 #&gt; initial  value 35078.872453 
 #&gt; iter  10 value 9898.773133
 #&gt; iter  20 value 9639.053885
 #&gt; iter  30 value 9144.093441
-#&gt; iter  40 value 7826.037696
-#&gt; iter  50 value 7279.872669
-#&gt; iter  60 value 7011.798196
-#&gt; iter  70 value 6538.294587
-#&gt; iter  80 value 6216.472023
-#&gt; iter  90 value 6140.245313
-#&gt; iter 100 value 6079.184660
-#&gt; iter 110 value 5885.076945
-#&gt; iter 120 value 5800.349185
-#&gt; iter 130 value 5758.187072
-#&gt; iter 140 value 5734.166922
-#&gt; iter 150 value 5727.264948
-#&gt; iter 160 value 5724.011819
-#&gt; iter 170 value 5719.110795
-#&gt; iter 180 value 5675.747369
-#&gt; iter 190 value 5641.012684
-#&gt; iter 200 value 5636.823687
-#&gt; iter 210 value 5632.526317
-#&gt; iter 220 value 5628.084071
-#&gt; iter 230 value 5625.793815
-#&gt; iter 240 value 5621.619122
-#&gt; iter 250 value 5621.579045
-#&gt; final  value 5621.579045 
-#&gt; stopped after 250 iterations</code></pre>
-<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb131-1"><a href="prediction.html#cb131-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1069</span>)</span>
-<span id="cb131-2"><a href="prediction.html#cb131-2" tabindex="-1"></a>wage.nn<span class="fl">.4</span> <span class="ot">&lt;-</span> <span class="fu">nnet</span>(WAGE <span class="sc">~</span> .,<span class="at">size=</span><span class="dv">5</span>, <span class="at">data=</span>wage.train, <span class="at">linout=</span><span class="cn">TRUE</span>, <span class="at">maxit=</span><span class="dv">1000</span>, <span class="at">decay=</span><span class="fl">0.01</span>)</span></code></pre></div>
+#&gt; iter  40 value 7826.027699
+#&gt; iter  50 value 7280.906397
+#&gt; iter  60 value 7014.257397
+#&gt; iter  70 value 6633.590521
+#&gt; iter  80 value 6445.393572
+#&gt; iter  90 value 6204.602833
+#&gt; iter 100 value 6060.848795
+#&gt; iter 110 value 6010.770063
+#&gt; iter 120 value 5868.244858
+#&gt; iter 130 value 5771.944799
+#&gt; iter 140 value 5702.256407
+#&gt; iter 150 value 5664.424728
+#&gt; iter 160 value 5642.921250
+#&gt; iter 170 value 5618.526653
+#&gt; iter 180 value 5613.555296
+#&gt; iter 190 value 5613.229284
+#&gt; final  value 5613.219380 
+#&gt; converged</code></pre>
+<div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb108-1"><a href="prediction.html#cb108-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1069</span>)</span>
+<span id="cb108-2"><a href="prediction.html#cb108-2" tabindex="-1"></a>wage.nn<span class="fl">.4</span> <span class="ot">&lt;-</span> <span class="fu">nnet</span>(WAGE <span class="sc">~</span> .,<span class="at">size=</span><span class="dv">5</span>, <span class="at">data=</span>wage.train, <span class="at">linout=</span><span class="cn">TRUE</span>, <span class="at">maxit=</span><span class="dv">1000</span>, <span class="at">decay=</span><span class="fl">0.01</span>)</span></code></pre></div>
 <pre><code>#&gt; # weights:  91
 #&gt; initial  value 35079.059683 
 #&gt; iter  10 value 9899.087090
@@ -2333,79 +2341,60 @@ try varying the <code>decay</code> and <code>size</code> parameters:</p>
 #&gt; iter  90 value 6514.004580
 #&gt; iter 100 value 6486.715687
 #&gt; iter 110 value 6422.863823
-#&gt; iter 120 value 6413.359668
-#&gt; iter 130 value 6404.914847
-#&gt; iter 140 value 6391.157086
-#&gt; iter 150 value 6366.201159
-#&gt; iter 160 value 6361.772112
-#&gt; iter 170 value 6315.489346
-#&gt; iter 180 value 6183.407448
-#&gt; iter 190 value 6055.917924
-#&gt; iter 200 value 6040.377799
-#&gt; iter 210 value 6029.631139
-#&gt; iter 220 value 5922.282775
-#&gt; iter 230 value 5584.845554
-#&gt; iter 240 value 5284.858728
-#&gt; iter 250 value 5045.600092
-#&gt; iter 260 value 4912.732799
-#&gt; iter 270 value 4836.755078
-#&gt; iter 280 value 4796.717099
-#&gt; iter 290 value 4780.231674
-#&gt; iter 300 value 4757.916201
-#&gt; iter 310 value 4729.821843
-#&gt; iter 320 value 4566.260676
-#&gt; iter 330 value 4461.450668
-#&gt; iter 340 value 4393.005603
-#&gt; iter 350 value 4334.395208
-#&gt; iter 360 value 4303.189659
-#&gt; iter 370 value 4279.775405
-#&gt; iter 380 value 4271.131683
-#&gt; iter 390 value 4265.550211
-#&gt; iter 400 value 4259.492440
-#&gt; iter 410 value 4249.764292
-#&gt; iter 420 value 4246.704715
-#&gt; iter 430 value 4242.745783
-#&gt; iter 440 value 4235.074225
-#&gt; iter 450 value 4224.119761
-#&gt; iter 460 value 4186.590663
-#&gt; iter 470 value 4147.228072
-#&gt; iter 480 value 4125.944871
-#&gt; iter 490 value 4116.081550
-#&gt; iter 500 value 4110.070124
-#&gt; iter 510 value 4096.012002
-#&gt; iter 520 value 4090.029372
-#&gt; iter 530 value 4083.813457
-#&gt; iter 540 value 4079.265215
-#&gt; iter 550 value 4078.607704
-#&gt; iter 560 value 4077.825166
-#&gt; iter 570 value 4077.484216
-#&gt; iter 580 value 4076.685026
-#&gt; iter 590 value 4076.533452
-#&gt; iter 600 value 4076.266089
-#&gt; iter 610 value 4073.929939
-#&gt; iter 620 value 4070.512974
-#&gt; iter 630 value 4068.094399
-#&gt; iter 640 value 4067.952698
-#&gt; iter 650 value 4067.930918
-#&gt; final  value 4067.930096 
+#&gt; iter 120 value 6413.359669
+#&gt; iter 130 value 6404.914846
+#&gt; iter 140 value 6391.157083
+#&gt; iter 150 value 6366.201123
+#&gt; iter 160 value 6361.773124
+#&gt; iter 170 value 6315.485887
+#&gt; iter 180 value 6183.450268
+#&gt; iter 190 value 6057.247575
+#&gt; iter 200 value 6045.648792
+#&gt; iter 210 value 6018.709366
+#&gt; iter 220 value 5833.713519
+#&gt; iter 230 value 5240.280659
+#&gt; iter 240 value 4877.286607
+#&gt; iter 250 value 4634.578901
+#&gt; iter 260 value 4533.734798
+#&gt; iter 270 value 4486.430186
+#&gt; iter 280 value 4470.048547
+#&gt; iter 290 value 4443.323159
+#&gt; iter 300 value 4418.315674
+#&gt; iter 310 value 4408.905750
+#&gt; iter 320 value 4378.615462
+#&gt; iter 330 value 4331.182426
+#&gt; iter 340 value 4281.052058
+#&gt; iter 350 value 4231.356086
+#&gt; iter 360 value 4190.805869
+#&gt; iter 370 value 4172.890858
+#&gt; iter 380 value 4165.957930
+#&gt; iter 390 value 4161.924512
+#&gt; iter 400 value 4159.483437
+#&gt; iter 410 value 4158.166529
+#&gt; iter 420 value 4157.733398
+#&gt; iter 430 value 4157.658218
+#&gt; iter 440 value 4157.581357
+#&gt; iter 450 value 4157.535733
+#&gt; iter 460 value 4157.531644
+#&gt; final  value 4157.529530 
 #&gt; converged</code></pre>
-<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb133-1"><a href="prediction.html#cb133-1" tabindex="-1"></a>wage.nn.pred <span class="ot">&lt;-</span> wage.test <span class="sc">|&gt;</span> <span class="fu">bind_cols</span>(</span>
-<span id="cb133-2"><a href="prediction.html#cb133-2" tabindex="-1"></a>  <span class="at">nn.1 =</span> <span class="fu">predict</span>(wage.nn<span class="fl">.1</span>, <span class="at">newdata=</span>wage.test),</span>
-<span id="cb133-3"><a href="prediction.html#cb133-3" tabindex="-1"></a>  <span class="at">nn.2 =</span> <span class="fu">predict</span>(wage.nn<span class="fl">.2</span>, <span class="at">newdata=</span>wage.test),</span>
-<span id="cb133-4"><a href="prediction.html#cb133-4" tabindex="-1"></a>  <span class="at">nn.3 =</span> <span class="fu">predict</span>(wage.nn<span class="fl">.3</span>, <span class="at">newdata=</span>wage.test),</span>
-<span id="cb133-5"><a href="prediction.html#cb133-5" tabindex="-1"></a>  <span class="at">nn.4 =</span> <span class="fu">predict</span>(wage.nn<span class="fl">.4</span>, <span class="at">newdata=</span>wage.test)</span>
-<span id="cb133-6"><a href="prediction.html#cb133-6" tabindex="-1"></a>)</span>
-<span id="cb133-7"><a href="prediction.html#cb133-7" tabindex="-1"></a>wage.nn.pred <span class="sc">|&gt;</span></span>
-<span id="cb133-8"><a href="prediction.html#cb133-8" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">starts_with</span>(<span class="st">&quot;nn.&quot;</span>), <span class="at">names_to =</span> <span class="st">&quot;model&quot;</span>, <span class="at">values_to=</span><span class="st">&quot;.pred&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb133-9"><a href="prediction.html#cb133-9" tabindex="-1"></a>  <span class="fu">group_by</span>(model) <span class="sc">|&gt;</span></span>
-<span id="cb133-10"><a href="prediction.html#cb133-10" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">MSE =</span> <span class="fu">mean</span>((.pred <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb110-1"><a href="prediction.html#cb110-1" tabindex="-1"></a>wage.nn.pred <span class="ot">&lt;-</span> wage.test <span class="sc">|&gt;</span> <span class="fu">bind_cols</span>(</span>
+<span id="cb110-2"><a href="prediction.html#cb110-2" tabindex="-1"></a>  <span class="at">nn.1 =</span> <span class="fu">predict</span>(wage.nn<span class="fl">.1</span>, <span class="at">newdata=</span>wage.test),</span>
+<span id="cb110-3"><a href="prediction.html#cb110-3" tabindex="-1"></a>  <span class="at">nn.2 =</span> <span class="fu">predict</span>(wage.nn<span class="fl">.2</span>, <span class="at">newdata=</span>wage.test),</span>
+<span id="cb110-4"><a href="prediction.html#cb110-4" tabindex="-1"></a>  <span class="at">nn.3 =</span> <span class="fu">predict</span>(wage.nn<span class="fl">.3</span>, <span class="at">newdata=</span>wage.test),</span>
+<span id="cb110-5"><a href="prediction.html#cb110-5" tabindex="-1"></a>  <span class="at">nn.4 =</span> <span class="fu">predict</span>(wage.nn<span class="fl">.4</span>, <span class="at">newdata=</span>wage.test)</span>
+<span id="cb110-6"><a href="prediction.html#cb110-6" tabindex="-1"></a>)</span>
+<span id="cb110-7"><a href="prediction.html#cb110-7" tabindex="-1"></a>wage.nn.pred <span class="sc">|&gt;</span></span>
+<span id="cb110-8"><a href="prediction.html#cb110-8" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">starts_with</span>(<span class="st">&quot;nn.&quot;</span>), <span class="at">names_to =</span> <span class="st">&quot;model&quot;</span>, <span class="at">values_to=</span><span class="st">&quot;.pred&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb110-9"><a href="prediction.html#cb110-9" tabindex="-1"></a>  <span class="fu">group_by</span>(model) <span class="sc">|&gt;</span></span>
+<span id="cb110-10"><a href="prediction.html#cb110-10" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">MSE =</span> <span class="fu">mean</span>((.pred <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 2
 #&gt;   model    MSE
 #&gt;   &lt;chr&gt;  &lt;dbl&gt;
 #&gt; 1 nn.1  24.423
-#&gt; 2 nn.2  29.864
-#&gt; 3 nn.3  21.635
-#&gt; 4 nn.4  31.981</code></pre>
+#&gt; 2 nn.2  32.163
+#&gt; 3 nn.3  21.948
+#&gt; 4 nn.4  29.739</code></pre>
 <p>Some points to note:</p>
 <ul>
 <li><p>We reinitialize the random number generator before fitting each
@@ -2424,33 +2413,33 @@ error for this model on the artificial test set is
 <span class="math inline">\(\textsf{MSE}= 24.4\)</span>.</p></li>
 <li><p>In the second model we try specifying 0.01 for the <code>decay</code> argument. As a result
 we notice a much better training RSS (the final value of iteration output), but
-a significantly worse prediction on the independent test set of <span class="math inline">\(\textsf{MSE}= 29.9\)</span>.
+a significantly worse prediction on the independent test set of <span class="math inline">\(\textsf{MSE}= 32.2\)</span>.
 This is due to <strong>overfitting</strong>. We have so many degrees of freedom that we’ve
 coerced the neural network into fitting the training data too well - with new
 observations that are just a bit different, we get the predictions badly wrong.
 We can see this when we look at the prediction on the training data, which are
 significantly lower for <code>wage.nn.2</code>:</p>
-<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb135-1"><a href="prediction.html#cb135-1" tabindex="-1"></a>wage.nn.pred.train <span class="ot">&lt;-</span> wage.train <span class="sc">|&gt;</span> <span class="fu">bind_cols</span>(</span>
-<span id="cb135-2"><a href="prediction.html#cb135-2" tabindex="-1"></a>  <span class="at">nn.1 =</span> <span class="fu">predict</span>(wage.nn<span class="fl">.1</span>, <span class="at">newdata=</span>wage.train),</span>
-<span id="cb135-3"><a href="prediction.html#cb135-3" tabindex="-1"></a>  <span class="at">nn.2 =</span> <span class="fu">predict</span>(wage.nn<span class="fl">.2</span>, <span class="at">newdata=</span>wage.train),</span>
-<span id="cb135-4"><a href="prediction.html#cb135-4" tabindex="-1"></a>  <span class="at">nn.3 =</span> <span class="fu">predict</span>(wage.nn<span class="fl">.3</span>, <span class="at">newdata=</span>wage.train),</span>
-<span id="cb135-5"><a href="prediction.html#cb135-5" tabindex="-1"></a>  <span class="at">nn.4 =</span> <span class="fu">predict</span>(wage.nn<span class="fl">.4</span>, <span class="at">newdata=</span>wage.train)</span>
-<span id="cb135-6"><a href="prediction.html#cb135-6" tabindex="-1"></a>)</span>
-<span id="cb135-7"><a href="prediction.html#cb135-7" tabindex="-1"></a>wage.nn.pred.train <span class="sc">|&gt;</span></span>
-<span id="cb135-8"><a href="prediction.html#cb135-8" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">starts_with</span>(<span class="st">&quot;nn.&quot;</span>), <span class="at">names_to =</span> <span class="st">&quot;model&quot;</span>, <span class="at">values_to=</span><span class="st">&quot;.pred&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb135-9"><a href="prediction.html#cb135-9" tabindex="-1"></a>  <span class="fu">group_by</span>(model) <span class="sc">|&gt;</span></span>
-<span id="cb135-10"><a href="prediction.html#cb135-10" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">MSE =</span> <span class="fu">mean</span>((.pred <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb112-1"><a href="prediction.html#cb112-1" tabindex="-1"></a>wage.nn.pred.train <span class="ot">&lt;-</span> wage.train <span class="sc">|&gt;</span> <span class="fu">bind_cols</span>(</span>
+<span id="cb112-2"><a href="prediction.html#cb112-2" tabindex="-1"></a>  <span class="at">nn.1 =</span> <span class="fu">predict</span>(wage.nn<span class="fl">.1</span>, <span class="at">newdata=</span>wage.train),</span>
+<span id="cb112-3"><a href="prediction.html#cb112-3" tabindex="-1"></a>  <span class="at">nn.2 =</span> <span class="fu">predict</span>(wage.nn<span class="fl">.2</span>, <span class="at">newdata=</span>wage.train),</span>
+<span id="cb112-4"><a href="prediction.html#cb112-4" tabindex="-1"></a>  <span class="at">nn.3 =</span> <span class="fu">predict</span>(wage.nn<span class="fl">.3</span>, <span class="at">newdata=</span>wage.train),</span>
+<span id="cb112-5"><a href="prediction.html#cb112-5" tabindex="-1"></a>  <span class="at">nn.4 =</span> <span class="fu">predict</span>(wage.nn<span class="fl">.4</span>, <span class="at">newdata=</span>wage.train)</span>
+<span id="cb112-6"><a href="prediction.html#cb112-6" tabindex="-1"></a>)</span>
+<span id="cb112-7"><a href="prediction.html#cb112-7" tabindex="-1"></a>wage.nn.pred.train <span class="sc">|&gt;</span></span>
+<span id="cb112-8"><a href="prediction.html#cb112-8" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">starts_with</span>(<span class="st">&quot;nn.&quot;</span>), <span class="at">names_to =</span> <span class="st">&quot;model&quot;</span>, <span class="at">values_to=</span><span class="st">&quot;.pred&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb112-9"><a href="prediction.html#cb112-9" tabindex="-1"></a>  <span class="fu">group_by</span>(model) <span class="sc">|&gt;</span></span>
+<span id="cb112-10"><a href="prediction.html#cb112-10" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">MSE =</span> <span class="fu">mean</span>((.pred <span class="sc">-</span> WAGE)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 2
 #&gt;   model     MSE
 #&gt;   &lt;chr&gt;   &lt;dbl&gt;
 #&gt; 1 nn.1  12.952 
-#&gt; 2 nn.2   8.0081
-#&gt; 3 nn.3  14.054 
-#&gt; 4 nn.4   9.9151</code></pre></li>
+#&gt; 2 nn.2   8.3982
+#&gt; 3 nn.3  14.033 
+#&gt; 4 nn.4  10.217</code></pre></li>
 <li><p>The third and fourth models differ from the first and second only in that we
 reduce the number of hidden nodes to 5, thus reducing the number of weights
-to 91. As a result, the prediction errors for the neural nets are <span class="math inline">\(21.6\)</span> for
-the default value of <code>decay</code> and <span class="math inline">\(32\)</span> for decay 0.01.</p></li>
+to 91. As a result, the prediction errors for the neural nets are <span class="math inline">\(21.9\)</span> for
+the default value of <code>decay</code> and <span class="math inline">\(29.7\)</span> for decay 0.01.</p></li>
 </ul>
 </div>
 </div>
@@ -2530,9 +2519,9 @@ prediction rules using each of these methodologies, assesses their
 efficacy on a validation set, and then applies the better of them to
 make predictions on the test data.</p>
 <p>We start by just looking at a print out of some of the data.</p>
-<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb137-1"><a href="prediction.html#cb137-1" tabindex="-1"></a>clock.train <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../data/clock-train.csv&quot;</span>)</span>
-<span id="cb137-2"><a href="prediction.html#cb137-2" tabindex="-1"></a>clock.test <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../data/clock-test.csv&quot;</span>)</span>
-<span id="cb137-3"><a href="prediction.html#cb137-3" tabindex="-1"></a>clock.train <span class="sc">|&gt;</span> <span class="fu">slice_head</span>(<span class="at">n=</span><span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb114-1"><a href="prediction.html#cb114-1" tabindex="-1"></a>clock.train <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../data/clock-train.csv&quot;</span>)</span>
+<span id="cb114-2"><a href="prediction.html#cb114-2" tabindex="-1"></a>clock.test <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../data/clock-test.csv&quot;</span>)</span>
+<span id="cb114-3"><a href="prediction.html#cb114-3" tabindex="-1"></a>clock.train <span class="sc">|&gt;</span> <span class="fu">slice_head</span>(<span class="at">n=</span><span class="dv">4</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;     Age Condition Price
 #&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;
@@ -2540,7 +2529,7 @@ make predictions on the test data.</p>
 #&gt; 2   161 Average     630
 #&gt; 3    96 Poor        200
 #&gt; 4    63 Average     230</code></pre>
-<div class="sourceCode" id="cb139"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb139-1"><a href="prediction.html#cb139-1" tabindex="-1"></a>clock.test <span class="sc">|&gt;</span> <span class="fu">slice_head</span>(<span class="at">n=</span><span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="prediction.html#cb116-1" tabindex="-1"></a>clock.test <span class="sc">|&gt;</span> <span class="fu">slice_head</span>(<span class="at">n=</span><span class="dv">4</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 2
 #&gt;     Age Condition
 #&gt;   &lt;dbl&gt; &lt;chr&gt;    
@@ -2554,12 +2543,11 @@ predict it!)</p>
 <p>Next, we divide the training data into a new training set and a
 validation (i.e. artificial test) set. The <code>rsample</code> package has the
 useful function <code>initial_split</code> for this:</p>
-<div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb141-1"><a href="prediction.html#cb141-1" tabindex="-1"></a><span class="fu">library</span>(rsample)</span></code></pre></div>
-<pre><code>#&gt; Warning: package &#39;rsample&#39; was built under R version 4.5.2</code></pre>
-<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb143-1"><a href="prediction.html#cb143-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">442</span>)</span>
-<span id="cb143-2"><a href="prediction.html#cb143-2" tabindex="-1"></a>split <span class="ot">=</span> <span class="fu">initial_split</span>(clock.train, <span class="at">prop =</span> <span class="fl">0.8</span>)</span>
-<span id="cb143-3"><a href="prediction.html#cb143-3" tabindex="-1"></a>clock.train.new <span class="ot">&lt;-</span> <span class="fu">training</span>(split)</span>
-<span id="cb143-4"><a href="prediction.html#cb143-4" tabindex="-1"></a>clock.validation <span class="ot">&lt;-</span> <span class="fu">testing</span>(split)</span></code></pre></div>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb118-1"><a href="prediction.html#cb118-1" tabindex="-1"></a><span class="fu">library</span>(rsample)</span>
+<span id="cb118-2"><a href="prediction.html#cb118-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">442</span>)</span>
+<span id="cb118-3"><a href="prediction.html#cb118-3" tabindex="-1"></a>split <span class="ot">=</span> <span class="fu">initial_split</span>(clock.train, <span class="at">prop =</span> <span class="fl">0.8</span>)</span>
+<span id="cb118-4"><a href="prediction.html#cb118-4" tabindex="-1"></a>clock.train.new <span class="ot">&lt;-</span> <span class="fu">training</span>(split)</span>
+<span id="cb118-5"><a href="prediction.html#cb118-5" tabindex="-1"></a>clock.validation <span class="ot">&lt;-</span> <span class="fu">testing</span>(split)</span></code></pre></div>
 <p>The object <code>split</code> contains information on how the split has been performed.
 We have specified <code>prop=0.8</code> to retain 80% of the data for training, and
 20% of the data for the validation set. This is somewhat arbitrary, though
@@ -2571,15 +2559,15 @@ this precise example if we wish.</p>
 <p>We now use the new training data to build linear regression and
 regression tree prediction models. We then assess their predictive
 accuracy on the validation set.</p>
-<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb144-1"><a href="prediction.html#cb144-1" tabindex="-1"></a><span class="fu">library</span>(rpart)</span>
-<span id="cb144-2"><a href="prediction.html#cb144-2" tabindex="-1"></a>clock.lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price <span class="sc">~</span> Age <span class="sc">+</span> Condition, <span class="at">data=</span>clock.train.new)</span>
-<span id="cb144-3"><a href="prediction.html#cb144-3" tabindex="-1"></a>clock.rp <span class="ot">&lt;-</span> <span class="fu">rpart</span>(Price <span class="sc">~</span> Age <span class="sc">+</span> Condition, <span class="at">data=</span>clock.train.new, <span class="at">cp=</span><span class="fl">0.001</span>)</span>
-<span id="cb144-4"><a href="prediction.html#cb144-4" tabindex="-1"></a>clock.pred <span class="ot">&lt;-</span> clock.validation <span class="sc">|&gt;</span></span>
-<span id="cb144-5"><a href="prediction.html#cb144-5" tabindex="-1"></a>  <span class="fu">bind_cols</span>(</span>
-<span id="cb144-6"><a href="prediction.html#cb144-6" tabindex="-1"></a>    <span class="at">pred.lm =</span> <span class="fu">predict</span>(clock.lm, <span class="at">newdata=</span>clock.validation),</span>
-<span id="cb144-7"><a href="prediction.html#cb144-7" tabindex="-1"></a>    <span class="at">pred.rp =</span> <span class="fu">predict</span>(clock.rp, <span class="at">newdata=</span>clock.validation)</span>
-<span id="cb144-8"><a href="prediction.html#cb144-8" tabindex="-1"></a>  )</span>
-<span id="cb144-9"><a href="prediction.html#cb144-9" tabindex="-1"></a>clock.pred</span></code></pre></div>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="prediction.html#cb119-1" tabindex="-1"></a><span class="fu">library</span>(rpart)</span>
+<span id="cb119-2"><a href="prediction.html#cb119-2" tabindex="-1"></a>clock.lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price <span class="sc">~</span> Age <span class="sc">+</span> Condition, <span class="at">data=</span>clock.train.new)</span>
+<span id="cb119-3"><a href="prediction.html#cb119-3" tabindex="-1"></a>clock.rp <span class="ot">&lt;-</span> <span class="fu">rpart</span>(Price <span class="sc">~</span> Age <span class="sc">+</span> Condition, <span class="at">data=</span>clock.train.new, <span class="at">cp=</span><span class="fl">0.001</span>)</span>
+<span id="cb119-4"><a href="prediction.html#cb119-4" tabindex="-1"></a>clock.pred <span class="ot">&lt;-</span> clock.validation <span class="sc">|&gt;</span></span>
+<span id="cb119-5"><a href="prediction.html#cb119-5" tabindex="-1"></a>  <span class="fu">bind_cols</span>(</span>
+<span id="cb119-6"><a href="prediction.html#cb119-6" tabindex="-1"></a>    <span class="at">pred.lm =</span> <span class="fu">predict</span>(clock.lm, <span class="at">newdata=</span>clock.validation),</span>
+<span id="cb119-7"><a href="prediction.html#cb119-7" tabindex="-1"></a>    <span class="at">pred.rp =</span> <span class="fu">predict</span>(clock.rp, <span class="at">newdata=</span>clock.validation)</span>
+<span id="cb119-8"><a href="prediction.html#cb119-8" tabindex="-1"></a>  )</span>
+<span id="cb119-9"><a href="prediction.html#cb119-9" tabindex="-1"></a>clock.pred</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 10 × 5
 #&gt;      Age Condition Price pred.lm pred.rp
 #&gt;    &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
@@ -2593,8 +2581,8 @@ accuracy on the validation set.</p>
 #&gt;  8    98 Poor        190  187.63  236.43
 #&gt;  9   118 Average     350  419.41  361.25
 #&gt; 10   143 Average     480  539.96  655</code></pre>
-<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb146-1"><a href="prediction.html#cb146-1" tabindex="-1"></a>clock.pred <span class="sc">|&gt;</span> <span class="fu">summarise</span>(<span class="at">MSE.lm =</span> <span class="fu">mean</span>((pred.lm <span class="sc">-</span> Price)<span class="sc">^</span><span class="dv">2</span>),</span>
-<span id="cb146-2"><a href="prediction.html#cb146-2" tabindex="-1"></a>                         <span class="at">MSE.rp =</span> <span class="fu">mean</span>((pred.rp <span class="sc">-</span> Price)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="prediction.html#cb121-1" tabindex="-1"></a>clock.pred <span class="sc">|&gt;</span> <span class="fu">summarise</span>(<span class="at">MSE.lm =</span> <span class="fu">mean</span>((pred.lm <span class="sc">-</span> Price)<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb121-2"><a href="prediction.html#cb121-2" tabindex="-1"></a>                         <span class="at">MSE.rp =</span> <span class="fu">mean</span>((pred.rp <span class="sc">-</span> Price)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 1 × 2
 #&gt;   MSE.lm MSE.rp
 #&gt;    &lt;dbl&gt;  &lt;dbl&gt;
@@ -2614,10 +2602,10 @@ whether regression trees or linear regression is preferable in this
 case). We should now be able to get a slightly better linear regression
 model if we fit it using all 50 training cases, rather than just the 40
 that were retained in the reduced training set.</p>
-<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb148-1"><a href="prediction.html#cb148-1" tabindex="-1"></a>clock.lm.final <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price <span class="sc">~</span> Age <span class="sc">+</span> Condition, <span class="at">data=</span>clock.train)</span>
-<span id="cb148-2"><a href="prediction.html#cb148-2" tabindex="-1"></a>clock.pred.test <span class="ot">&lt;-</span> clock.test <span class="sc">|&gt;</span></span>
-<span id="cb148-3"><a href="prediction.html#cb148-3" tabindex="-1"></a>  <span class="fu">bind_cols</span>(<span class="at">PredPrice =</span> <span class="fu">predict</span>(clock.lm.final, <span class="at">newdata=</span>clock.test))</span>
-<span id="cb148-4"><a href="prediction.html#cb148-4" tabindex="-1"></a>clock.pred.test</span></code></pre></div>
+<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb123-1"><a href="prediction.html#cb123-1" tabindex="-1"></a>clock.lm.final <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price <span class="sc">~</span> Age <span class="sc">+</span> Condition, <span class="at">data=</span>clock.train)</span>
+<span id="cb123-2"><a href="prediction.html#cb123-2" tabindex="-1"></a>clock.pred.test <span class="ot">&lt;-</span> clock.test <span class="sc">|&gt;</span></span>
+<span id="cb123-3"><a href="prediction.html#cb123-3" tabindex="-1"></a>  <span class="fu">bind_cols</span>(<span class="at">PredPrice =</span> <span class="fu">predict</span>(clock.lm.final, <span class="at">newdata=</span>clock.test))</span>
+<span id="cb123-4"><a href="prediction.html#cb123-4" tabindex="-1"></a>clock.pred.test</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 20 × 3
 #&gt;      Age Condition PredPrice
 #&gt;    &lt;dbl&gt; &lt;chr&gt;         &lt;dbl&gt;

@@ -10,7 +10,7 @@
 
   <meta property="og:title" content="Chapter 5 Tidy modelling | Data mining" />
   <meta property="og:type" content="book" />
-  
+  <meta property="og:image" content="/graphics/Datamining_cover.png" />
   <meta property="og:description" content="Chapter 5 Tidy modelling | Data mining notes" />
   <meta name="github-repo" content="jmarshallnz/161324" />
 
@@ -18,12 +18,12 @@
   <meta name="twitter:title" content="Chapter 5 Tidy modelling | Data mining" />
   
   <meta name="twitter:description" content="Chapter 5 Tidy modelling | Data mining notes" />
-  
+  <meta name="twitter:image" content="/graphics/Datamining_cover.png" />
 
 <meta name="author" content="Jonathan Marshall, Martin Hazelton, Nick Knowlton" />
 
 
-<meta name="date" content="2026-05-03" />
+<meta name="date" content="2026-05-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -154,7 +154,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="./">161.324 Data Mining</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="0.1" data-path="index.html"><a href="index.html#course-structure"><i class="fa fa-check"></i><b>0.1</b> Course structure</a></li>
+<li class="chapter" data-level="0.2" data-path="index.html"><a href="index.html#prerequisites"><i class="fa fa-check"></i><b>0.2</b> Prerequisites</a></li>
+<li class="chapter" data-level="0.3" data-path="index.html"><a href="index.html#how-to-use-these-notes"><i class="fa fa-check"></i><b>0.3</b> How to use these notes</a></li>
+<li class="chapter" data-level="0.4" data-path="index.html"><a href="index.html#acknowledgements"><i class="fa fa-check"></i><b>0.4</b> Acknowledgements</a></li>
+</ul></li>
 <li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
 <ul>
 <li class="chapter" data-level="1.1" data-path="introduction.html"><a href="introduction.html#sec:intro1"><i class="fa fa-check"></i><b>1.1</b> What is Data Mining?</a></li>
@@ -397,16 +403,16 @@ the same pipeline rather than being treated as a mysterious side quest.</p>
 <div class="example">
 <p><span id="exm:wagesplit" class="example"><strong>Example 5.1  </strong></span><strong>Splitting the US Wage data</strong></p>
 <p>We can split the US wage data into a new training and artificial test/validation set using the <code>initial_split()</code> function.</p>
-<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb150-1"><a href="tidy-modelling.html#cb150-1" tabindex="-1"></a><span class="fu">library</span>(rsample)</span>
-<span id="cb150-2"><a href="tidy-modelling.html#cb150-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1945</span>)</span>
-<span id="cb150-3"><a href="tidy-modelling.html#cb150-3" tabindex="-1"></a>wage.orig <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../data/wage-train.csv&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">rowid_to_column</span>()</span>
-<span id="cb150-4"><a href="tidy-modelling.html#cb150-4" tabindex="-1"></a>split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(wage.orig, <span class="at">prop =</span> <span class="fl">0.75</span>)</span>
-<span id="cb150-5"><a href="tidy-modelling.html#cb150-5" tabindex="-1"></a>split</span></code></pre></div>
+<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb125-1"><a href="tidy-modelling.html#cb125-1" tabindex="-1"></a><span class="fu">library</span>(rsample)</span>
+<span id="cb125-2"><a href="tidy-modelling.html#cb125-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1945</span>)</span>
+<span id="cb125-3"><a href="tidy-modelling.html#cb125-3" tabindex="-1"></a>wage.orig <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../data/wage-train.csv&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">rowid_to_column</span>()</span>
+<span id="cb125-4"><a href="tidy-modelling.html#cb125-4" tabindex="-1"></a>split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(wage.orig, <span class="at">prop =</span> <span class="fl">0.75</span>)</span>
+<span id="cb125-5"><a href="tidy-modelling.html#cb125-5" tabindex="-1"></a>split</span></code></pre></div>
 <pre><code>#&gt; &lt;Training/Testing/Total&gt;
 #&gt; &lt;300/100/400&gt;</code></pre>
-<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb152-1"><a href="tidy-modelling.html#cb152-1" tabindex="-1"></a>wage.new.train <span class="ot">&lt;-</span> <span class="fu">training</span>(split)</span>
-<span id="cb152-2"><a href="tidy-modelling.html#cb152-2" tabindex="-1"></a>wage.validation <span class="ot">&lt;-</span> <span class="fu">testing</span>(split)</span>
-<span id="cb152-3"><a href="tidy-modelling.html#cb152-3" tabindex="-1"></a>wage.new.train <span class="sc">|&gt;</span> <span class="fu">slice_head</span>(<span class="at">n=</span><span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb127-1"><a href="tidy-modelling.html#cb127-1" tabindex="-1"></a>wage.new.train <span class="ot">&lt;-</span> <span class="fu">training</span>(split)</span>
+<span id="cb127-2"><a href="tidy-modelling.html#cb127-2" tabindex="-1"></a>wage.validation <span class="ot">&lt;-</span> <span class="fu">testing</span>(split)</span>
+<span id="cb127-3"><a href="tidy-modelling.html#cb127-3" tabindex="-1"></a>wage.new.train <span class="sc">|&gt;</span> <span class="fu">slice_head</span>(<span class="at">n=</span><span class="dv">4</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 12
 #&gt;   rowid   EDU SOUTH SEX     EXP UNION  WAGE   AGE RACE  OCCUP     SECTOR MARRIED
 #&gt;   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;  &lt;chr&gt;  
@@ -414,7 +420,7 @@ the same pipeline rather than being treated as a mysterious side quest.</p>
 #&gt; 2   132    12     0 F        42     0  3.64    60 White Manageme… Other  Yes    
 #&gt; 3   333    13     1 M        17     0  8.06    36 White Professi… Other  Yes    
 #&gt; 4   262     8     0 F        29     0  3.4     43 Other Service   Other  Yes</code></pre>
-<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb154-1"><a href="tidy-modelling.html#cb154-1" tabindex="-1"></a>wage.validation <span class="sc">|&gt;</span> <span class="fu">slice_head</span>(<span class="at">n=</span><span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb129"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb129-1"><a href="tidy-modelling.html#cb129-1" tabindex="-1"></a>wage.validation <span class="sc">|&gt;</span> <span class="fu">slice_head</span>(<span class="at">n=</span><span class="dv">4</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 12
 #&gt;   rowid   EDU SOUTH SEX     EXP UNION  WAGE   AGE RACE  OCCUP SECTOR     MARRIED
 #&gt;   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt;  
@@ -447,47 +453,47 @@ data.</p>
 <div class="example">
 <p><span id="exm:wagerecipe" class="example"><strong>Example 5.2  </strong></span><strong>A recipe for scaling the US Wage data</strong></p>
 <p>Suppose we wish to prepare the new training and validation sets from example <a href="tidy-modelling.html#exm:wagesplit">5.1</a> for use in a neural network model, so wish to normalise the numeric variables to the same scale (mean 0, variance 1)<a href="#fn44" class="footnote-ref" id="fnref44"><sup>44</sup></a>. We do this by constructing a <code>recipe</code> for this data, specifying the formula and dataset we plan to use for modelling which defines outcome variable and predictors:</p>
-<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb156-1"><a href="tidy-modelling.html#cb156-1" tabindex="-1"></a><span class="fu">library</span>(recipes)</span>
-<span id="cb156-2"><a href="tidy-modelling.html#cb156-2" tabindex="-1"></a>wage.recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(WAGE <span class="sc">~</span> ., <span class="at">data=</span>wage.new.train)</span>
-<span id="cb156-3"><a href="tidy-modelling.html#cb156-3" tabindex="-1"></a>wage.recipe</span></code></pre></div>
+<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb131-1"><a href="tidy-modelling.html#cb131-1" tabindex="-1"></a><span class="fu">library</span>(recipes)</span>
+<span id="cb131-2"><a href="tidy-modelling.html#cb131-2" tabindex="-1"></a>wage.recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(WAGE <span class="sc">~</span> ., <span class="at">data=</span>wage.new.train)</span>
+<span id="cb131-3"><a href="tidy-modelling.html#cb131-3" tabindex="-1"></a>wage.recipe</span></code></pre></div>
 <p>Our next step is to remove the <code>rowid</code> variable as not being useful for modelling and to normalise the numeric variables except those that are binary indicators (<code>UNION</code> and <code>SOUTH</code>):</p>
-<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb157-1"><a href="tidy-modelling.html#cb157-1" tabindex="-1"></a>wage.recipe.norm <span class="ot">&lt;-</span> wage.recipe <span class="sc">|&gt;</span></span>
-<span id="cb157-2"><a href="tidy-modelling.html#cb157-2" tabindex="-1"></a>  <span class="fu">step_rm</span>(rowid) <span class="sc">|&gt;</span></span>
-<span id="cb157-3"><a href="tidy-modelling.html#cb157-3" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>(), <span class="sc">-</span>UNION, <span class="sc">-</span>SOUTH)</span>
-<span id="cb157-4"><a href="tidy-modelling.html#cb157-4" tabindex="-1"></a>wage.recipe.norm</span>
-<span id="cb157-5"><a href="tidy-modelling.html#cb157-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb157-6"><a href="tidy-modelling.html#cb157-6" tabindex="-1"></a><span class="co">#&gt; ── Recipe ──────────────────────────────────────────────────────────────────────</span></span>
-<span id="cb157-7"><a href="tidy-modelling.html#cb157-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb157-8"><a href="tidy-modelling.html#cb157-8" tabindex="-1"></a><span class="co">#&gt; ── Inputs</span></span>
-<span id="cb157-9"><a href="tidy-modelling.html#cb157-9" tabindex="-1"></a><span class="co">#&gt; Number of variables by role</span></span>
-<span id="cb157-10"><a href="tidy-modelling.html#cb157-10" tabindex="-1"></a><span class="co">#&gt; outcome:    1</span></span>
-<span id="cb157-11"><a href="tidy-modelling.html#cb157-11" tabindex="-1"></a><span class="co">#&gt; predictor: 11</span></span>
-<span id="cb157-12"><a href="tidy-modelling.html#cb157-12" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb157-13"><a href="tidy-modelling.html#cb157-13" tabindex="-1"></a><span class="co">#&gt; ── Operations</span></span>
-<span id="cb157-14"><a href="tidy-modelling.html#cb157-14" tabindex="-1"></a><span class="co">#&gt; • Variables removed: rowid</span></span>
-<span id="cb157-15"><a href="tidy-modelling.html#cb157-15" tabindex="-1"></a><span class="co">#&gt; • Centering and scaling for: all_numeric_predictors(), -UNION, -SOUTH</span></span></code></pre></div>
+<div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb132-1"><a href="tidy-modelling.html#cb132-1" tabindex="-1"></a>wage.recipe.norm <span class="ot">&lt;-</span> wage.recipe <span class="sc">|&gt;</span></span>
+<span id="cb132-2"><a href="tidy-modelling.html#cb132-2" tabindex="-1"></a>  <span class="fu">step_rm</span>(rowid) <span class="sc">|&gt;</span></span>
+<span id="cb132-3"><a href="tidy-modelling.html#cb132-3" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>(), <span class="sc">-</span>UNION, <span class="sc">-</span>SOUTH)</span>
+<span id="cb132-4"><a href="tidy-modelling.html#cb132-4" tabindex="-1"></a>wage.recipe.norm</span>
+<span id="cb132-5"><a href="tidy-modelling.html#cb132-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb132-6"><a href="tidy-modelling.html#cb132-6" tabindex="-1"></a><span class="co">#&gt; ── Recipe ──────────────────────────────────────────────────────────────────────</span></span>
+<span id="cb132-7"><a href="tidy-modelling.html#cb132-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb132-8"><a href="tidy-modelling.html#cb132-8" tabindex="-1"></a><span class="co">#&gt; ── Inputs</span></span>
+<span id="cb132-9"><a href="tidy-modelling.html#cb132-9" tabindex="-1"></a><span class="co">#&gt; Number of variables by role</span></span>
+<span id="cb132-10"><a href="tidy-modelling.html#cb132-10" tabindex="-1"></a><span class="co">#&gt; outcome:    1</span></span>
+<span id="cb132-11"><a href="tidy-modelling.html#cb132-11" tabindex="-1"></a><span class="co">#&gt; predictor: 11</span></span>
+<span id="cb132-12"><a href="tidy-modelling.html#cb132-12" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb132-13"><a href="tidy-modelling.html#cb132-13" tabindex="-1"></a><span class="co">#&gt; ── Operations</span></span>
+<span id="cb132-14"><a href="tidy-modelling.html#cb132-14" tabindex="-1"></a><span class="co">#&gt; • Variables removed: rowid</span></span>
+<span id="cb132-15"><a href="tidy-modelling.html#cb132-15" tabindex="-1"></a><span class="co">#&gt; • Centering and scaling for: all_numeric_predictors(), -UNION, -SOUTH</span></span></code></pre></div>
 <p>We then prep (train) this recipe with the training set:</p>
-<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb158-1"><a href="tidy-modelling.html#cb158-1" tabindex="-1"></a>wage.recipe.trained <span class="ot">&lt;-</span> wage.recipe.norm <span class="sc">|&gt;</span> <span class="fu">prep</span>(wage.new.train)</span>
-<span id="cb158-2"><a href="tidy-modelling.html#cb158-2" tabindex="-1"></a>wage.recipe.trained</span>
-<span id="cb158-3"><a href="tidy-modelling.html#cb158-3" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb158-4"><a href="tidy-modelling.html#cb158-4" tabindex="-1"></a><span class="co">#&gt; ── Recipe ──────────────────────────────────────────────────────────────────────</span></span>
-<span id="cb158-5"><a href="tidy-modelling.html#cb158-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb158-6"><a href="tidy-modelling.html#cb158-6" tabindex="-1"></a><span class="co">#&gt; ── Inputs</span></span>
-<span id="cb158-7"><a href="tidy-modelling.html#cb158-7" tabindex="-1"></a><span class="co">#&gt; Number of variables by role</span></span>
-<span id="cb158-8"><a href="tidy-modelling.html#cb158-8" tabindex="-1"></a><span class="co">#&gt; outcome:    1</span></span>
-<span id="cb158-9"><a href="tidy-modelling.html#cb158-9" tabindex="-1"></a><span class="co">#&gt; predictor: 11</span></span>
-<span id="cb158-10"><a href="tidy-modelling.html#cb158-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb158-11"><a href="tidy-modelling.html#cb158-11" tabindex="-1"></a><span class="co">#&gt; ── Training information</span></span>
-<span id="cb158-12"><a href="tidy-modelling.html#cb158-12" tabindex="-1"></a><span class="co">#&gt; Training data contained 300 data points and no incomplete rows.</span></span>
-<span id="cb158-13"><a href="tidy-modelling.html#cb158-13" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb158-14"><a href="tidy-modelling.html#cb158-14" tabindex="-1"></a><span class="co">#&gt; ── Operations</span></span>
-<span id="cb158-15"><a href="tidy-modelling.html#cb158-15" tabindex="-1"></a><span class="co">#&gt; • Variables removed: rowid | Trained</span></span>
-<span id="cb158-16"><a href="tidy-modelling.html#cb158-16" tabindex="-1"></a><span class="co">#&gt; • Centering and scaling for: EDU, EXP, AGE | Trained</span></span></code></pre></div>
+<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb133-1"><a href="tidy-modelling.html#cb133-1" tabindex="-1"></a>wage.recipe.trained <span class="ot">&lt;-</span> wage.recipe.norm <span class="sc">|&gt;</span> <span class="fu">prep</span>(wage.new.train)</span>
+<span id="cb133-2"><a href="tidy-modelling.html#cb133-2" tabindex="-1"></a>wage.recipe.trained</span>
+<span id="cb133-3"><a href="tidy-modelling.html#cb133-3" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb133-4"><a href="tidy-modelling.html#cb133-4" tabindex="-1"></a><span class="co">#&gt; ── Recipe ──────────────────────────────────────────────────────────────────────</span></span>
+<span id="cb133-5"><a href="tidy-modelling.html#cb133-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb133-6"><a href="tidy-modelling.html#cb133-6" tabindex="-1"></a><span class="co">#&gt; ── Inputs</span></span>
+<span id="cb133-7"><a href="tidy-modelling.html#cb133-7" tabindex="-1"></a><span class="co">#&gt; Number of variables by role</span></span>
+<span id="cb133-8"><a href="tidy-modelling.html#cb133-8" tabindex="-1"></a><span class="co">#&gt; outcome:    1</span></span>
+<span id="cb133-9"><a href="tidy-modelling.html#cb133-9" tabindex="-1"></a><span class="co">#&gt; predictor: 11</span></span>
+<span id="cb133-10"><a href="tidy-modelling.html#cb133-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb133-11"><a href="tidy-modelling.html#cb133-11" tabindex="-1"></a><span class="co">#&gt; ── Training information</span></span>
+<span id="cb133-12"><a href="tidy-modelling.html#cb133-12" tabindex="-1"></a><span class="co">#&gt; Training data contained 300 data points and no incomplete rows.</span></span>
+<span id="cb133-13"><a href="tidy-modelling.html#cb133-13" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb133-14"><a href="tidy-modelling.html#cb133-14" tabindex="-1"></a><span class="co">#&gt; ── Operations</span></span>
+<span id="cb133-15"><a href="tidy-modelling.html#cb133-15" tabindex="-1"></a><span class="co">#&gt; • Variables removed: rowid | Trained</span></span>
+<span id="cb133-16"><a href="tidy-modelling.html#cb133-16" tabindex="-1"></a><span class="co">#&gt; • Centering and scaling for: EDU, EXP, AGE | Trained</span></span></code></pre></div>
 <p>Finally, we <code>bake</code> our recipe into the final datasets:</p>
-<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="tidy-modelling.html#cb159-1" tabindex="-1"></a>wage.train.baked <span class="ot">&lt;-</span> wage.recipe.trained <span class="sc">|&gt;</span> <span class="fu">bake</span>(wage.new.train)</span>
-<span id="cb159-2"><a href="tidy-modelling.html#cb159-2" tabindex="-1"></a>wage.valid.baked <span class="ot">&lt;-</span> wage.recipe.trained <span class="sc">|&gt;</span> <span class="fu">bake</span>(wage.validation)</span></code></pre></div>
+<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb134-1"><a href="tidy-modelling.html#cb134-1" tabindex="-1"></a>wage.train.baked <span class="ot">&lt;-</span> wage.recipe.trained <span class="sc">|&gt;</span> <span class="fu">bake</span>(wage.new.train)</span>
+<span id="cb134-2"><a href="tidy-modelling.html#cb134-2" tabindex="-1"></a>wage.valid.baked <span class="ot">&lt;-</span> wage.recipe.trained <span class="sc">|&gt;</span> <span class="fu">bake</span>(wage.validation)</span></code></pre></div>
 <p>This has resulted in datasets where our numeric variables have been centered and scaled to have mean zero and standard deviation one:</p>
-<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb160-1"><a href="tidy-modelling.html#cb160-1" tabindex="-1"></a>skimr<span class="sc">::</span><span class="fu">skim</span>(wage.train.baked)</span></code></pre></div>
+<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb135-1"><a href="tidy-modelling.html#cb135-1" tabindex="-1"></a>skimr<span class="sc">::</span><span class="fu">skim</span>(wage.train.baked)</span></code></pre></div>
 <pre><code>#&gt; ── Data Summary ────────────────────────
 #&gt;                            Values          
 #&gt; Name                       wage.train.baked
@@ -530,7 +536,7 @@ data.</p>
 #&gt; 5 -0.17433  0.63441  2.5215 ▆▇▅▂▂
 #&gt; 6  8       11.68    44.5    ▇▃▁▁▁</code></pre>
 <p>Note that the baked validation set will not have mean zero and standard deviation one, as it was normalised using the same transformation as used for the training set (i.e. subtract the mean and divide by the standard deviation from the training set). Nonetheless they should be expected to be close to zero and one:</p>
-<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="tidy-modelling.html#cb162-1" tabindex="-1"></a>skimr<span class="sc">::</span><span class="fu">skim</span>(wage.valid.baked)</span></code></pre></div>
+<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb137-1"><a href="tidy-modelling.html#cb137-1" tabindex="-1"></a>skimr<span class="sc">::</span><span class="fu">skim</span>(wage.valid.baked)</span></code></pre></div>
 <pre><code>#&gt; ── Data Summary ────────────────────────
 #&gt;                            Values          
 #&gt; Name                       wage.valid.baked
@@ -573,42 +579,41 @@ data.</p>
 #&gt; 5 -0.084468  0.81413  2.5215 ▆▇▅▃▃
 #&gt; 6  7.25     10.448   22.5    ▇▇▃▁▁</code></pre>
 <p>Typically the above process will be done without many of the intermediate objects<a href="#fn45" class="footnote-ref" id="fnref45"><sup>45</sup></a>:</p>
-<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb164-1"><a href="tidy-modelling.html#cb164-1" tabindex="-1"></a>wage.recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(WAGE <span class="sc">~</span> ., <span class="at">data=</span>wage.new.train) <span class="sc">|&gt;</span></span>
-<span id="cb164-2"><a href="tidy-modelling.html#cb164-2" tabindex="-1"></a>  <span class="fu">step_rm</span>(rowid) <span class="sc">|&gt;</span></span>
-<span id="cb164-3"><a href="tidy-modelling.html#cb164-3" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>(), <span class="sc">-</span>UNION, <span class="sc">-</span>SOUTH)</span>
-<span id="cb164-4"><a href="tidy-modelling.html#cb164-4" tabindex="-1"></a>wage.prepped <span class="ot">&lt;-</span> wage.recipe <span class="sc">|&gt;</span> <span class="fu">prep</span>(wage.new.train)</span>
-<span id="cb164-5"><a href="tidy-modelling.html#cb164-5" tabindex="-1"></a>wage.train.baked <span class="ot">&lt;-</span> <span class="fu">bake</span>(wage.prepped, wage.new.train)</span>
-<span id="cb164-6"><a href="tidy-modelling.html#cb164-6" tabindex="-1"></a>wage.valid.baked <span class="ot">&lt;-</span> <span class="fu">bake</span>(wage.prepped, wage.validation)</span></code></pre></div>
+<div class="sourceCode" id="cb139"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb139-1"><a href="tidy-modelling.html#cb139-1" tabindex="-1"></a>wage.recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(WAGE <span class="sc">~</span> ., <span class="at">data=</span>wage.new.train) <span class="sc">|&gt;</span></span>
+<span id="cb139-2"><a href="tidy-modelling.html#cb139-2" tabindex="-1"></a>  <span class="fu">step_rm</span>(rowid) <span class="sc">|&gt;</span></span>
+<span id="cb139-3"><a href="tidy-modelling.html#cb139-3" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>(), <span class="sc">-</span>UNION, <span class="sc">-</span>SOUTH)</span>
+<span id="cb139-4"><a href="tidy-modelling.html#cb139-4" tabindex="-1"></a>wage.prepped <span class="ot">&lt;-</span> wage.recipe <span class="sc">|&gt;</span> <span class="fu">prep</span>(wage.new.train)</span>
+<span id="cb139-5"><a href="tidy-modelling.html#cb139-5" tabindex="-1"></a>wage.train.baked <span class="ot">&lt;-</span> <span class="fu">bake</span>(wage.prepped, wage.new.train)</span>
+<span id="cb139-6"><a href="tidy-modelling.html#cb139-6" tabindex="-1"></a>wage.valid.baked <span class="ot">&lt;-</span> <span class="fu">bake</span>(wage.prepped, wage.validation)</span></code></pre></div>
 </div>
 </div>
 <div id="modelling-with-parsnip" class="section level2 hasAnchor" number="5.3">
 <h2><span class="header-section-number">5.3</span> Modelling with parsnip<a href="tidy-modelling.html#modelling-with-parsnip" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>We have seen throughout the <a href="prediction.html#prediction">prediction chapter</a> that each prediction model has its own functions available for fitting the model and predicting new observations given a model.</p>
 <p>In the case of linear models via <code>lm</code>, regression trees via <code>rpart</code>, random forests via <code>randomForest</code>and neural networks via <code>nnet</code> both the construction of models and prediction from those models follow essentially identical syntaxes. We fit models using:</p>
-<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb165-1"><a href="tidy-modelling.html#cb165-1" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">model_fit_function</span>(outcome <span class="sc">~</span> predictors, <span class="at">data =</span> training)</span></code></pre></div>
+<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb140-1"><a href="tidy-modelling.html#cb140-1" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">model_fit_function</span>(outcome <span class="sc">~</span> predictors, <span class="at">data =</span> training)</span></code></pre></div>
 <p>and do prediction via:</p>
-<div class="sourceCode" id="cb166"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb166-1"><a href="tidy-modelling.html#cb166-1" tabindex="-1"></a>pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(model, <span class="at">newdata=</span>testing)</span></code></pre></div>
+<div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb141-1"><a href="tidy-modelling.html#cb141-1" tabindex="-1"></a>pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(model, <span class="at">newdata=</span>testing)</span></code></pre></div>
 <p>Unfortunately, this convenient formulation is not the norm. There are model types that are fit by providing a vector outcome and matrix of predictors (e.g. <code>glmnet</code> for penalised regression), and there are model types where predictions require additional processing to yield a vector of outcomes (e.g. <code>ranger</code> for random forests).</p>
 <p>The <code>parsnip</code> package<a href="#fn46" class="footnote-ref" id="fnref46"><sup>46</sup></a> is designed to alleviate this by providing a consistent interface to a wide range of models for both prediction and classification. The idea is that we have essentially two main functions <code>fit</code> and <code>predict</code> that apply over different types of model fit using different modelling engines. For example, the linear regression model <code>linear_reg</code> can be fit using the <code>lm</code> engine we’re familiar with, or via penalised regression<a href="#fn47" class="footnote-ref" id="fnref47"><sup>47</sup></a> with <code>glmnet</code> or in a Bayesian framework<a href="#fn48" class="footnote-ref" id="fnref48"><sup>48</sup></a> with <code>stan</code>. Whichever model or engine we choose, the <code>predict</code> method will always return a data frame with one row for each row of the new data supplied to it which is convenient for binding as a new column.</p>
 <div class="example">
 <p><span id="exm:wagefit" class="example"><strong>Example 5.3  </strong></span><strong>Fitting a linear regression and neural network to the US Wage data using parsnip</strong></p>
 <p>Below we utilise the baked training set from Example <a href="tidy-modelling.html#exm:wagerecipe">5.2</a> to
 fit a linear regression and neural network model with the <code>parsnip</code> package.</p>
-<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb167-1"><a href="tidy-modelling.html#cb167-1" tabindex="-1"></a><span class="fu">library</span>(parsnip)</span></code></pre></div>
-<pre><code>#&gt; Warning: package &#39;parsnip&#39; was built under R version 4.5.2</code></pre>
-<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="tidy-modelling.html#cb169-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1937</span>)</span>
-<span id="cb169-2"><a href="tidy-modelling.html#cb169-2" tabindex="-1"></a>wage.spec.lm <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">mode =</span> <span class="st">&quot;regression&quot;</span>,</span>
-<span id="cb169-3"><a href="tidy-modelling.html#cb169-3" tabindex="-1"></a>                           <span class="at">engine =</span> <span class="st">&quot;lm&quot;</span>)</span>
-<span id="cb169-4"><a href="tidy-modelling.html#cb169-4" tabindex="-1"></a>wage.spec.nn <span class="ot">&lt;-</span> <span class="fu">mlp</span>(<span class="at">mode =</span> <span class="st">&quot;regression&quot;</span>,</span>
-<span id="cb169-5"><a href="tidy-modelling.html#cb169-5" tabindex="-1"></a>                    <span class="at">engine=</span><span class="st">&quot;nnet&quot;</span>,</span>
-<span id="cb169-6"><a href="tidy-modelling.html#cb169-6" tabindex="-1"></a>                    <span class="at">hidden_units =</span> <span class="dv">5</span>,</span>
-<span id="cb169-7"><a href="tidy-modelling.html#cb169-7" tabindex="-1"></a>                    <span class="at">penalty =</span> <span class="fl">0.01</span>,</span>
-<span id="cb169-8"><a href="tidy-modelling.html#cb169-8" tabindex="-1"></a>                    <span class="at">epochs =</span> <span class="dv">1000</span>)</span>
-<span id="cb169-9"><a href="tidy-modelling.html#cb169-9" tabindex="-1"></a></span>
-<span id="cb169-10"><a href="tidy-modelling.html#cb169-10" tabindex="-1"></a>wage.fit.lm <span class="ot">&lt;-</span> wage.spec.lm <span class="sc">|&gt;</span> <span class="fu">fit</span>(WAGE <span class="sc">~</span> ., <span class="at">data=</span>wage.train.baked)</span>
-<span id="cb169-11"><a href="tidy-modelling.html#cb169-11" tabindex="-1"></a>wage.fit.nn <span class="ot">&lt;-</span> wage.spec.nn <span class="sc">|&gt;</span> <span class="fu">fit</span>(WAGE <span class="sc">~</span> ., <span class="at">data=</span>wage.train.baked)</span>
-<span id="cb169-12"><a href="tidy-modelling.html#cb169-12" tabindex="-1"></a></span>
-<span id="cb169-13"><a href="tidy-modelling.html#cb169-13" tabindex="-1"></a>wage.fit.lm <span class="sc">|&gt;</span> <span class="fu">extract_fit_engine</span>() <span class="sc">|&gt;</span> <span class="fu">summary</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb142-1"><a href="tidy-modelling.html#cb142-1" tabindex="-1"></a><span class="fu">library</span>(parsnip)</span>
+<span id="cb142-2"><a href="tidy-modelling.html#cb142-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1937</span>)</span>
+<span id="cb142-3"><a href="tidy-modelling.html#cb142-3" tabindex="-1"></a>wage.spec.lm <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">mode =</span> <span class="st">&quot;regression&quot;</span>,</span>
+<span id="cb142-4"><a href="tidy-modelling.html#cb142-4" tabindex="-1"></a>                           <span class="at">engine =</span> <span class="st">&quot;lm&quot;</span>)</span>
+<span id="cb142-5"><a href="tidy-modelling.html#cb142-5" tabindex="-1"></a>wage.spec.nn <span class="ot">&lt;-</span> <span class="fu">mlp</span>(<span class="at">mode =</span> <span class="st">&quot;regression&quot;</span>,</span>
+<span id="cb142-6"><a href="tidy-modelling.html#cb142-6" tabindex="-1"></a>                    <span class="at">engine=</span><span class="st">&quot;nnet&quot;</span>,</span>
+<span id="cb142-7"><a href="tidy-modelling.html#cb142-7" tabindex="-1"></a>                    <span class="at">hidden_units =</span> <span class="dv">5</span>,</span>
+<span id="cb142-8"><a href="tidy-modelling.html#cb142-8" tabindex="-1"></a>                    <span class="at">penalty =</span> <span class="fl">0.01</span>,</span>
+<span id="cb142-9"><a href="tidy-modelling.html#cb142-9" tabindex="-1"></a>                    <span class="at">epochs =</span> <span class="dv">1000</span>)</span>
+<span id="cb142-10"><a href="tidy-modelling.html#cb142-10" tabindex="-1"></a></span>
+<span id="cb142-11"><a href="tidy-modelling.html#cb142-11" tabindex="-1"></a>wage.fit.lm <span class="ot">&lt;-</span> wage.spec.lm <span class="sc">|&gt;</span> <span class="fu">fit</span>(WAGE <span class="sc">~</span> ., <span class="at">data=</span>wage.train.baked)</span>
+<span id="cb142-12"><a href="tidy-modelling.html#cb142-12" tabindex="-1"></a>wage.fit.nn <span class="ot">&lt;-</span> wage.spec.nn <span class="sc">|&gt;</span> <span class="fu">fit</span>(WAGE <span class="sc">~</span> ., <span class="at">data=</span>wage.train.baked)</span>
+<span id="cb142-13"><a href="tidy-modelling.html#cb142-13" tabindex="-1"></a></span>
+<span id="cb142-14"><a href="tidy-modelling.html#cb142-14" tabindex="-1"></a>wage.fit.lm <span class="sc">|&gt;</span> <span class="fu">extract_fit_engine</span>() <span class="sc">|&gt;</span> <span class="fu">summary</span>()</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Call:
 #&gt; stats::lm(formula = WAGE ~ ., data = data)
@@ -664,15 +669,15 @@ be useful for interogating the model fit such as looking at coefficients or plot
 tree.</p></li>
 </ul>
 <p>Once we have our model fits, we can perform prediction:</p>
-<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="tidy-modelling.html#cb171-1" tabindex="-1"></a>wage.pred <span class="ot">&lt;-</span> wage.validation <span class="sc">|&gt;</span></span>
-<span id="cb171-2"><a href="tidy-modelling.html#cb171-2" tabindex="-1"></a>  <span class="fu">bind_cols</span>(</span>
-<span id="cb171-3"><a href="tidy-modelling.html#cb171-3" tabindex="-1"></a>    <span class="fu">predict</span>(wage.fit.lm, <span class="at">new_data =</span> wage.valid.baked) <span class="sc">|&gt;</span> <span class="fu">rename</span>(<span class="at">pred.lm =</span> .pred),</span>
-<span id="cb171-4"><a href="tidy-modelling.html#cb171-4" tabindex="-1"></a>    <span class="fu">predict</span>(wage.fit.nn, <span class="at">new_data =</span> wage.valid.baked) <span class="sc">|&gt;</span> <span class="fu">rename</span>(<span class="at">pred.nn =</span> .pred)</span>
-<span id="cb171-5"><a href="tidy-modelling.html#cb171-5" tabindex="-1"></a>    )</span>
-<span id="cb171-6"><a href="tidy-modelling.html#cb171-6" tabindex="-1"></a></span>
-<span id="cb171-7"><a href="tidy-modelling.html#cb171-7" tabindex="-1"></a>wage.pred <span class="sc">|&gt;</span></span>
-<span id="cb171-8"><a href="tidy-modelling.html#cb171-8" tabindex="-1"></a>  <span class="fu">select</span>(rowid, WAGE, pred.lm, pred.nn, <span class="fu">everything</span>()) <span class="sc">|&gt;</span></span>
-<span id="cb171-9"><a href="tidy-modelling.html#cb171-9" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n=</span><span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb144-1"><a href="tidy-modelling.html#cb144-1" tabindex="-1"></a>wage.pred <span class="ot">&lt;-</span> wage.validation <span class="sc">|&gt;</span></span>
+<span id="cb144-2"><a href="tidy-modelling.html#cb144-2" tabindex="-1"></a>  <span class="fu">bind_cols</span>(</span>
+<span id="cb144-3"><a href="tidy-modelling.html#cb144-3" tabindex="-1"></a>    <span class="fu">predict</span>(wage.fit.lm, <span class="at">new_data =</span> wage.valid.baked) <span class="sc">|&gt;</span> <span class="fu">rename</span>(<span class="at">pred.lm =</span> .pred),</span>
+<span id="cb144-4"><a href="tidy-modelling.html#cb144-4" tabindex="-1"></a>    <span class="fu">predict</span>(wage.fit.nn, <span class="at">new_data =</span> wage.valid.baked) <span class="sc">|&gt;</span> <span class="fu">rename</span>(<span class="at">pred.nn =</span> .pred)</span>
+<span id="cb144-5"><a href="tidy-modelling.html#cb144-5" tabindex="-1"></a>    )</span>
+<span id="cb144-6"><a href="tidy-modelling.html#cb144-6" tabindex="-1"></a></span>
+<span id="cb144-7"><a href="tidy-modelling.html#cb144-7" tabindex="-1"></a>wage.pred <span class="sc">|&gt;</span></span>
+<span id="cb144-8"><a href="tidy-modelling.html#cb144-8" tabindex="-1"></a>  <span class="fu">select</span>(rowid, WAGE, pred.lm, pred.nn, <span class="fu">everything</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb144-9"><a href="tidy-modelling.html#cb144-9" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n=</span><span class="dv">4</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 14
 #&gt;   rowid  WAGE pred.lm pred.nn   EDU SOUTH SEX     EXP UNION   AGE RACE  OCCUP
 #&gt;   &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;
@@ -681,10 +686,10 @@ tree.</p></li>
 #&gt; 3    11  5.71  9.9598 10.676     12     0 F        16     1    34 White Other
 #&gt; 4    12  7     8.9805  7.5999     7     0 M        42     1    55 Other Other
 #&gt; # ℹ 2 more variables: SECTOR &lt;chr&gt;, MARRIED &lt;chr&gt;</code></pre>
-<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="tidy-modelling.html#cb173-1" tabindex="-1"></a>wage.pred <span class="sc">|&gt;</span> <span class="fu">summarise</span>(</span>
-<span id="cb173-2"><a href="tidy-modelling.html#cb173-2" tabindex="-1"></a>  <span class="at">MSE.lm =</span> <span class="fu">mean</span>((WAGE <span class="sc">-</span> pred.lm)<span class="sc">^</span><span class="dv">2</span>),</span>
-<span id="cb173-3"><a href="tidy-modelling.html#cb173-3" tabindex="-1"></a>  <span class="at">MSE.nn =</span> <span class="fu">mean</span>((WAGE <span class="sc">-</span> pred.nn)<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb173-4"><a href="tidy-modelling.html#cb173-4" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb146-1"><a href="tidy-modelling.html#cb146-1" tabindex="-1"></a>wage.pred <span class="sc">|&gt;</span> <span class="fu">summarise</span>(</span>
+<span id="cb146-2"><a href="tidy-modelling.html#cb146-2" tabindex="-1"></a>  <span class="at">MSE.lm =</span> <span class="fu">mean</span>((WAGE <span class="sc">-</span> pred.lm)<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb146-3"><a href="tidy-modelling.html#cb146-3" tabindex="-1"></a>  <span class="at">MSE.nn =</span> <span class="fu">mean</span>((WAGE <span class="sc">-</span> pred.nn)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb146-4"><a href="tidy-modelling.html#cb146-4" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 1 × 2
 #&gt;   MSE.lm MSE.nn
 #&gt;    &lt;dbl&gt;  &lt;dbl&gt;
@@ -714,16 +719,15 @@ which is also on the same scale as the outcome variable. This measure is preferr
 <div class="example">
 <p><span id="exm:unlabeled-div-25" class="example"><strong>Example 5.4  </strong></span><strong>Assessing model fits on the US Wage data with yardstick</strong></p>
 <p>Consider the models fit in Example <a href="tidy-modelling.html#exm:wagefit">5.3</a>. The <code>metrics</code> function from <code>yardstick</code> gives a set of standard metrics (RMSE, <span class="math inline">\(R^2\)</span>, MAE) for predictive performance on each model in turn.</p>
-<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="tidy-modelling.html#cb175-1" tabindex="-1"></a><span class="fu">library</span>(yardstick)</span></code></pre></div>
-<pre><code>#&gt; Warning: package &#39;yardstick&#39; was built under R version 4.5.2</code></pre>
-<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="tidy-modelling.html#cb177-1" tabindex="-1"></a>wage.pred <span class="sc">|&gt;</span> <span class="fu">metrics</span>(<span class="at">truth =</span> WAGE, <span class="at">estimate =</span> pred.lm)</span></code></pre></div>
+<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb148-1"><a href="tidy-modelling.html#cb148-1" tabindex="-1"></a><span class="fu">library</span>(yardstick)</span>
+<span id="cb148-2"><a href="tidy-modelling.html#cb148-2" tabindex="-1"></a>wage.pred <span class="sc">|&gt;</span> <span class="fu">metrics</span>(<span class="at">truth =</span> WAGE, <span class="at">estimate =</span> pred.lm)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 3 × 3
 #&gt;   .metric .estimator .estimate
 #&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 rmse    standard     3.5820 
 #&gt; 2 rsq     standard     0.35758
 #&gt; 3 mae     standard     2.7634</code></pre>
-<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="tidy-modelling.html#cb179-1" tabindex="-1"></a>wage.pred <span class="sc">|&gt;</span> <span class="fu">metrics</span>(<span class="at">truth =</span> WAGE, <span class="at">estimate =</span> pred.nn)</span></code></pre></div>
+<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb150-1"><a href="tidy-modelling.html#cb150-1" tabindex="-1"></a>wage.pred <span class="sc">|&gt;</span> <span class="fu">metrics</span>(<span class="at">truth =</span> WAGE, <span class="at">estimate =</span> pred.nn)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 3 × 3
 #&gt;   .metric .estimator .estimate
 #&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
@@ -732,12 +736,12 @@ which is also on the same scale as the outcome variable. This measure is preferr
 #&gt; 3 mae     standard     3.0061</code></pre>
 <p>Alternatively, we could pivot our two model predictions long so we can evaluate both
 models at once.</p>
-<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb181-1"><a href="tidy-modelling.html#cb181-1" tabindex="-1"></a>wage.long <span class="ot">&lt;-</span> wage.pred <span class="sc">|&gt;</span></span>
-<span id="cb181-2"><a href="tidy-modelling.html#cb181-2" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">starts_with</span>(<span class="st">&quot;pred.&quot;</span>), <span class="at">names_to=</span><span class="st">&quot;model&quot;</span>, <span class="at">values_to=</span><span class="st">&quot;pred&quot;</span>)</span>
-<span id="cb181-3"><a href="tidy-modelling.html#cb181-3" tabindex="-1"></a></span>
-<span id="cb181-4"><a href="tidy-modelling.html#cb181-4" tabindex="-1"></a>wage.long <span class="sc">|&gt;</span></span>
-<span id="cb181-5"><a href="tidy-modelling.html#cb181-5" tabindex="-1"></a>  <span class="fu">group_by</span>(model) <span class="sc">|&gt;</span></span>
-<span id="cb181-6"><a href="tidy-modelling.html#cb181-6" tabindex="-1"></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> WAGE, <span class="at">estimate =</span> pred)</span></code></pre></div>
+<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb152-1"><a href="tidy-modelling.html#cb152-1" tabindex="-1"></a>wage.long <span class="ot">&lt;-</span> wage.pred <span class="sc">|&gt;</span></span>
+<span id="cb152-2"><a href="tidy-modelling.html#cb152-2" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">starts_with</span>(<span class="st">&quot;pred.&quot;</span>), <span class="at">names_to=</span><span class="st">&quot;model&quot;</span>, <span class="at">values_to=</span><span class="st">&quot;pred&quot;</span>)</span>
+<span id="cb152-3"><a href="tidy-modelling.html#cb152-3" tabindex="-1"></a></span>
+<span id="cb152-4"><a href="tidy-modelling.html#cb152-4" tabindex="-1"></a>wage.long <span class="sc">|&gt;</span></span>
+<span id="cb152-5"><a href="tidy-modelling.html#cb152-5" tabindex="-1"></a>  <span class="fu">group_by</span>(model) <span class="sc">|&gt;</span></span>
+<span id="cb152-6"><a href="tidy-modelling.html#cb152-6" tabindex="-1"></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> WAGE, <span class="at">estimate =</span> pred)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 6 × 4
 #&gt;   model   .metric .estimator .estimate
 #&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
@@ -755,15 +759,15 @@ creates a <code>model</code> column filled with “pred.lm” and “pred.nn”,
 corresponding predictions.</p></li>
 <li><p>We <code>group_by(model)</code> so that the <code>metrics</code> function is run on each model in turn.</p></li>
 <li><p>The result allows relatively easy comparison, though we could optionally add</p>
-<div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb183-1"><a href="tidy-modelling.html#cb183-1" tabindex="-1"></a><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> model, <span class="at">values_from =</span> .estimate)</span></code></pre></div>
+<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb154-1"><a href="tidy-modelling.html#cb154-1" tabindex="-1"></a><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> model, <span class="at">values_from =</span> .estimate)</span></code></pre></div>
 <p>if we wanted a three by two table.</p></li>
 <li><p>In this example the linear model does better than the neural network across all metrics.</p></li>
 </ul>
 <p>The other advantage to pivoting longer is we can more easily produce charts of the predictions, such as that given in Figure <a href="tidy-modelling.html#fig:wagepredictions">5.1</a>. It is clear from this chart that the neural network is performing considerably worse than the linear model.</p>
-<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="tidy-modelling.html#cb184-1" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> wage.long) <span class="sc">+</span></span>
-<span id="cb184-2"><a href="tidy-modelling.html#cb184-2" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x=</span>WAGE, <span class="at">y=</span>pred, <span class="at">col=</span>model), <span class="at">alpha=</span><span class="fl">0.7</span>) <span class="sc">+</span></span>
-<span id="cb184-3"><a href="tidy-modelling.html#cb184-3" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="at">pred.lm =</span> <span class="st">&#39;black&#39;</span>, <span class="at">pred.nn=</span><span class="st">&#39;red&#39;</span>)) <span class="sc">+</span></span>
-<span id="cb184-4"><a href="tidy-modelling.html#cb184-4" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;WAGE (truth)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;WAGE (predicted)&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb155-1"><a href="tidy-modelling.html#cb155-1" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> wage.long) <span class="sc">+</span></span>
+<span id="cb155-2"><a href="tidy-modelling.html#cb155-2" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x=</span>WAGE, <span class="at">y=</span>pred, <span class="at">col=</span>model), <span class="at">alpha=</span><span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb155-3"><a href="tidy-modelling.html#cb155-3" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="at">pred.lm =</span> <span class="st">&#39;black&#39;</span>, <span class="at">pred.nn=</span><span class="st">&#39;red&#39;</span>)) <span class="sc">+</span></span>
+<span id="cb155-4"><a href="tidy-modelling.html#cb155-4" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;WAGE (truth)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;WAGE (predicted)&quot;</span>)</span></code></pre></div>
 <div class="figure"><span style="display:block;" id="fig:wagepredictions"></span>
 <img src="05-tidymodels_files/figure-html/wagepredictions-1.png" alt="Comparison of predictions for the US Wage data from a linear model and neural network" width="672" />
 <p class="caption">
@@ -783,26 +787,26 @@ single object.</p>
 <p><span id="exm:unlabeled-div-26" class="example"><strong>Example 5.5  </strong></span><strong>Bundling a recipe and model into a workflow</strong></p>
 <p>Below we combine the wage recipe with the linear model and neural
 network specifications from Example <a href="tidy-modelling.html#exm:wagefit">5.3</a>.</p>
-<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb185-1"><a href="tidy-modelling.html#cb185-1" tabindex="-1"></a><span class="fu">library</span>(workflows)</span></code></pre></div>
-<pre><code>#&gt; Warning: package &#39;workflows&#39; was built under R version 4.5.2</code></pre>
-<div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb187-1"><a href="tidy-modelling.html#cb187-1" tabindex="-1"></a>wage.wf.lm <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
-<span id="cb187-2"><a href="tidy-modelling.html#cb187-2" tabindex="-1"></a>  <span class="fu">add_recipe</span>(wage.recipe) <span class="sc">|&gt;</span></span>
-<span id="cb187-3"><a href="tidy-modelling.html#cb187-3" tabindex="-1"></a>  <span class="fu">add_model</span>(wage.spec.lm)</span>
-<span id="cb187-4"><a href="tidy-modelling.html#cb187-4" tabindex="-1"></a></span>
-<span id="cb187-5"><a href="tidy-modelling.html#cb187-5" tabindex="-1"></a>wage.wf.nn <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
-<span id="cb187-6"><a href="tidy-modelling.html#cb187-6" tabindex="-1"></a>  <span class="fu">add_recipe</span>(wage.recipe) <span class="sc">|&gt;</span></span>
-<span id="cb187-7"><a href="tidy-modelling.html#cb187-7" tabindex="-1"></a>  <span class="fu">add_model</span>(wage.spec.nn)</span>
-<span id="cb187-8"><a href="tidy-modelling.html#cb187-8" tabindex="-1"></a></span>
-<span id="cb187-9"><a href="tidy-modelling.html#cb187-9" tabindex="-1"></a>wage.wf.nn.fit <span class="ot">&lt;-</span> wage.wf.nn <span class="sc">|&gt;</span> <span class="fu">fit</span>(<span class="at">data =</span> wage.new.train)</span>
-<span id="cb187-10"><a href="tidy-modelling.html#cb187-10" tabindex="-1"></a><span class="fu">predict</span>(wage.wf.nn.fit, <span class="at">new_data =</span> wage.validation) <span class="sc">|&gt;</span></span>
-<span id="cb187-11"><a href="tidy-modelling.html#cb187-11" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb156-1"><a href="tidy-modelling.html#cb156-1" tabindex="-1"></a><span class="fu">library</span>(workflows)</span>
+<span id="cb156-2"><a href="tidy-modelling.html#cb156-2" tabindex="-1"></a></span>
+<span id="cb156-3"><a href="tidy-modelling.html#cb156-3" tabindex="-1"></a>wage.wf.lm <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb156-4"><a href="tidy-modelling.html#cb156-4" tabindex="-1"></a>  <span class="fu">add_recipe</span>(wage.recipe) <span class="sc">|&gt;</span></span>
+<span id="cb156-5"><a href="tidy-modelling.html#cb156-5" tabindex="-1"></a>  <span class="fu">add_model</span>(wage.spec.lm)</span>
+<span id="cb156-6"><a href="tidy-modelling.html#cb156-6" tabindex="-1"></a></span>
+<span id="cb156-7"><a href="tidy-modelling.html#cb156-7" tabindex="-1"></a>wage.wf.nn <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb156-8"><a href="tidy-modelling.html#cb156-8" tabindex="-1"></a>  <span class="fu">add_recipe</span>(wage.recipe) <span class="sc">|&gt;</span></span>
+<span id="cb156-9"><a href="tidy-modelling.html#cb156-9" tabindex="-1"></a>  <span class="fu">add_model</span>(wage.spec.nn)</span>
+<span id="cb156-10"><a href="tidy-modelling.html#cb156-10" tabindex="-1"></a></span>
+<span id="cb156-11"><a href="tidy-modelling.html#cb156-11" tabindex="-1"></a>wage.wf.nn.fit <span class="ot">&lt;-</span> wage.wf.nn <span class="sc">|&gt;</span> <span class="fu">fit</span>(<span class="at">data =</span> wage.new.train)</span>
+<span id="cb156-12"><a href="tidy-modelling.html#cb156-12" tabindex="-1"></a><span class="fu">predict</span>(wage.wf.nn.fit, <span class="at">new_data =</span> wage.validation) <span class="sc">|&gt;</span></span>
+<span id="cb156-13"><a href="tidy-modelling.html#cb156-13" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">4</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 1
 #&gt;     .pred
 #&gt;     &lt;dbl&gt;
 #&gt; 1  5.9473
 #&gt; 2 10.382 
 #&gt; 3 10.301 
-#&gt; 4  9.1853</code></pre>
+#&gt; 4  9.1854</code></pre>
 <p>Some notes:</p>
 <ul>
 <li><p>The workflow is given the <strong>raw</strong> training data. It takes care of
@@ -826,33 +830,33 @@ validation folds.</p>
 <p><span id="exm:unlabeled-div-27" class="example"><strong>Example 5.6  </strong></span><strong>Comparing two workflows by cross-validation</strong></p>
 <p>We can compare the linear model and neural network workflows using
 5-fold cross-validation on the training data.</p>
-<div class="sourceCode" id="cb189"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb189-1"><a href="tidy-modelling.html#cb189-1" tabindex="-1"></a><span class="fu">library</span>(tune)</span></code></pre></div>
-<pre><code>#&gt; Warning: package &#39;tune&#39; was built under R version 4.5.2</code></pre>
-<div class="sourceCode" id="cb191"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb191-1"><a href="tidy-modelling.html#cb191-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1945</span>)</span>
-<span id="cb191-2"><a href="tidy-modelling.html#cb191-2" tabindex="-1"></a>wage_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(wage.new.train, <span class="at">v =</span> <span class="dv">5</span>)</span>
-<span id="cb191-3"><a href="tidy-modelling.html#cb191-3" tabindex="-1"></a></span>
-<span id="cb191-4"><a href="tidy-modelling.html#cb191-4" tabindex="-1"></a>wage.resamples.lm <span class="ot">&lt;-</span> wage.wf.lm <span class="sc">|&gt;</span></span>
-<span id="cb191-5"><a href="tidy-modelling.html#cb191-5" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(<span class="at">resamples =</span> wage_folds,</span>
-<span id="cb191-6"><a href="tidy-modelling.html#cb191-6" tabindex="-1"></a>                <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse, mae, rsq))</span>
-<span id="cb191-7"><a href="tidy-modelling.html#cb191-7" tabindex="-1"></a></span>
-<span id="cb191-8"><a href="tidy-modelling.html#cb191-8" tabindex="-1"></a>wage.resamples.nn <span class="ot">&lt;-</span> wage.wf.nn <span class="sc">|&gt;</span></span>
-<span id="cb191-9"><a href="tidy-modelling.html#cb191-9" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(<span class="at">resamples =</span> wage_folds,</span>
-<span id="cb191-10"><a href="tidy-modelling.html#cb191-10" tabindex="-1"></a>                <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse, mae, rsq))</span>
-<span id="cb191-11"><a href="tidy-modelling.html#cb191-11" tabindex="-1"></a></span>
-<span id="cb191-12"><a href="tidy-modelling.html#cb191-12" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
-<span id="cb191-13"><a href="tidy-modelling.html#cb191-13" tabindex="-1"></a>  <span class="fu">collect_metrics</span>(wage.resamples.lm) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">&quot;linear model&quot;</span>),</span>
-<span id="cb191-14"><a href="tidy-modelling.html#cb191-14" tabindex="-1"></a>  <span class="fu">collect_metrics</span>(wage.resamples.nn) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">&quot;neural network&quot;</span>)</span>
-<span id="cb191-15"><a href="tidy-modelling.html#cb191-15" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb191-16"><a href="tidy-modelling.html#cb191-16" tabindex="-1"></a>  <span class="fu">select</span>(model, .metric, mean, std_err)</span></code></pre></div>
+<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb158-1"><a href="tidy-modelling.html#cb158-1" tabindex="-1"></a><span class="fu">library</span>(tune)</span>
+<span id="cb158-2"><a href="tidy-modelling.html#cb158-2" tabindex="-1"></a></span>
+<span id="cb158-3"><a href="tidy-modelling.html#cb158-3" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1945</span>)</span>
+<span id="cb158-4"><a href="tidy-modelling.html#cb158-4" tabindex="-1"></a>wage_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(wage.new.train, <span class="at">v =</span> <span class="dv">5</span>)</span>
+<span id="cb158-5"><a href="tidy-modelling.html#cb158-5" tabindex="-1"></a></span>
+<span id="cb158-6"><a href="tidy-modelling.html#cb158-6" tabindex="-1"></a>wage.resamples.lm <span class="ot">&lt;-</span> wage.wf.lm <span class="sc">|&gt;</span></span>
+<span id="cb158-7"><a href="tidy-modelling.html#cb158-7" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(<span class="at">resamples =</span> wage_folds,</span>
+<span id="cb158-8"><a href="tidy-modelling.html#cb158-8" tabindex="-1"></a>                <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse, mae, rsq))</span>
+<span id="cb158-9"><a href="tidy-modelling.html#cb158-9" tabindex="-1"></a></span>
+<span id="cb158-10"><a href="tidy-modelling.html#cb158-10" tabindex="-1"></a>wage.resamples.nn <span class="ot">&lt;-</span> wage.wf.nn <span class="sc">|&gt;</span></span>
+<span id="cb158-11"><a href="tidy-modelling.html#cb158-11" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(<span class="at">resamples =</span> wage_folds,</span>
+<span id="cb158-12"><a href="tidy-modelling.html#cb158-12" tabindex="-1"></a>                <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse, mae, rsq))</span>
+<span id="cb158-13"><a href="tidy-modelling.html#cb158-13" tabindex="-1"></a></span>
+<span id="cb158-14"><a href="tidy-modelling.html#cb158-14" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb158-15"><a href="tidy-modelling.html#cb158-15" tabindex="-1"></a>  <span class="fu">collect_metrics</span>(wage.resamples.lm) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">&quot;linear model&quot;</span>),</span>
+<span id="cb158-16"><a href="tidy-modelling.html#cb158-16" tabindex="-1"></a>  <span class="fu">collect_metrics</span>(wage.resamples.nn) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">&quot;neural network&quot;</span>)</span>
+<span id="cb158-17"><a href="tidy-modelling.html#cb158-17" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb158-18"><a href="tidy-modelling.html#cb158-18" tabindex="-1"></a>  <span class="fu">select</span>(model, .metric, mean, std_err)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 6 × 4
 #&gt;   model          .metric    mean  std_err
 #&gt;   &lt;chr&gt;          &lt;chr&gt;     &lt;dbl&gt;    &lt;dbl&gt;
 #&gt; 1 linear model   mae     3.0457  0.20526 
 #&gt; 2 linear model   rmse    4.3640  0.42507 
 #&gt; 3 linear model   rsq     0.29957 0.061394
-#&gt; 4 neural network mae     4.1655  0.30019 
-#&gt; 5 neural network rmse    5.7765  0.58700 
-#&gt; 6 neural network rsq     0.17560 0.032067</code></pre>
+#&gt; 4 neural network mae     4.3880  0.43099 
+#&gt; 5 neural network rmse    6.2532  0.93070 
+#&gt; 6 neural network rsq     0.16021 0.042837</code></pre>
 <p>Some notes:</p>
 <ul>
 <li><p><code>vfold_cv()</code> creates a collection of training/assessment splits from
@@ -873,29 +877,29 @@ This updates the random-forest story from Section <a href="prediction.html#sec:r
 into a more modern workflow.</p>
 <div class="example">
 <p><span id="exm:unlabeled-div-28" class="example"><strong>Example 5.7  </strong></span><strong>Tuning a random forest with <code>ranger</code></strong></p>
-<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb193-1"><a href="tidy-modelling.html#cb193-1" tabindex="-1"></a><span class="fu">library</span>(ranger)</span>
-<span id="cb193-2"><a href="tidy-modelling.html#cb193-2" tabindex="-1"></a></span>
-<span id="cb193-3"><a href="tidy-modelling.html#cb193-3" tabindex="-1"></a>wage.spec.rf <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">mode =</span> <span class="st">&quot;regression&quot;</span>,</span>
-<span id="cb193-4"><a href="tidy-modelling.html#cb193-4" tabindex="-1"></a>                            <span class="at">trees =</span> <span class="dv">500</span>,</span>
-<span id="cb193-5"><a href="tidy-modelling.html#cb193-5" tabindex="-1"></a>                            <span class="at">mtry =</span> <span class="fu">tune</span>(),</span>
-<span id="cb193-6"><a href="tidy-modelling.html#cb193-6" tabindex="-1"></a>                            <span class="at">min_n =</span> <span class="fu">tune</span>()) <span class="sc">|&gt;</span></span>
-<span id="cb193-7"><a href="tidy-modelling.html#cb193-7" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;ranger&quot;</span>)</span>
-<span id="cb193-8"><a href="tidy-modelling.html#cb193-8" tabindex="-1"></a></span>
-<span id="cb193-9"><a href="tidy-modelling.html#cb193-9" tabindex="-1"></a>wage.wf.rf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
-<span id="cb193-10"><a href="tidy-modelling.html#cb193-10" tabindex="-1"></a>  <span class="fu">add_recipe</span>(wage.recipe) <span class="sc">|&gt;</span></span>
-<span id="cb193-11"><a href="tidy-modelling.html#cb193-11" tabindex="-1"></a>  <span class="fu">add_model</span>(wage.spec.rf)</span>
-<span id="cb193-12"><a href="tidy-modelling.html#cb193-12" tabindex="-1"></a></span>
-<span id="cb193-13"><a href="tidy-modelling.html#cb193-13" tabindex="-1"></a>wage.rf.grid <span class="ot">&lt;-</span> <span class="fu">crossing</span>(</span>
-<span id="cb193-14"><a href="tidy-modelling.html#cb193-14" tabindex="-1"></a>  <span class="at">mtry =</span> <span class="fu">c</span>(<span class="dv">2</span><span class="dt">L</span>, <span class="dv">4</span><span class="dt">L</span>, <span class="dv">6</span><span class="dt">L</span>),</span>
-<span id="cb193-15"><a href="tidy-modelling.html#cb193-15" tabindex="-1"></a>  <span class="at">min_n =</span> <span class="fu">c</span>(<span class="dv">2</span><span class="dt">L</span>, <span class="dv">5</span><span class="dt">L</span>, <span class="dv">20</span><span class="dt">L</span>)</span>
-<span id="cb193-16"><a href="tidy-modelling.html#cb193-16" tabindex="-1"></a>)</span>
-<span id="cb193-17"><a href="tidy-modelling.html#cb193-17" tabindex="-1"></a></span>
-<span id="cb193-18"><a href="tidy-modelling.html#cb193-18" tabindex="-1"></a>wage.rf.tune <span class="ot">&lt;-</span> wage.wf.rf <span class="sc">|&gt;</span></span>
-<span id="cb193-19"><a href="tidy-modelling.html#cb193-19" tabindex="-1"></a>  <span class="fu">tune_grid</span>(<span class="at">resamples =</span> wage_folds,</span>
-<span id="cb193-20"><a href="tidy-modelling.html#cb193-20" tabindex="-1"></a>            <span class="at">grid =</span> wage.rf.grid,</span>
-<span id="cb193-21"><a href="tidy-modelling.html#cb193-21" tabindex="-1"></a>            <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse, mae, rsq))</span>
-<span id="cb193-22"><a href="tidy-modelling.html#cb193-22" tabindex="-1"></a></span>
-<span id="cb193-23"><a href="tidy-modelling.html#cb193-23" tabindex="-1"></a><span class="fu">show_best</span>(wage.rf.tune, <span class="at">metric =</span> <span class="st">&quot;rmse&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb160-1"><a href="tidy-modelling.html#cb160-1" tabindex="-1"></a><span class="fu">library</span>(ranger)</span>
+<span id="cb160-2"><a href="tidy-modelling.html#cb160-2" tabindex="-1"></a></span>
+<span id="cb160-3"><a href="tidy-modelling.html#cb160-3" tabindex="-1"></a>wage.spec.rf <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">mode =</span> <span class="st">&quot;regression&quot;</span>,</span>
+<span id="cb160-4"><a href="tidy-modelling.html#cb160-4" tabindex="-1"></a>                            <span class="at">trees =</span> <span class="dv">500</span>,</span>
+<span id="cb160-5"><a href="tidy-modelling.html#cb160-5" tabindex="-1"></a>                            <span class="at">mtry =</span> <span class="fu">tune</span>(),</span>
+<span id="cb160-6"><a href="tidy-modelling.html#cb160-6" tabindex="-1"></a>                            <span class="at">min_n =</span> <span class="fu">tune</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb160-7"><a href="tidy-modelling.html#cb160-7" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;ranger&quot;</span>)</span>
+<span id="cb160-8"><a href="tidy-modelling.html#cb160-8" tabindex="-1"></a></span>
+<span id="cb160-9"><a href="tidy-modelling.html#cb160-9" tabindex="-1"></a>wage.wf.rf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb160-10"><a href="tidy-modelling.html#cb160-10" tabindex="-1"></a>  <span class="fu">add_recipe</span>(wage.recipe) <span class="sc">|&gt;</span></span>
+<span id="cb160-11"><a href="tidy-modelling.html#cb160-11" tabindex="-1"></a>  <span class="fu">add_model</span>(wage.spec.rf)</span>
+<span id="cb160-12"><a href="tidy-modelling.html#cb160-12" tabindex="-1"></a></span>
+<span id="cb160-13"><a href="tidy-modelling.html#cb160-13" tabindex="-1"></a>wage.rf.grid <span class="ot">&lt;-</span> <span class="fu">crossing</span>(</span>
+<span id="cb160-14"><a href="tidy-modelling.html#cb160-14" tabindex="-1"></a>  <span class="at">mtry =</span> <span class="fu">c</span>(<span class="dv">2</span><span class="dt">L</span>, <span class="dv">4</span><span class="dt">L</span>, <span class="dv">6</span><span class="dt">L</span>),</span>
+<span id="cb160-15"><a href="tidy-modelling.html#cb160-15" tabindex="-1"></a>  <span class="at">min_n =</span> <span class="fu">c</span>(<span class="dv">2</span><span class="dt">L</span>, <span class="dv">5</span><span class="dt">L</span>, <span class="dv">20</span><span class="dt">L</span>)</span>
+<span id="cb160-16"><a href="tidy-modelling.html#cb160-16" tabindex="-1"></a>)</span>
+<span id="cb160-17"><a href="tidy-modelling.html#cb160-17" tabindex="-1"></a></span>
+<span id="cb160-18"><a href="tidy-modelling.html#cb160-18" tabindex="-1"></a>wage.rf.tune <span class="ot">&lt;-</span> wage.wf.rf <span class="sc">|&gt;</span></span>
+<span id="cb160-19"><a href="tidy-modelling.html#cb160-19" tabindex="-1"></a>  <span class="fu">tune_grid</span>(<span class="at">resamples =</span> wage_folds,</span>
+<span id="cb160-20"><a href="tidy-modelling.html#cb160-20" tabindex="-1"></a>            <span class="at">grid =</span> wage.rf.grid,</span>
+<span id="cb160-21"><a href="tidy-modelling.html#cb160-21" tabindex="-1"></a>            <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse, mae, rsq))</span>
+<span id="cb160-22"><a href="tidy-modelling.html#cb160-22" tabindex="-1"></a></span>
+<span id="cb160-23"><a href="tidy-modelling.html#cb160-23" tabindex="-1"></a><span class="fu">show_best</span>(wage.rf.tune, <span class="at">metric =</span> <span class="st">&quot;rmse&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 5 × 8
 #&gt;    mtry min_n .metric .estimator   mean     n std_err .config        
 #&gt;   &lt;int&gt; &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;          
@@ -925,13 +929,13 @@ training/test split from Example <a href="tidy-modelling.html#exm:wagesplit">5.1
 honest assessment on data that were not used during tuning.</p>
 <div class="example">
 <p><span id="exm:unlabeled-div-29" class="example"><strong>Example 5.8  </strong></span><strong>Finalising the tuned random forest</strong></p>
-<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb195-1"><a href="tidy-modelling.html#cb195-1" tabindex="-1"></a>best_wage_rf <span class="ot">&lt;-</span> <span class="fu">select_best</span>(wage.rf.tune, <span class="at">metric =</span> <span class="st">&quot;rmse&quot;</span>)</span>
-<span id="cb195-2"><a href="tidy-modelling.html#cb195-2" tabindex="-1"></a>wage.rf.final <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(wage.wf.rf, best_wage_rf)</span>
-<span id="cb195-3"><a href="tidy-modelling.html#cb195-3" tabindex="-1"></a></span>
-<span id="cb195-4"><a href="tidy-modelling.html#cb195-4" tabindex="-1"></a>wage.rf.last <span class="ot">&lt;-</span> wage.rf.final <span class="sc">|&gt;</span></span>
-<span id="cb195-5"><a href="tidy-modelling.html#cb195-5" tabindex="-1"></a>  <span class="fu">last_fit</span>(<span class="at">split =</span> split, <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse, mae, rsq))</span>
-<span id="cb195-6"><a href="tidy-modelling.html#cb195-6" tabindex="-1"></a></span>
-<span id="cb195-7"><a href="tidy-modelling.html#cb195-7" tabindex="-1"></a><span class="fu">collect_metrics</span>(wage.rf.last)</span></code></pre></div>
+<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="tidy-modelling.html#cb162-1" tabindex="-1"></a>best_wage_rf <span class="ot">&lt;-</span> <span class="fu">select_best</span>(wage.rf.tune, <span class="at">metric =</span> <span class="st">&quot;rmse&quot;</span>)</span>
+<span id="cb162-2"><a href="tidy-modelling.html#cb162-2" tabindex="-1"></a>wage.rf.final <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(wage.wf.rf, best_wage_rf)</span>
+<span id="cb162-3"><a href="tidy-modelling.html#cb162-3" tabindex="-1"></a></span>
+<span id="cb162-4"><a href="tidy-modelling.html#cb162-4" tabindex="-1"></a>wage.rf.last <span class="ot">&lt;-</span> wage.rf.final <span class="sc">|&gt;</span></span>
+<span id="cb162-5"><a href="tidy-modelling.html#cb162-5" tabindex="-1"></a>  <span class="fu">last_fit</span>(<span class="at">split =</span> split, <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse, mae, rsq))</span>
+<span id="cb162-6"><a href="tidy-modelling.html#cb162-6" tabindex="-1"></a></span>
+<span id="cb162-7"><a href="tidy-modelling.html#cb162-7" tabindex="-1"></a><span class="fu">collect_metrics</span>(wage.rf.last)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 3 × 4
 #&gt;   .metric .estimator .estimate .config        
 #&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;          

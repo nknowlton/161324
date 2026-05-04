@@ -10,7 +10,7 @@
 
   <meta property="og:title" content="Chapter 2 Data Acquisition and Processing | Data mining" />
   <meta property="og:type" content="book" />
-  
+  <meta property="og:image" content="/graphics/Datamining_cover.png" />
   <meta property="og:description" content="Chapter 2 Data Acquisition and Processing | Data mining notes" />
   <meta name="github-repo" content="jmarshallnz/161324" />
 
@@ -18,12 +18,12 @@
   <meta name="twitter:title" content="Chapter 2 Data Acquisition and Processing | Data mining" />
   
   <meta name="twitter:description" content="Chapter 2 Data Acquisition and Processing | Data mining notes" />
-  
+  <meta name="twitter:image" content="/graphics/Datamining_cover.png" />
 
 <meta name="author" content="Jonathan Marshall, Martin Hazelton, Nick Knowlton" />
 
 
-<meta name="date" content="2026-05-03" />
+<meta name="date" content="2026-05-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -154,7 +154,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="./">161.324 Data Mining</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="0.1" data-path="index.html"><a href="index.html#course-structure"><i class="fa fa-check"></i><b>0.1</b> Course structure</a></li>
+<li class="chapter" data-level="0.2" data-path="index.html"><a href="index.html#prerequisites"><i class="fa fa-check"></i><b>0.2</b> Prerequisites</a></li>
+<li class="chapter" data-level="0.3" data-path="index.html"><a href="index.html#how-to-use-these-notes"><i class="fa fa-check"></i><b>0.3</b> How to use these notes</a></li>
+<li class="chapter" data-level="0.4" data-path="index.html"><a href="index.html#acknowledgements"><i class="fa fa-check"></i><b>0.4</b> Acknowledgements</a></li>
+</ul></li>
 <li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
 <ul>
 <li class="chapter" data-level="1.1" data-path="introduction.html"><a href="introduction.html#sec:intro1"><i class="fa fa-check"></i><b>1.1</b> What is Data Mining?</a></li>
@@ -383,7 +389,7 @@ and prediction competitions, some with quite large prizes available!</p>
 part of the <a href="https://tidyverse.org">tidyverse</a> set of packages. In general
 we’ll be using the tidyverse throughout, at least where we can.</p>
 <p>We’ll start most of our code with:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="data-acquisition-and-processing.html#cb15-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="data-acquisition-and-processing.html#cb4-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div>
 <p>We’ll tend to use CSV (comma separated value) files, for which the
 <code>read_csv()</code> command is appropriate.</p>
 <p>By default, this should work out of the box for just about all data
@@ -393,7 +399,7 @@ values have been encoded correctly at import time, for example through
 the <code>na=</code> argument of <code>read_csv()</code>.</p>
 <p>This might be easier to see through a specific example, so consider the
 following command:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="data-acquisition-and-processing.html#cb16-1" tabindex="-1"></a>fires <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="at">file=</span><span class="st">&quot;../data/forestfires.csv&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="data-acquisition-and-processing.html#cb5-1" tabindex="-1"></a>fires <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="at">file=</span><span class="st">&quot;../data/forestfires.csv&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; Rows: 517 Columns: 13
 #&gt; ── Column specification ────────────────────────────────────────────────────────
 #&gt; Delimiter: &quot;,&quot;
@@ -459,20 +465,20 @@ following example.</p>
 18      8        C</code></pre>
 <p>where we have three columns <code>x</code>, <code>y</code> and <code>group</code> and six entries.</p>
 <p>We can define this a number of ways as the below code illustrates.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="data-acquisition-and-processing.html#cb20-1" tabindex="-1"></a>one <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">21</span>, <span class="dv">24</span>, <span class="dv">21</span>, <span class="dv">22</span>, <span class="dv">34</span>, <span class="dv">18</span>),</span>
-<span id="cb20-2"><a href="data-acquisition-and-processing.html#cb20-2" tabindex="-1"></a>                  <span class="at">y =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">7</span>, <span class="dv">1</span>, <span class="dv">8</span>),</span>
-<span id="cb20-3"><a href="data-acquisition-and-processing.html#cb20-3" tabindex="-1"></a>                  <span class="at">group =</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;C&quot;</span>))</span>
-<span id="cb20-4"><a href="data-acquisition-and-processing.html#cb20-4" tabindex="-1"></a>two <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">21</span>, <span class="dv">24</span>, <span class="dv">21</span>, <span class="dv">22</span>, <span class="dv">34</span>, <span class="dv">18</span>),</span>
-<span id="cb20-5"><a href="data-acquisition-and-processing.html#cb20-5" tabindex="-1"></a>                  <span class="at">y =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">7</span>, <span class="dv">1</span>, <span class="dv">8</span>),</span>
-<span id="cb20-6"><a href="data-acquisition-and-processing.html#cb20-6" tabindex="-1"></a>                  <span class="at">group =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>), <span class="at">each=</span><span class="dv">2</span>))</span>
-<span id="cb20-7"><a href="data-acquisition-and-processing.html#cb20-7" tabindex="-1"></a>three <span class="ot">&lt;-</span> <span class="fu">tribble</span>(<span class="sc">~</span>x, <span class="sc">~</span>y, <span class="sc">~</span>group,</span>
-<span id="cb20-8"><a href="data-acquisition-and-processing.html#cb20-8" tabindex="-1"></a>                 <span class="dv">21</span>, <span class="dv">5</span>, <span class="st">&quot;A&quot;</span>,</span>
-<span id="cb20-9"><a href="data-acquisition-and-processing.html#cb20-9" tabindex="-1"></a>                 <span class="dv">24</span>, <span class="dv">3</span>, <span class="st">&quot;A&quot;</span>,</span>
-<span id="cb20-10"><a href="data-acquisition-and-processing.html#cb20-10" tabindex="-1"></a>                 <span class="dv">21</span>, <span class="dv">8</span>, <span class="st">&quot;B&quot;</span>,</span>
-<span id="cb20-11"><a href="data-acquisition-and-processing.html#cb20-11" tabindex="-1"></a>                 <span class="dv">22</span>, <span class="dv">7</span>, <span class="st">&quot;B&quot;</span>,</span>
-<span id="cb20-12"><a href="data-acquisition-and-processing.html#cb20-12" tabindex="-1"></a>                 <span class="dv">34</span>, <span class="dv">1</span>, <span class="st">&quot;C&quot;</span>,</span>
-<span id="cb20-13"><a href="data-acquisition-and-processing.html#cb20-13" tabindex="-1"></a>                 <span class="dv">18</span>, <span class="dv">8</span>, <span class="st">&quot;C&quot;</span>)</span>
-<span id="cb20-14"><a href="data-acquisition-and-processing.html#cb20-14" tabindex="-1"></a>one</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="data-acquisition-and-processing.html#cb9-1" tabindex="-1"></a>one <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">21</span>, <span class="dv">24</span>, <span class="dv">21</span>, <span class="dv">22</span>, <span class="dv">34</span>, <span class="dv">18</span>),</span>
+<span id="cb9-2"><a href="data-acquisition-and-processing.html#cb9-2" tabindex="-1"></a>                  <span class="at">y =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">7</span>, <span class="dv">1</span>, <span class="dv">8</span>),</span>
+<span id="cb9-3"><a href="data-acquisition-and-processing.html#cb9-3" tabindex="-1"></a>                  <span class="at">group =</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;C&quot;</span>))</span>
+<span id="cb9-4"><a href="data-acquisition-and-processing.html#cb9-4" tabindex="-1"></a>two <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">21</span>, <span class="dv">24</span>, <span class="dv">21</span>, <span class="dv">22</span>, <span class="dv">34</span>, <span class="dv">18</span>),</span>
+<span id="cb9-5"><a href="data-acquisition-and-processing.html#cb9-5" tabindex="-1"></a>                  <span class="at">y =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">7</span>, <span class="dv">1</span>, <span class="dv">8</span>),</span>
+<span id="cb9-6"><a href="data-acquisition-and-processing.html#cb9-6" tabindex="-1"></a>                  <span class="at">group =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>), <span class="at">each=</span><span class="dv">2</span>))</span>
+<span id="cb9-7"><a href="data-acquisition-and-processing.html#cb9-7" tabindex="-1"></a>three <span class="ot">&lt;-</span> <span class="fu">tribble</span>(<span class="sc">~</span>x, <span class="sc">~</span>y, <span class="sc">~</span>group,</span>
+<span id="cb9-8"><a href="data-acquisition-and-processing.html#cb9-8" tabindex="-1"></a>                 <span class="dv">21</span>, <span class="dv">5</span>, <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb9-9"><a href="data-acquisition-and-processing.html#cb9-9" tabindex="-1"></a>                 <span class="dv">24</span>, <span class="dv">3</span>, <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb9-10"><a href="data-acquisition-and-processing.html#cb9-10" tabindex="-1"></a>                 <span class="dv">21</span>, <span class="dv">8</span>, <span class="st">&quot;B&quot;</span>,</span>
+<span id="cb9-11"><a href="data-acquisition-and-processing.html#cb9-11" tabindex="-1"></a>                 <span class="dv">22</span>, <span class="dv">7</span>, <span class="st">&quot;B&quot;</span>,</span>
+<span id="cb9-12"><a href="data-acquisition-and-processing.html#cb9-12" tabindex="-1"></a>                 <span class="dv">34</span>, <span class="dv">1</span>, <span class="st">&quot;C&quot;</span>,</span>
+<span id="cb9-13"><a href="data-acquisition-and-processing.html#cb9-13" tabindex="-1"></a>                 <span class="dv">18</span>, <span class="dv">8</span>, <span class="st">&quot;C&quot;</span>)</span>
+<span id="cb9-14"><a href="data-acquisition-and-processing.html#cb9-14" tabindex="-1"></a>one</span></code></pre></div>
 <pre><code>#&gt;    x y group
 #&gt; 1 21 5     A
 #&gt; 2 24 3     A
@@ -480,7 +486,7 @@ following example.</p>
 #&gt; 4 22 7     B
 #&gt; 5 34 1     C
 #&gt; 6 18 8     C</code></pre>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="data-acquisition-and-processing.html#cb22-1" tabindex="-1"></a>two</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="data-acquisition-and-processing.html#cb11-1" tabindex="-1"></a>two</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 6 × 3
 #&gt;       x     y group
 #&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;
@@ -490,7 +496,7 @@ following example.</p>
 #&gt; 4    22     7 B    
 #&gt; 5    34     1 C    
 #&gt; 6    18     8 C</code></pre>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="data-acquisition-and-processing.html#cb24-1" tabindex="-1"></a>three</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="data-acquisition-and-processing.html#cb13-1" tabindex="-1"></a>three</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 6 × 3
 #&gt;       x     y group
 #&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;
@@ -519,7 +525,7 @@ be written so that it maintains the natural ordering.</p></li>
 Remember that when you use <code>read_csv</code>, R will assume by default that
 any column of numbers corresponds to a quantitative variable. Consider
 the following example.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="data-acquisition-and-processing.html#cb26-1" tabindex="-1"></a>fossils <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="at">file=</span><span class="st">&quot;../data/fossils.csv&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="data-acquisition-and-processing.html#cb15-1" tabindex="-1"></a>fossils <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="at">file=</span><span class="st">&quot;../data/fossils.csv&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; Rows: 27 Columns: 2
 #&gt; ── Column specification ────────────────────────────────────────────────────────
 #&gt; Delimiter: &quot;,&quot;
@@ -527,7 +533,7 @@ the following example.</p>
 #&gt; 
 #&gt; ℹ Use `spec()` to retrieve the full column specification for this data.
 #&gt; ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="data-acquisition-and-processing.html#cb28-1" tabindex="-1"></a>fossils</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="data-acquisition-and-processing.html#cb17-1" tabindex="-1"></a>fossils</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 27 × 2
 #&gt;     bite species
 #&gt;    &lt;dbl&gt;   &lt;dbl&gt;
@@ -542,7 +548,7 @@ the following example.</p>
 #&gt;  9 16.6        1
 #&gt; 10 15.16       1
 #&gt; # ℹ 17 more rows</code></pre>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="data-acquisition-and-processing.html#cb30-1" tabindex="-1"></a>fossils <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="fu">sqrt</span>(species))</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="data-acquisition-and-processing.html#cb19-1" tabindex="-1"></a>fossils <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="fu">sqrt</span>(species))</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 27 × 3
 #&gt;     bite species `sqrt(species)`
 #&gt;    &lt;dbl&gt;   &lt;dbl&gt;           &lt;dbl&gt;
@@ -557,8 +563,8 @@ the following example.</p>
 #&gt;  9 16.6        1               1
 #&gt; 10 15.16       1               1
 #&gt; # ℹ 17 more rows</code></pre>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="data-acquisition-and-processing.html#cb32-1" tabindex="-1"></a>fixed_fossils <span class="ot">&lt;-</span> fossils <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">species =</span> <span class="fu">as.factor</span>(species))</span>
-<span id="cb32-2"><a href="data-acquisition-and-processing.html#cb32-2" tabindex="-1"></a>fixed_fossils</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="data-acquisition-and-processing.html#cb21-1" tabindex="-1"></a>fixed_fossils <span class="ot">&lt;-</span> fossils <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">species =</span> <span class="fu">as.factor</span>(species))</span>
+<span id="cb21-2"><a href="data-acquisition-and-processing.html#cb21-2" tabindex="-1"></a>fixed_fossils</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 27 × 2
 #&gt;     bite species
 #&gt;    &lt;dbl&gt; &lt;fct&gt;  
@@ -573,7 +579,7 @@ the following example.</p>
 #&gt;  9 16.6  1      
 #&gt; 10 15.16 1      
 #&gt; # ℹ 17 more rows</code></pre>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="data-acquisition-and-processing.html#cb34-1" tabindex="-1"></a>fixed_fossils <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="fu">sqrt</span>(species))</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="data-acquisition-and-processing.html#cb23-1" tabindex="-1"></a>fixed_fossils <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="fu">sqrt</span>(species))</span></code></pre></div>
 <pre><code>#&gt; Error in `mutate()`:
 #&gt; ℹ In argument: `sqrt(species)`.
 #&gt; Caused by error in `Math.factor()`:
@@ -595,9 +601,8 @@ to assess things like variable types.</p>
 153 observations on 6 variables (<code>Ozone</code>, <code>Solar.R</code>, <code>Wind</code>, <code>Temp</code>, <code>Month</code>,
 and <code>Day</code>). We can visualise the structure of these using the <code>vis_dat()</code> function
 from <code>visdat</code>:</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="data-acquisition-and-processing.html#cb36-1" tabindex="-1"></a><span class="fu">library</span>(visdat)</span></code></pre></div>
-<pre><code>#&gt; Warning: package &#39;visdat&#39; was built under R version 4.5.2</code></pre>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="data-acquisition-and-processing.html#cb38-1" tabindex="-1"></a><span class="fu">vis_dat</span>(airquality)</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="data-acquisition-and-processing.html#cb25-1" tabindex="-1"></a><span class="fu">library</span>(visdat)</span>
+<span id="cb25-2"><a href="data-acquisition-and-processing.html#cb25-2" tabindex="-1"></a><span class="fu">vis_dat</span>(airquality)</span></code></pre></div>
 <p><img src="02-data_files/figure-html/unnamed-chunk-7-1.png" alt="" width="672" /></p>
 <p>As can be seen, <code>vis_dat()</code> shows us that the first 5 columns are ‘integer’ type
 (whole numbers) while the <code>Wind</code> column is ‘numeric’ (double precision real value).</p>
@@ -679,7 +684,7 @@ for which the following variables are recorded.</p>
 <p>The data contain a number of missing values, represented in the text
 file of the data by the number 9999. These data are processed in the
 following R snippet.</p>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="data-acquisition-and-processing.html#cb39-1" tabindex="-1"></a>husbands <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="at">file=</span><span class="st">&quot;../data/husbands.csv&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="data-acquisition-and-processing.html#cb26-1" tabindex="-1"></a>husbands <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="at">file=</span><span class="st">&quot;../data/husbands.csv&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; Rows: 199 Columns: 5
 #&gt; ── Column specification ────────────────────────────────────────────────────────
 #&gt; Delimiter: &quot;,&quot;
@@ -687,7 +692,7 @@ following R snippet.</p>
 #&gt; 
 #&gt; ℹ Use `spec()` to retrieve the full column specification for this data.
 #&gt; ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="data-acquisition-and-processing.html#cb41-1" tabindex="-1"></a><span class="fu">glimpse</span>(husbands)</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="data-acquisition-and-processing.html#cb28-1" tabindex="-1"></a><span class="fu">glimpse</span>(husbands)</span></code></pre></div>
 <pre><code>#&gt; Rows: 199
 #&gt; Columns: 5
 #&gt; $ H.Age          &lt;dbl&gt; 49, 25, 40, 52, 58, 32, 43, 42, 47, 31, 26, 40, 35, 45,…
@@ -695,7 +700,7 @@ following R snippet.</p>
 #&gt; $ W.Age          &lt;dbl&gt; 43, 28, 30, 57, 52, 27, 52, 9999, 43, 23, 25, 39, 32, 9…
 #&gt; $ W.Ht           &lt;dbl&gt; 1590, 1560, 1620, 1540, 1420, 1660, 1610, 1635, 1580, 1…
 #&gt; $ H.Age.Marriage &lt;dbl&gt; 25, 19, 38, 26, 30, 23, 33, 30, 26, 26, 23, 23, 31, 41,…</code></pre>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="data-acquisition-and-processing.html#cb43-1" tabindex="-1"></a>skimr<span class="sc">::</span><span class="fu">skim</span>(husbands)</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="data-acquisition-and-processing.html#cb30-1" tabindex="-1"></a>skimr<span class="sc">::</span><span class="fu">skim</span>(husbands)</span></code></pre></div>
 <pre><code>#&gt; ── Data Summary ────────────────────────
 #&gt;                            Values  
 #&gt; Name                       husbands
@@ -720,18 +725,18 @@ following R snippet.</p>
 #&gt; 3 9999 ▇▁▁▁▂
 #&gt; 4 1760 ▁▃▇▆▁
 #&gt; 5 9999 ▇▁▁▁▁</code></pre>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="data-acquisition-and-processing.html#cb45-1" tabindex="-1"></a>husbands <span class="sc">|&gt;</span> <span class="fu">summarise</span>(<span class="fu">mean</span>(W.Age))</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="data-acquisition-and-processing.html#cb32-1" tabindex="-1"></a>husbands <span class="sc">|&gt;</span> <span class="fu">summarise</span>(<span class="fu">mean</span>(W.Age))</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 1 × 1
 #&gt;   `mean(W.Age)`
 #&gt;           &lt;dbl&gt;
 #&gt; 1        1491.9</code></pre>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="data-acquisition-and-processing.html#cb47-1" tabindex="-1"></a>husb_fixed <span class="ot">&lt;-</span> husbands <span class="sc">|&gt;</span></span>
-<span id="cb47-2"><a href="data-acquisition-and-processing.html#cb47-2" tabindex="-1"></a>  naniar<span class="sc">::</span><span class="fu">replace_with_na</span>(<span class="at">replace =</span> <span class="fu">list</span>(<span class="at">W.Age =</span> <span class="dv">9999</span>,</span>
-<span id="cb47-3"><a href="data-acquisition-and-processing.html#cb47-3" tabindex="-1"></a>                                         <span class="at">H.Age.Marriage =</span> <span class="dv">9999</span>))</span>
-<span id="cb47-4"><a href="data-acquisition-and-processing.html#cb47-4" tabindex="-1"></a>husb_fixed <span class="sc">|&gt;</span></span>
-<span id="cb47-5"><a href="data-acquisition-and-processing.html#cb47-5" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">mean</span>(W.Age),</span>
-<span id="cb47-6"><a href="data-acquisition-and-processing.html#cb47-6" tabindex="-1"></a>            <span class="fu">mean</span>(W.Age, <span class="at">na.rm=</span><span class="cn">TRUE</span>),</span>
-<span id="cb47-7"><a href="data-acquisition-and-processing.html#cb47-7" tabindex="-1"></a>            <span class="fu">mean</span>(H.Age.Marriage, <span class="at">na.rm=</span><span class="cn">TRUE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="data-acquisition-and-processing.html#cb34-1" tabindex="-1"></a>husb_fixed <span class="ot">&lt;-</span> husbands <span class="sc">|&gt;</span></span>
+<span id="cb34-2"><a href="data-acquisition-and-processing.html#cb34-2" tabindex="-1"></a>  naniar<span class="sc">::</span><span class="fu">replace_with_na</span>(<span class="at">replace =</span> <span class="fu">list</span>(<span class="at">W.Age =</span> <span class="dv">9999</span>,</span>
+<span id="cb34-3"><a href="data-acquisition-and-processing.html#cb34-3" tabindex="-1"></a>                                         <span class="at">H.Age.Marriage =</span> <span class="dv">9999</span>))</span>
+<span id="cb34-4"><a href="data-acquisition-and-processing.html#cb34-4" tabindex="-1"></a>husb_fixed <span class="sc">|&gt;</span></span>
+<span id="cb34-5"><a href="data-acquisition-and-processing.html#cb34-5" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">mean</span>(W.Age),</span>
+<span id="cb34-6"><a href="data-acquisition-and-processing.html#cb34-6" tabindex="-1"></a>            <span class="fu">mean</span>(W.Age, <span class="at">na.rm=</span><span class="cn">TRUE</span>),</span>
+<span id="cb34-7"><a href="data-acquisition-and-processing.html#cb34-7" tabindex="-1"></a>            <span class="fu">mean</span>(H.Age.Marriage, <span class="at">na.rm=</span><span class="cn">TRUE</span>))</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 1 × 3
 #&gt;   `mean(W.Age)` `mean(W.Age, na.rm = TRUE)` `mean(H.Age.Marriage, na.rm = TRUE)`
 #&gt;           &lt;dbl&gt;                       &lt;dbl&gt;                                &lt;dbl&gt;
@@ -765,8 +770,8 @@ just over 40.</p></li>
 across all columns, we could use the <code>na</code> argument of <code>read_csv</code>. It defaults
 to <code>c("", "NA")</code>, to detect the empty string or the string NA, but we could
 replace this with <code>"9999"</code>:</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="data-acquisition-and-processing.html#cb49-1" tabindex="-1"></a>husbands <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="at">file=</span><span class="st">&quot;../data/husbands.csv&quot;</span>, <span class="at">na=</span><span class="st">&quot;9999&quot;</span>)</span>
-<span id="cb49-2"><a href="data-acquisition-and-processing.html#cb49-2" tabindex="-1"></a>husbands <span class="sc">|&gt;</span> skimr<span class="sc">::</span><span class="fu">skim</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="data-acquisition-and-processing.html#cb36-1" tabindex="-1"></a>husbands <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="at">file=</span><span class="st">&quot;../data/husbands.csv&quot;</span>, <span class="at">na=</span><span class="st">&quot;9999&quot;</span>)</span>
+<span id="cb36-2"><a href="data-acquisition-and-processing.html#cb36-2" tabindex="-1"></a>husbands <span class="sc">|&gt;</span> skimr<span class="sc">::</span><span class="fu">skim</span>()</span></code></pre></div>
 <pre><code>#&gt; ── Data Summary ────────────────────────
 #&gt;                            Values  
 #&gt; Name                       husbands
