@@ -7,8 +7,13 @@ on:
       - 'notes/_bookdown.yml'
       - 'notes/_output.yml'
       - 'notes/style.css'
+      - 'notes/install_packages.R'
+      - 'notes/helpers/**'
+      - 'notes/graphics/**'
+      - 'notes/preamble.tex'
       - 'common/*.R'
       - 'data/**'
+      - '.github/workflows/render-notes.yml'
   workflow_dispatch:
 
 permissions:
@@ -38,7 +43,7 @@ jobs:
         env:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          install.packages("remotes", repos = "https://packagemanager.posit.co/cran/__linux__/noble/latest")
+          install.packages("remotes")
           source("notes/install_packages.R")
 
       - name: Render notes

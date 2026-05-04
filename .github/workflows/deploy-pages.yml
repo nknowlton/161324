@@ -60,7 +60,7 @@ jobs:
             "arrow", "jsonlite", "vip", "Matrix", "irlba",
             "patchwork", "skimr", "rsample"
           )
-          install.packages(pkgs, repos = "https://packagemanager.posit.co/cran/__linux__/jammy/latest")
+          install.packages(pkgs)
 
       - name: Render reveal lectures
         run: |
