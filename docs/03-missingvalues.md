@@ -89,6 +89,13 @@ We can use `vis_miss` directly on the `airquality` data.frame:
 
 ``` r
 library(visdat)
+```
+
+```
+#> Warning: package 'visdat' was built under R version 4.5.2
+```
+
+``` r
 vis_miss(airquality)
 ```
 
@@ -242,6 +249,13 @@ the first of these variables .
 
 ``` r
 library(naniar)
+```
+
+```
+#> Warning: package 'naniar' was built under R version 4.5.2
+```
+
+``` r
 HusWife <- husbands |>
   mutate(W.Age.New = impute_mean(W.Age),
          H.Age.Marriage.New = impute_mean(H.Age.Marriage))
@@ -331,6 +345,17 @@ In this example we impute values for the missing data on `W.Age` and
 
 ``` r
 library(VIM)
+```
+
+```
+#> Warning: package 'VIM' was built under R version 4.5.2
+```
+
+```
+#> Warning: package 'colorspace' was built under R version 4.5.2
+```
+
+``` r
 husbands.imp <- husbands |> kNN(k = 5)
 ```
 

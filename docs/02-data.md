@@ -342,6 +342,13 @@ from `visdat`:
 
 ``` r
 library(visdat)
+```
+
+```
+#> Warning: package 'visdat' was built under R version 4.5.2
+```
+
+``` r
 vis_dat(airquality)
 ```
 

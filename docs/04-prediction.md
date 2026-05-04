@@ -1101,6 +1101,10 @@ linear regression.
 <p class="caption">(\#fig:toytree1)Scatterplot of toy dataset.</p>
 </div>
 
+```
+#> Warning: package 'rpart' was built under R version 4.5.2
+```
+
 A tree based method works by systematically splitting the data into
 groups according to $x$, and then predicting the target using the means
 within each group. The recursive partitioning of the data (i.e. the
@@ -2136,6 +2140,13 @@ trying $p/2 = 8$ nodes in the hidden layer.
 
 ``` r
 library(nnet)
+```
+
+```
+#> Warning: package 'nnet' was built under R version 4.5.2
+```
+
+``` r
 set.seed(1069)
 wage.nn.1 <- nnet(WAGE ~ .,size=8, data=wage.train, linout=TRUE)
 ```
@@ -2148,12 +2159,12 @@ wage.nn.1 <- nnet(WAGE ~ .,size=8, data=wage.train, linout=TRUE)
 #> iter  30 value 8407.104646
 #> iter  40 value 7137.560954
 #> iter  50 value 6409.347535
-#> iter  60 value 6055.671851
-#> iter  70 value 5653.071563
-#> iter  80 value 5458.217813
-#> iter  90 value 5339.338424
-#> iter 100 value 5294.441153
-#> final  value 5294.441153 
+#> iter  60 value 6055.671849
+#> iter  70 value 5653.071634
+#> iter  80 value 5458.214737
+#> iter  90 value 5339.341183
+#> iter 100 value 5294.443408
+#> final  value 5294.443408 
 #> stopped after 100 iterations
 ```
 
@@ -2176,25 +2187,25 @@ wage.nn.1 <- nnet(WAGE ~ .,size=8, data=wage.train, linout=TRUE, maxit=250)
 #> iter  30 value 8407.104646
 #> iter  40 value 7137.560954
 #> iter  50 value 6409.347535
-#> iter  60 value 6055.671851
-#> iter  70 value 5653.071563
-#> iter  80 value 5458.217813
-#> iter  90 value 5339.338424
-#> iter 100 value 5294.441153
-#> iter 110 value 5277.264786
-#> iter 120 value 5259.477058
-#> iter 130 value 5221.375520
-#> iter 140 value 5213.262776
-#> iter 150 value 5204.729204
-#> iter 160 value 5186.140067
-#> iter 170 value 5181.490169
-#> iter 180 value 5180.836426
-#> iter 190 value 5180.713899
-#> iter 200 value 5180.681210
-#> iter 210 value 5180.664533
-#> iter 220 value 5180.656824
-#> iter 230 value 5180.649072
-#> final  value 5180.648896 
+#> iter  60 value 6055.671849
+#> iter  70 value 5653.071634
+#> iter  80 value 5458.214737
+#> iter  90 value 5339.341183
+#> iter 100 value 5294.443408
+#> iter 110 value 5277.262956
+#> iter 120 value 5259.472925
+#> iter 130 value 5221.372400
+#> iter 140 value 5213.260196
+#> iter 150 value 5204.724066
+#> iter 160 value 5186.121214
+#> iter 170 value 5181.475745
+#> iter 180 value 5180.836619
+#> iter 190 value 5180.712366
+#> iter 200 value 5180.680071
+#> iter 210 value 5180.664910
+#> iter 220 value 5180.656683
+#> iter 230 value 5180.649097
+#> final  value 5180.648910 
 #> converged
 ```
 
@@ -2212,57 +2223,47 @@ wage.nn.2 <- nnet(WAGE ~ .,size=8, data=wage.train, linout=TRUE, maxit=1000, dec
 #> iter  40 value 6878.376122
 #> iter  50 value 6481.117353
 #> iter  60 value 6207.284772
-#> iter  70 value 5888.370643
-#> iter  80 value 5679.460865
-#> iter  90 value 5587.558053
-#> iter 100 value 5562.770888
-#> iter 110 value 5549.232998
-#> iter 120 value 5534.746892
-#> iter 130 value 5377.320342
-#> iter 140 value 4956.878840
-#> iter 150 value 4748.302776
-#> iter 160 value 4666.816050
-#> iter 170 value 4641.362805
-#> iter 180 value 4522.339012
-#> iter 190 value 4249.076658
-#> iter 200 value 4148.421313
-#> iter 210 value 4141.294333
-#> iter 220 value 4128.342428
-#> iter 230 value 4113.462752
-#> iter 240 value 4088.338712
-#> iter 250 value 4036.092349
-#> iter 260 value 3885.738552
-#> iter 270 value 3665.268656
-#> iter 280 value 3599.800099
-#> iter 290 value 3598.014247
-#> iter 300 value 3587.143227
-#> iter 310 value 3579.255264
-#> iter 320 value 3558.760159
-#> iter 330 value 3544.988341
-#> iter 340 value 3537.662068
-#> iter 350 value 3526.169481
-#> iter 360 value 3511.864771
-#> iter 370 value 3490.326282
-#> iter 380 value 3471.140803
-#> iter 390 value 3467.922148
-#> iter 400 value 3463.300108
-#> iter 410 value 3459.851024
-#> iter 420 value 3458.404360
-#> iter 430 value 3458.068068
-#> iter 440 value 3457.741192
-#> iter 450 value 3457.539546
-#> iter 460 value 3457.523272
-#> iter 470 value 3457.490380
-#> iter 480 value 3457.378970
-#> iter 490 value 3456.983406
-#> iter 500 value 3456.783995
-#> iter 510 value 3456.677792
-#> iter 520 value 3456.545741
-#> iter 530 value 3456.508321
-#> iter 540 value 3456.497985
-#> iter 550 value 3456.495455
-#> iter 560 value 3456.493827
-#> final  value 3456.493751 
+#> iter  70 value 5888.370682
+#> iter  80 value 5679.460910
+#> iter  90 value 5587.557983
+#> iter 100 value 5562.770322
+#> iter 110 value 5549.232128
+#> iter 120 value 5534.737535
+#> iter 130 value 5423.151400
+#> iter 140 value 5006.531549
+#> iter 150 value 4791.212282
+#> iter 160 value 4678.106404
+#> iter 170 value 4604.413260
+#> iter 180 value 4574.261195
+#> iter 190 value 4562.695725
+#> iter 200 value 4532.623415
+#> iter 210 value 4460.599447
+#> iter 220 value 4174.205752
+#> iter 230 value 3777.204565
+#> iter 240 value 3626.401311
+#> iter 250 value 3556.716044
+#> iter 260 value 3477.252873
+#> iter 270 value 3410.639912
+#> iter 280 value 3370.428958
+#> iter 290 value 3356.013428
+#> iter 300 value 3347.590486
+#> iter 310 value 3342.952019
+#> iter 320 value 3338.835662
+#> iter 330 value 3327.244695
+#> iter 340 value 3312.767104
+#> iter 350 value 3307.501743
+#> iter 360 value 3305.657146
+#> iter 370 value 3304.260947
+#> iter 380 value 3303.739138
+#> iter 390 value 3303.609181
+#> iter 400 value 3303.574092
+#> iter 410 value 3303.558593
+#> iter 420 value 3303.491448
+#> iter 430 value 3303.206511
+#> iter 440 value 3303.077402
+#> iter 450 value 3303.009188
+#> iter 460 value 3302.952691
+#> final  value 3302.948490 
 #> converged
 ```
 
@@ -2277,24 +2278,30 @@ wage.nn.3 <- nnet(WAGE ~ .,size=5, data=wage.train, linout=TRUE, maxit=250)
 #> iter  10 value 9898.773133
 #> iter  20 value 9639.053885
 #> iter  30 value 9144.093441
-#> iter  40 value 7826.027699
-#> iter  50 value 7280.906397
-#> iter  60 value 7014.257397
-#> iter  70 value 6633.590521
-#> iter  80 value 6445.393572
-#> iter  90 value 6204.602833
-#> iter 100 value 6060.848795
-#> iter 110 value 6010.770063
-#> iter 120 value 5868.244858
-#> iter 130 value 5771.944799
-#> iter 140 value 5702.256407
-#> iter 150 value 5664.424728
-#> iter 160 value 5642.921250
-#> iter 170 value 5618.526653
-#> iter 180 value 5613.555296
-#> iter 190 value 5613.229284
-#> final  value 5613.219380 
-#> converged
+#> iter  40 value 7826.037696
+#> iter  50 value 7279.872669
+#> iter  60 value 7011.798196
+#> iter  70 value 6538.294587
+#> iter  80 value 6216.472023
+#> iter  90 value 6140.245313
+#> iter 100 value 6079.184660
+#> iter 110 value 5885.076945
+#> iter 120 value 5800.349185
+#> iter 130 value 5758.187072
+#> iter 140 value 5734.166922
+#> iter 150 value 5727.264948
+#> iter 160 value 5724.011819
+#> iter 170 value 5719.110795
+#> iter 180 value 5675.747369
+#> iter 190 value 5641.012684
+#> iter 200 value 5636.823687
+#> iter 210 value 5632.526317
+#> iter 220 value 5628.084071
+#> iter 230 value 5625.793815
+#> iter 240 value 5621.619122
+#> iter 250 value 5621.579045
+#> final  value 5621.579045 
+#> stopped after 250 iterations
 ```
 
 ``` r
@@ -2316,42 +2323,61 @@ wage.nn.4 <- nnet(WAGE ~ .,size=5, data=wage.train, linout=TRUE, maxit=1000, dec
 #> iter  90 value 6514.004580
 #> iter 100 value 6486.715687
 #> iter 110 value 6422.863823
-#> iter 120 value 6413.359669
-#> iter 130 value 6404.914846
-#> iter 140 value 6391.157083
-#> iter 150 value 6366.201123
-#> iter 160 value 6361.773124
-#> iter 170 value 6315.485887
-#> iter 180 value 6183.450268
-#> iter 190 value 6057.247575
-#> iter 200 value 6045.648792
-#> iter 210 value 6018.709366
-#> iter 220 value 5833.713519
-#> iter 230 value 5240.280659
-#> iter 240 value 4877.286607
-#> iter 250 value 4634.578901
-#> iter 260 value 4533.734798
-#> iter 270 value 4486.430186
-#> iter 280 value 4470.048547
-#> iter 290 value 4443.323159
-#> iter 300 value 4418.315674
-#> iter 310 value 4408.905750
-#> iter 320 value 4378.615462
-#> iter 330 value 4331.182426
-#> iter 340 value 4281.052058
-#> iter 350 value 4231.356086
-#> iter 360 value 4190.805869
-#> iter 370 value 4172.890858
-#> iter 380 value 4165.957930
-#> iter 390 value 4161.924512
-#> iter 400 value 4159.483437
-#> iter 410 value 4158.166529
-#> iter 420 value 4157.733398
-#> iter 430 value 4157.658218
-#> iter 440 value 4157.581357
-#> iter 450 value 4157.535733
-#> iter 460 value 4157.531644
-#> final  value 4157.529530 
+#> iter 120 value 6413.359668
+#> iter 130 value 6404.914847
+#> iter 140 value 6391.157086
+#> iter 150 value 6366.201159
+#> iter 160 value 6361.772112
+#> iter 170 value 6315.489346
+#> iter 180 value 6183.407448
+#> iter 190 value 6055.917924
+#> iter 200 value 6040.377799
+#> iter 210 value 6029.631139
+#> iter 220 value 5922.282775
+#> iter 230 value 5584.845554
+#> iter 240 value 5284.858728
+#> iter 250 value 5045.600092
+#> iter 260 value 4912.732799
+#> iter 270 value 4836.755078
+#> iter 280 value 4796.717099
+#> iter 290 value 4780.231674
+#> iter 300 value 4757.916201
+#> iter 310 value 4729.821843
+#> iter 320 value 4566.260676
+#> iter 330 value 4461.450668
+#> iter 340 value 4393.005603
+#> iter 350 value 4334.395208
+#> iter 360 value 4303.189659
+#> iter 370 value 4279.775405
+#> iter 380 value 4271.131683
+#> iter 390 value 4265.550211
+#> iter 400 value 4259.492440
+#> iter 410 value 4249.764292
+#> iter 420 value 4246.704715
+#> iter 430 value 4242.745783
+#> iter 440 value 4235.074225
+#> iter 450 value 4224.119761
+#> iter 460 value 4186.590663
+#> iter 470 value 4147.228072
+#> iter 480 value 4125.944871
+#> iter 490 value 4116.081550
+#> iter 500 value 4110.070124
+#> iter 510 value 4096.012002
+#> iter 520 value 4090.029372
+#> iter 530 value 4083.813457
+#> iter 540 value 4079.265215
+#> iter 550 value 4078.607704
+#> iter 560 value 4077.825166
+#> iter 570 value 4077.484216
+#> iter 580 value 4076.685026
+#> iter 590 value 4076.533452
+#> iter 600 value 4076.266089
+#> iter 610 value 4073.929939
+#> iter 620 value 4070.512974
+#> iter 630 value 4068.094399
+#> iter 640 value 4067.952698
+#> iter 650 value 4067.930918
+#> final  value 4067.930096 
 #> converged
 ```
 
@@ -2373,9 +2399,9 @@ wage.nn.pred |>
 #>   model    MSE
 #>   <chr>  <dbl>
 #> 1 nn.1  24.423
-#> 2 nn.2  32.163
-#> 3 nn.3  21.948
-#> 4 nn.4  29.739
+#> 2 nn.2  29.864
+#> 3 nn.3  21.635
+#> 4 nn.4  31.981
 ```
 
 
@@ -2401,7 +2427,7 @@ Some points to note:
 
 -   In the second model we try specifying 0.01 for the `decay` argument. As a result
     we notice a much better training RSS (the final value of iteration output), but
-    a significantly worse prediction on the independent test set of $\textsf{MSE}= 32.2$.
+    a significantly worse prediction on the independent test set of $\textsf{MSE}= 29.9$.
     This is due to **overfitting**. We have so many degrees of freedom that we've
     coerced the neural network into fitting the training data too well - with new
     observations that are just a bit different, we get the predictions badly wrong.
@@ -2427,15 +2453,15 @@ Some points to note:
     #>   model     MSE
     #>   <chr>   <dbl>
     #> 1 nn.1  12.952 
-    #> 2 nn.2   8.3982
-    #> 3 nn.3  14.033 
-    #> 4 nn.4  10.217
+    #> 2 nn.2   8.0081
+    #> 3 nn.3  14.054 
+    #> 4 nn.4   9.9151
     ```
 
 -   The third and fourth models differ from the first and second only in that we
     reduce the number of hidden nodes to 5, thus reducing the number of weights
-    to 91. As a result, the prediction errors for the neural nets are $21.9$ for
-    the default value of `decay` and $29.7$ for decay 0.01.
+    to 91. As a result, the prediction errors for the neural nets are $21.6$ for
+    the default value of `decay` and $32$ for decay 0.01.
 :::
 
 ## Summary of Prediction Methods
@@ -2559,6 +2585,13 @@ useful function `initial_split` for this:
 
 ``` r
 library(rsample)
+```
+
+```
+#> Warning: package 'rsample' was built under R version 4.5.2
+```
+
+``` r
 set.seed(442)
 split = initial_split(clock.train, prop = 0.8)
 clock.train.new <- training(split)

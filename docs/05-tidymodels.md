@@ -343,6 +343,13 @@ fit a linear regression and neural network model with the `parsnip` package.
 
 ``` r
 library(parsnip)
+```
+
+```
+#> Warning: package 'parsnip' was built under R version 4.5.2
+```
+
+``` r
 set.seed(1937)
 wage.spec.lm <- linear_reg(mode = "regression",
                            engine = "lm")
@@ -493,6 +500,13 @@ Consider the models fit in Example \@ref(exm:wagefit). The `metrics` function fr
 
 ``` r
 library(yardstick)
+```
+
+```
+#> Warning: package 'yardstick' was built under R version 4.5.2
+```
+
+``` r
 wage.pred |> metrics(truth = WAGE, estimate = pred.lm)
 ```
 
@@ -596,7 +610,13 @@ network specifications from Example \@ref(exm:wagefit).
 
 ``` r
 library(workflows)
+```
 
+```
+#> Warning: package 'workflows' was built under R version 4.5.2
+```
+
+``` r
 wage.wf.lm <- workflow() |>
   add_recipe(wage.recipe) |>
   add_model(wage.spec.lm)
@@ -617,7 +637,7 @@ predict(wage.wf.nn.fit, new_data = wage.validation) |>
 #> 1  5.9473
 #> 2 10.382 
 #> 3 10.301 
-#> 4  9.1854
+#> 4  9.1853
 ```
 
 Some notes:
@@ -650,7 +670,13 @@ We can compare the linear model and neural network workflows using
 
 ``` r
 library(tune)
+```
 
+```
+#> Warning: package 'tune' was built under R version 4.5.2
+```
+
+``` r
 set.seed(1945)
 wage_folds <- vfold_cv(wage.new.train, v = 5)
 
@@ -676,9 +702,9 @@ bind_rows(
 #> 1 linear model   mae     3.0457  0.20526 
 #> 2 linear model   rmse    4.3640  0.42507 
 #> 3 linear model   rsq     0.29957 0.061394
-#> 4 neural network mae     4.3880  0.43099 
-#> 5 neural network rmse    6.2532  0.93070 
-#> 6 neural network rsq     0.16021 0.042837
+#> 4 neural network mae     4.1655  0.30019 
+#> 5 neural network rmse    5.7765  0.58700 
+#> 6 neural network rsq     0.17560 0.032067
 ```
 
 Some notes:

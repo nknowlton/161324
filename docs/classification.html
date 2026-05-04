@@ -1,0 +1,2232 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 6 Classification | Data mining</title>
+  <meta name="description" content="Chapter 6 Classification | Data mining notes" />
+  <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 6 Classification | Data mining" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="Chapter 6 Classification | Data mining notes" />
+  <meta name="github-repo" content="jmarshallnz/161324" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 6 Classification | Data mining" />
+  
+  <meta name="twitter:description" content="Chapter 6 Classification | Data mining notes" />
+  
+
+<meta name="author" content="Jonathan Marshall, Martin Hazelton, Nick Knowlton" />
+
+
+<meta name="date" content="2026-05-03" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="tidy-modelling.html"/>
+<link rel="next" href="cluster-analysis.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet" />
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="libs/datatables-binding-0.34.0/datatables.js"></script>
+<link href="libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+<link href="libs/nouislider-7.0.10/jquery.nouislider.min.css" rel="stylesheet" />
+<script src="libs/nouislider-7.0.10/jquery.nouislider.min.js"></script>
+<link href="libs/selectize-0.12.0/selectize.bootstrap3.css" rel="stylesheet" />
+<script src="libs/selectize-0.12.0/selectize.min.js"></script>
+<link href="libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+
+
+<style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">161.324 Data Mining</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="introduction.html"><a href="introduction.html#sec:intro1"><i class="fa fa-check"></i><b>1.1</b> What is Data Mining?</a></li>
+<li class="chapter" data-level="1.2" data-path="introduction.html"><a href="introduction.html#sec:Rinitial"><i class="fa fa-check"></i><b>1.2</b> Statistical Computing with R</a></li>
+<li class="chapter" data-level="1.3" data-path="introduction.html"><a href="introduction.html#the-tidyverse"><i class="fa fa-check"></i><b>1.3</b> The tidyverse</a></li>
+<li class="chapter" data-level="1.4" data-path="introduction.html"><a href="introduction.html#sec:notes-roadmap"><i class="fa fa-check"></i><b>1.4</b> A roadmap for these notes</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="introduction.html"><a href="introduction.html#sec:task-compare"><i class="fa fa-check"></i><b>1.4.1</b> Comparing the main task families</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html"><i class="fa fa-check"></i><b>2</b> Data Acquisition and Processing</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#obtaining-data"><i class="fa fa-check"></i><b>2.1</b> Obtaining Data</a></li>
+<li class="chapter" data-level="2.2" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#sec:dataload"><i class="fa fa-check"></i><b>2.2</b> Loading Data into R</a></li>
+<li class="chapter" data-level="2.3" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#organizing-the-data-in-r"><i class="fa fa-check"></i><b>2.3</b> Organizing the Data in R</a></li>
+<li class="chapter" data-level="2.4" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#sec:missing1"><i class="fa fa-check"></i><b>2.4</b> Missing Values</a></li>
+<li class="chapter" data-level="2.5" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#summary"><i class="fa fa-check"></i><b>2.5</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>3</b> Missing values</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="missing-values.html"><a href="missing-values.html#sec:missing"><i class="fa fa-check"></i><b>3.1</b> Patterns of Missingness</a></li>
+<li class="chapter" data-level="3.2" data-path="missing-values.html"><a href="missing-values.html#visualising-missing-values"><i class="fa fa-check"></i><b>3.2</b> Visualising missing values</a></li>
+<li class="chapter" data-level="3.3" data-path="missing-values.html"><a href="missing-values.html#working-with-complete-cases"><i class="fa fa-check"></i><b>3.3</b> Working with Complete Cases</a></li>
+<li class="chapter" data-level="3.4" data-path="missing-values.html"><a href="missing-values.html#sec:imputation"><i class="fa fa-check"></i><b>3.4</b> Missing Data Imputation</a></li>
+<li class="chapter" data-level="3.5" data-path="missing-values.html"><a href="missing-values.html#alternative-methods-of-imputation"><i class="fa fa-check"></i><b>3.5</b> Alternative Methods of Imputation</a></li>
+<li class="chapter" data-level="3.6" data-path="missing-values.html"><a href="missing-values.html#summary-1"><i class="fa fa-check"></i><b>3.6</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="prediction.html"><a href="prediction.html"><i class="fa fa-check"></i><b>4</b> Prediction</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="prediction.html"><a href="prediction.html#prediction-classification-and-clustering"><i class="fa fa-check"></i><b>4.1</b> Prediction, Classification and Clustering</a></li>
+<li class="chapter" data-level="4.2" data-path="prediction.html"><a href="prediction.html#sec:predictionbasics"><i class="fa fa-check"></i><b>4.2</b> The Basics of Prediction</a></li>
+<li class="chapter" data-level="4.3" data-path="prediction.html"><a href="prediction.html#sec:regress"><i class="fa fa-check"></i><b>4.3</b> Linear Regression for Prediction</a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="prediction.html"><a href="prediction.html#data-structures-and-notation"><i class="fa fa-check"></i><b>4.3.1</b> Data Structures and Notation</a></li>
+<li class="chapter" data-level="4.3.2" data-path="prediction.html"><a href="prediction.html#the-linear-regression-model"><i class="fa fa-check"></i><b>4.3.2</b> The Linear Regression Model</a></li>
+<li class="chapter" data-level="4.3.3" data-path="prediction.html"><a href="prediction.html#fitting-linear-regression-models"><i class="fa fa-check"></i><b>4.3.3</b> Fitting Linear Regression Models</a></li>
+<li class="chapter" data-level="4.3.4" data-path="prediction.html"><a href="prediction.html#prediction-1"><i class="fa fa-check"></i><b>4.3.4</b> Prediction</a></li>
+<li class="chapter" data-level="4.3.5" data-path="prediction.html"><a href="prediction.html#prediction-accuracy-and-the-bias-variance-trade-off"><i class="fa fa-check"></i><b>4.3.5</b> Prediction Accuracy and the Bias-Variance Trade-Off</a></li>
+<li class="chapter" data-level="4.3.6" data-path="prediction.html"><a href="prediction.html#model-selection"><i class="fa fa-check"></i><b>4.3.6</b> Model Selection</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="prediction.html"><a href="prediction.html#sec:regtree"><i class="fa fa-check"></i><b>4.4</b> Regression Trees</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="prediction.html"><a href="prediction.html#sec:introtree"><i class="fa fa-check"></i><b>4.4.1</b> Introduction to Regression Trees</a></li>
+<li class="chapter" data-level="4.4.2" data-path="prediction.html"><a href="prediction.html#how-to-grow-a-tree"><i class="fa fa-check"></i><b>4.4.2</b> How to Grow a Tree</a></li>
+<li class="chapter" data-level="4.4.3" data-path="prediction.html"><a href="prediction.html#implementing-regression-trees-in-r"><i class="fa fa-check"></i><b>4.4.3</b> Implementing Regression Trees in R</a></li>
+<li class="chapter" data-level="4.4.4" data-path="prediction.html"><a href="prediction.html#sec:treeprune"><i class="fa fa-check"></i><b>4.4.4</b> Pruning</a></li>
+<li class="chapter" data-level="4.4.5" data-path="prediction.html"><a href="prediction.html#sec:validation"><i class="fa fa-check"></i><b>4.4.5</b> Validation and Cross-Validation</a></li>
+<li class="chapter" data-level="4.4.6" data-path="prediction.html"><a href="prediction.html#sec:treeinstability"><i class="fa fa-check"></i><b>4.4.6</b> Tree instability</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="prediction.html"><a href="prediction.html#sec:randomforest"><i class="fa fa-check"></i><b>4.5</b> Random forests</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="prediction.html"><a href="prediction.html#implementation-in-r"><i class="fa fa-check"></i><b>4.5.1</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="prediction.html"><a href="prediction.html#sec:neuralnet"><i class="fa fa-check"></i><b>4.6</b> Neural Networks</a>
+<ul>
+<li class="chapter" data-level="4.6.1" data-path="prediction.html"><a href="prediction.html#an-introduction-to-neural-networks"><i class="fa fa-check"></i><b>4.6.1</b> An Introduction to Neural Networks</a></li>
+<li class="chapter" data-level="4.6.2" data-path="prediction.html"><a href="prediction.html#building-a-neural-network"><i class="fa fa-check"></i><b>4.6.2</b> Building a Neural Network</a></li>
+<li class="chapter" data-level="4.6.3" data-path="prediction.html"><a href="prediction.html#prediction-using-neural-networks-in-r"><i class="fa fa-check"></i><b>4.6.3</b> Prediction Using Neural Networks in R</a></li>
+</ul></li>
+<li class="chapter" data-level="4.7" data-path="prediction.html"><a href="prediction.html#summary-of-prediction-methods"><i class="fa fa-check"></i><b>4.7</b> Summary of Prediction Methods</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="tidy-modelling.html"><a href="tidy-modelling.html"><i class="fa fa-check"></i><b>5</b> Tidy modelling</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="tidy-modelling.html"><a href="tidy-modelling.html#splitting-and-resampling-data"><i class="fa fa-check"></i><b>5.1</b> Splitting and resampling data</a></li>
+<li class="chapter" data-level="5.2" data-path="tidy-modelling.html"><a href="tidy-modelling.html#data-processing-with-recipes"><i class="fa fa-check"></i><b>5.2</b> Data processing with recipes</a></li>
+<li class="chapter" data-level="5.3" data-path="tidy-modelling.html"><a href="tidy-modelling.html#modelling-with-parsnip"><i class="fa fa-check"></i><b>5.3</b> Modelling with parsnip</a></li>
+<li class="chapter" data-level="5.4" data-path="tidy-modelling.html"><a href="tidy-modelling.html#model-performance-with-yardstick"><i class="fa fa-check"></i><b>5.4</b> Model performance with yardstick</a></li>
+<li class="chapter" data-level="5.5" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-workflow"><i class="fa fa-check"></i><b>5.5</b> Workflows</a></li>
+<li class="chapter" data-level="5.6" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-resamples"><i class="fa fa-check"></i><b>5.6</b> Resampling with <code>fit_resamples()</code></a></li>
+<li class="chapter" data-level="5.7" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-tuning"><i class="fa fa-check"></i><b>5.7</b> Simple tuning with <code>tune_grid()</code></a></li>
+<li class="chapter" data-level="5.8" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-final"><i class="fa fa-check"></i><b>5.8</b> Final model fitting with <code>last_fit()</code></a></li>
+<li class="chapter" data-level="5.9" data-path="tidy-modelling.html"><a href="tidy-modelling.html#summary-2"><i class="fa fa-check"></i><b>5.9</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="classification.html"><a href="classification.html"><i class="fa fa-check"></i><b>6</b> Classification</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="classification.html"><a href="classification.html#introduction-to-classification"><i class="fa fa-check"></i><b>6.1</b> Introduction to Classification</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="classification.html"><a href="classification.html#statistical-theory-for-classification"><i class="fa fa-check"></i><b>6.1.1</b> Statistical Theory for Classification</a></li>
+<li class="chapter" data-level="6.1.2" data-path="classification.html"><a href="classification.html#misclassification-rates-and-confusion-matrices"><i class="fa fa-check"></i><b>6.1.2</b> Misclassification Rates and Confusion Matrices</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="classification.html"><a href="classification.html#sec:lda"><i class="fa fa-check"></i><b>6.2</b> Linear Discriminant Analysis</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="classification.html"><a href="classification.html#the-method-in-theory"><i class="fa fa-check"></i><b>6.2.1</b> The Method in Theory</a></li>
+<li class="chapter" data-level="6.2.2" data-path="classification.html"><a href="classification.html#implementation-in-r-1"><i class="fa fa-check"></i><b>6.2.2</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="classification.html"><a href="classification.html#sec:kda"><i class="fa fa-check"></i><b>6.3</b> Kernel Discriminant Analysis</a></li>
+<li class="chapter" data-level="6.4" data-path="classification.html"><a href="classification.html#sec:naive"><i class="fa fa-check"></i><b>6.4</b> Naive Bayes Classifiers</a></li>
+<li class="chapter" data-level="6.5" data-path="classification.html"><a href="classification.html#logistic-regression"><i class="fa fa-check"></i><b>6.5</b> Logistic regression</a>
+<ul>
+<li class="chapter" data-level="6.5.1" data-path="classification.html"><a href="classification.html#fitting-logistic-regression-models"><i class="fa fa-check"></i><b>6.5.1</b> Fitting Logistic Regression Models</a></li>
+<li class="chapter" data-level="6.5.2" data-path="classification.html"><a href="classification.html#logistic-regression-as-a-classifier"><i class="fa fa-check"></i><b>6.5.2</b> Logistic Regression as a classifier</a></li>
+<li class="chapter" data-level="6.5.3" data-path="classification.html"><a href="classification.html#sec:multinomial"><i class="fa fa-check"></i><b>6.5.3</b> Extending Logistic Regression to more than two classes</a></li>
+<li class="chapter" data-level="6.5.4" data-path="classification.html"><a href="classification.html#model-selection-1"><i class="fa fa-check"></i><b>6.5.4</b> Model selection</a></li>
+<li class="chapter" data-level="6.5.5" data-path="classification.html"><a href="classification.html#sec:roc"><i class="fa fa-check"></i><b>6.5.5</b> ROC curves and the classification threshold</a></li>
+</ul></li>
+<li class="chapter" data-level="6.6" data-path="classification.html"><a href="classification.html#other-methods-of-classification"><i class="fa fa-check"></i><b>6.6</b> Other Methods of Classification</a>
+<ul>
+<li class="chapter" data-level="6.6.1" data-path="classification.html"><a href="classification.html#k-nearest-neighbour-classification"><i class="fa fa-check"></i><b>6.6.1</b> k-Nearest Neighbour Classification</a></li>
+<li class="chapter" data-level="6.6.2" data-path="classification.html"><a href="classification.html#classification-trees"><i class="fa fa-check"></i><b>6.6.2</b> Classification Trees</a></li>
+<li class="chapter" data-level="6.6.3" data-path="classification.html"><a href="classification.html#random-forests-for-classification"><i class="fa fa-check"></i><b>6.6.3</b> Random Forests for Classification</a></li>
+<li class="chapter" data-level="6.6.4" data-path="classification.html"><a href="classification.html#neural-networks-for-classification"><i class="fa fa-check"></i><b>6.6.4</b> Neural Networks for Classification</a></li>
+</ul></li>
+<li class="chapter" data-level="6.7" data-path="classification.html"><a href="classification.html#sec:classimbalance"><i class="fa fa-check"></i><b>6.7</b> Dealing with Class Imbalance</a>
+<ul>
+<li class="chapter" data-level="6.7.1" data-path="classification.html"><a href="classification.html#resampling-strategies"><i class="fa fa-check"></i><b>6.7.1</b> Resampling strategies</a></li>
+<li class="chapter" data-level="6.7.2" data-path="classification.html"><a href="classification.html#sec:smote"><i class="fa fa-check"></i><b>6.7.2</b> SMOTE: synthetic minority oversampling</a></li>
+</ul></li>
+<li class="chapter" data-level="6.8" data-path="classification.html"><a href="classification.html#high-class-classifiers"><i class="fa fa-check"></i><b>6.8</b> High Class Classifiers</a></li>
+<li class="chapter" data-level="6.9" data-path="classification.html"><a href="classification.html#summary-3"><i class="fa fa-check"></i><b>6.9</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="cluster-analysis.html"><a href="cluster-analysis.html"><i class="fa fa-check"></i><b>7</b> Cluster Analysis</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#dissimilarity-matrices-for-multivariate-data"><i class="fa fa-check"></i><b>7.1</b> Dissimilarity Matrices for Multivariate Data</a></li>
+<li class="chapter" data-level="7.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering"><i class="fa fa-check"></i><b>7.2</b> Hierarchical Clustering</a></li>
+<li class="chapter" data-level="7.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means-clustering"><i class="fa fa-check"></i><b>7.3</b> K-means clustering</a></li>
+<li class="chapter" data-level="7.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-medoids-clustering"><i class="fa fa-check"></i><b>7.4</b> K-medoids clustering</a></li>
+<li class="chapter" data-level="7.5" data-path="cluster-analysis.html"><a href="cluster-analysis.html#silhouette-plots"><i class="fa fa-check"></i><b>7.5</b> Silhouette plots</a></li>
+<li class="chapter" data-level="7.6" data-path="cluster-analysis.html"><a href="cluster-analysis.html#bootstrap-stability-and-the-adjusted-rand-index"><i class="fa fa-check"></i><b>7.6</b> Bootstrap stability and the adjusted Rand index</a></li>
+<li class="chapter" data-level="7.7" data-path="cluster-analysis.html"><a href="cluster-analysis.html#density-based-clustering"><i class="fa fa-check"></i><b>7.7</b> Density-based clustering</a></li>
+<li class="chapter" data-level="7.8" data-path="cluster-analysis.html"><a href="cluster-analysis.html#choosing-varepsilon-using-a-k-distance-plot"><i class="fa fa-check"></i><b>7.8</b> Choosing <span class="math inline">\(\varepsilon\)</span> using a <span class="math inline">\(k\)</span>-distance plot</a></li>
+<li class="chapter" data-level="7.9" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hdbscan-and-umap"><i class="fa fa-check"></i><b>7.9</b> HDBSCAN and UMAP</a>
+<ul>
+<li class="chapter" data-level="7.9.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#sec:hdbscan"><i class="fa fa-check"></i><b>7.9.1</b> HDBSCAN</a></li>
+<li class="chapter" data-level="7.9.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#sec:umap"><i class="fa fa-check"></i><b>7.9.2</b> UMAP</a></li>
+<li class="chapter" data-level="7.9.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#sec:cluster-compare"><i class="fa fa-check"></i><b>7.9.3</b> Practical method comparison</a></li>
+</ul></li>
+<li class="chapter" data-level="7.10" data-path="cluster-analysis.html"><a href="cluster-analysis.html#summary-4"><i class="fa fa-check"></i><b>7.10</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="association-rule-mining.html"><a href="association-rule-mining.html"><i class="fa fa-check"></i><b>8</b> Association rule mining</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="association-rule-mining.html"><a href="association-rule-mining.html#transaction-data-as-a-binary-matrix"><i class="fa fa-check"></i><b>8.1</b> Transaction data as a binary matrix</a></li>
+<li class="chapter" data-level="8.2" data-path="association-rule-mining.html"><a href="association-rule-mining.html#the-apriori-principle"><i class="fa fa-check"></i><b>8.2</b> The Apriori principle</a></li>
+<li class="chapter" data-level="8.3" data-path="association-rule-mining.html"><a href="association-rule-mining.html#the-apriori-algorithm"><i class="fa fa-check"></i><b>8.3</b> The Apriori algorithm</a></li>
+<li class="chapter" data-level="8.4" data-path="association-rule-mining.html"><a href="association-rule-mining.html#apriori-and-eclat"><i class="fa fa-check"></i><b>8.4</b> Apriori and Eclat</a></li>
+<li class="chapter" data-level="8.5" data-path="association-rule-mining.html"><a href="association-rule-mining.html#inspecting-and-filtering-rules-in-arules"><i class="fa fa-check"></i><b>8.5</b> Inspecting and filtering rules in <code>arules</code></a></li>
+<li class="chapter" data-level="8.6" data-path="association-rule-mining.html"><a href="association-rule-mining.html#sec:association-fit"><i class="fa fa-check"></i><b>8.6</b> Where association rules fit</a></li>
+<li class="chapter" data-level="8.7" data-path="association-rule-mining.html"><a href="association-rule-mining.html#summary-5"><i class="fa fa-check"></i><b>8.7</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="sec:ensemble.html"><a href="sec:ensemble.html"><i class="fa fa-check"></i><b>9</b> Ensemble Learning</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:ensemble-motivation"><i class="fa fa-check"></i><b>9.1</b> Motivation: Why Combine Models?</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#the-variance-reduction-argument"><i class="fa fa-check"></i><b>9.1.1</b> The variance reduction argument</a></li>
+<li class="chapter" data-level="9.1.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#bias-vs-variance-in-ensembles"><i class="fa fa-check"></i><b>9.1.2</b> Bias vs variance in ensembles</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:bagging"><i class="fa fa-check"></i><b>9.2</b> Bagging</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#the-bootstrap-aggregating-algorithm"><i class="fa fa-check"></i><b>9.2.1</b> The bootstrap aggregating algorithm</a></li>
+<li class="chapter" data-level="9.2.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:oob"><i class="fa fa-check"></i><b>9.2.2</b> Out-of-bag error</a></li>
+<li class="chapter" data-level="9.2.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#implementation-in-r-2"><i class="fa fa-check"></i><b>9.2.3</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:ensemblerf"><i class="fa fa-check"></i><b>9.3</b> Random Forests</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:varimp"><i class="fa fa-check"></i><b>9.3.1</b> Variable importance</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:boosting"><i class="fa fa-check"></i><b>9.4</b> Boosting</a>
+<ul>
+<li class="chapter" data-level="9.4.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#forward-stagewise-additive-modelling"><i class="fa fa-check"></i><b>9.4.1</b> Forward stagewise additive modelling</a></li>
+<li class="chapter" data-level="9.4.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:gradboosting"><i class="fa fa-check"></i><b>9.4.2</b> Gradient boosting</a></li>
+<li class="chapter" data-level="9.4.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:xgboost"><i class="fa fa-check"></i><b>9.4.3</b> XGBoost: regularised gradient boosting</a></li>
+<li class="chapter" data-level="9.4.4" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:boost-r"><i class="fa fa-check"></i><b>9.4.4</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="9.5" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:stacking"><i class="fa fa-check"></i><b>9.5</b> Stacking</a>
+<ul>
+<li class="chapter" data-level="9.5.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#stacked-generalisation"><i class="fa fa-check"></i><b>9.5.1</b> Stacked generalisation</a></li>
+<li class="chapter" data-level="9.5.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:cv-meta"><i class="fa fa-check"></i><b>9.5.2</b> Cross-validated meta-features</a></li>
+<li class="chapter" data-level="9.5.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:stacking-r"><i class="fa fa-check"></i><b>9.5.3</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="9.6" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:automl"><i class="fa fa-check"></i><b>9.6</b> AutoML: Automated Model Selection</a></li>
+<li class="chapter" data-level="9.7" data-path="sec:ensemble.html"><a href="sec:ensemble.html#summary-6"><i class="fa fa-check"></i><b>9.7</b> Summary</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Data mining</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="classification" class="section level1 hasAnchor" number="6">
+<h1><span class="header-section-number">Chapter 6</span> Classification<a href="classification.html#classification" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="introduction-to-classification" class="section level2 hasAnchor" number="6.1">
+<h2><span class="header-section-number">6.1</span> Introduction to Classification<a href="classification.html#introduction-to-classification" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In classification, our goal is to assign each observation in the test
+dataset to one of a number of pre-specified categories. We do so using
+information from the observed predictor variables (or ‘features’), based
+on a classification rule derived using the training data. Applications
+of classification analysis are manifold, ranging from biological
+taxonomy (the assignment organisms to species) to diagnosis of disease,
+to the assessment of credit risk.</p>
+<p>As with the prediction problem, in practice we will have training and
+test datasets. For the training data we will have a record of both the
+features and the true class membership for each case. The training data
+can then be used to create a method for linking class membership to the
+features. In the test data we will have just the features. We can then
+apply the classification method developed on the training data to
+allocate each test case to a group.</p>
+<p>As we did when discussing prediction, we will at times look at validation
+datasets (i.e. artificial test datasets) in which the true class
+memberships are available. This is for illustrative purposes, helping us
+to compare and contrast various classification technique.</p>
+<p><strong>How this chapter connects.</strong> This chapter focuses on the main
+classification methods and the ideas behind them. When we want a more
+reproducible implementation path with recipes, workflows, resampling,
+and tuning, Chapter 5 is the place to look. The comparison table in
+Section <a href="introduction.html#sec:task-compare">1.4.1</a> is also a useful reminder of how
+classification differs from prediction, clustering, and association
+rules.</p>
+<p>As an example of a classification problem, recall the Italian wine data
+that we met in Exercise 1 of Laboratory 4. Thinking of this as a
+training dataset, we display in Figure <a href="classification.html#fig:wineclass">6.1</a> a
+scatterplot of the percentage alcohol content of the wine against its
+hue, with the data plotted using different colour plotting symbols for
+each of the three cultivars. These three groups are quite well separated
+on just the plotted variables, suggesting that we should be able to
+derive a classification method with a high degree of accuracy when using
+information from all the variables.</p>
+<div class="figure"><span style="display:block;" id="fig:wineclass"></span>
+<img src="06-classification_files/figure-html/wineclass-1.png" alt="Plot of percentage alcohol content against hue for a sample of Italian wines. The coloured plotting symbols distinguish the three different cultivars for the wines." width="672" />
+<p class="caption">
+Figure 6.1: Plot of percentage alcohol content against hue for a sample of Italian wines. The coloured plotting symbols distinguish the three different cultivars for the wines.
+</p>
+</div>
+<p>If we think of class membership as being defined by a categorical target
+variable, then this mirrors the prediction problem studied except for
+the nature of the target. It should therefore be no surprise that some
+of the techniques that we met in the context of prediction can also be
+applied to the classification problem with only minor modifications.
+Tree-based methods and neural networks are two prime examples that will
+be considered in this chapter. We shall also a examine some specialized
+methods for classification, including logistic regression, linear
+discriminant analysis, kernel discriminant analysis and naive Bayes
+classifiers<a href="#fn49" class="footnote-ref" id="fnref49"><sup>49</sup></a>.</p>
+<p>In general, no classification method is likely to be 100% accurate. This
+is because there will always be inherent uncertainty on class membership
+based upon the observed features. For example, suppose that we try to
+classify human sex based on height and weight. A person of 185cm and
+85kg is likely to be male, but is not certain to be so. The best we can
+do is to try and evaluate <em>classification probabilities</em>. These are the
+probabilities of membership of the possible classes given the observed
+features: <span class="math inline">\({\textsf P}(\mbox{class} | \mbox{features})\)</span>.</p>
+<p>We will usually assign each test case to the class with highest
+classification probability. However, this is not always the case, since
+in some situations there are differing costs associated between
+different types of mistake. For example, consider a dermatologist
+classifying each skin lesion as benign or malignant. Mistakenly
+classifying a lesion that is benign to the malignant class will result
+in unnecessary treatment, but that is a less critical error than
+classifying a malignant lesion as benign, when the delay in treatment
+might be fatal. As a consequence, a dermatologist may act as if a lesion
+is malignant (for example, by excising it) even if
+<span class="math inline">\({\textsf P}(\mbox{malignant} | \mbox{features}) = 0.1\)</span>.</p>
+<p>Our broad approach to classification must be to estimate the
+classification probabilities. There are two ways in which we might do
+this: generational and discriminatory. Discriminatory (or <em>conditional</em>)
+methods seek to estimate the classification probabilities directly.
+Generational methods compute the classification problems by first
+estimating related quantities, following a statistical theory for
+classification which we now discuss.</p>
+<div id="statistical-theory-for-classification" class="section level3 hasAnchor" number="6.1.1">
+<h3><span class="header-section-number">6.1.1</span> Statistical Theory for Classification<a href="classification.html#statistical-theory-for-classification" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>In classification we assume that each observation belongs to one of a
+finite number of classes, which we will label <span class="math inline">\(1, 2, \ldots, C\)</span>. We will
+make each classification based on the observed vector
+<span class="math inline">\(\boldsymbol{x}= (x_1, x_2, \ldots, x_p)\)</span> of variables (features). Let
+the joint probability function<a href="#fn50" class="footnote-ref" id="fnref50"><sup>50</sup></a> of <span class="math inline">\(\boldsymbol{x}\)</span> for individuals
+in class <span class="math inline">\(j\)</span> be denoted by <span class="math inline">\(f_j\)</span>.</p>
+<p>Now, suppose that we have some prior ideas about the probabilities of
+each class; denote these by <span class="math inline">\(\pi_1, \ldots, \pi_C\)</span>. If the training data
+are a random sample then we can use the relative proportions to provide
+these prior probabilities – that is, <span class="math inline">\(\pi_j = n_j/n\)</span> where <span class="math inline">\(n_j\)</span> is the
+number of training observations in class <span class="math inline">\(j\)</span>, and <span class="math inline">\(n\)</span> is the total
+number of training observations. This is the default method of
+estimating the priors for most classifiers implemented in R. In other
+situations we might have exogenous information about the class
+probabilities. Sometimes we will have no useful information, when the
+best course may be to simply set them equal: <span class="math inline">\(\pi_j = 1/C\)</span> for all
+<span class="math inline">\(j=1,\ldots,C\)</span>.</p>
+<p>Suppose for now that the probability functions <span class="math inline">\(f_1, \ldots, f_C\)</span> and
+prior probabilities are all known. We observe an individual with feature
+vector <span class="math inline">\(\boldsymbol{x}\)</span>. Which class is this individual most likely to
+belong to? To answer this, we must compute the conditional probabilities
+<span class="math inline">\({\textsf P}(j | \boldsymbol{x})\)</span> for <span class="math inline">\(j=1,\ldots,C\)</span>. The quantity
+<span class="math inline">\({\textsf P}(j | \boldsymbol{x})\)</span> is the probability that the individual
+belongs to class <span class="math inline">\(j\)</span> given that they have feature vector
+<span class="math inline">\(\boldsymbol{x}\)</span>. Now, by Bayes’ Theorem<a href="#fn51" class="footnote-ref" id="fnref51"><sup>51</sup></a> we have
+<span class="math display" id="eq:bayes">\[\begin{equation}
+{\textsf P}(j | \boldsymbol{x}) = \frac{ \pi_j f_j(\boldsymbol{x}) }{f(\boldsymbol{x})}~~~~~~~~~~(j=1,\ldots,C)
+\tag{6.1}
+\end{equation}\]</span>
+where <span class="math inline">\(f(\boldsymbol{x}) = \sum_j \pi_j f_j(\boldsymbol{x})\)</span>. Because the
+denominator on the right-hand side of Equation <a href="classification.html#eq:bayes">(6.1)</a>
+does not depend upon the class <span class="math inline">\(j\)</span>, it follows that the most probable
+class is the one for which <span class="math inline">\(\pi_j f_j(\boldsymbol{x})\)</span> is largest.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-30" class="example"><strong>Example 6.1  </strong></span><strong>Some Bayesian Reassurance for a Hypochondriac</strong></p>
+<p>A nervous patient has a set of blood test results <span class="math inline">\(\boldsymbol{x}\)</span>. He
+surfs the Internet, and finds that the probability that a normal healthy
+individual will return such results is <span class="math inline">\(0.01\)</span>, but that for people with
+Erdheim-Chester disease such test results would be reasonably common,
+appearing with probability <span class="math inline">\(0.5\)</span>. However, his GP (an avid Bayesian!)
+seems very unconcerned. She notes that this is a classification problem
+with two categories: diseased (class 1) and non-diseased (class 2). It
+is well known that Erdheim-Chester disease is a very rare condition, so
+that <span class="math inline">\(\pi_1 = 0.000001\)</span> (i.e. 1 in a million), and hence
+<span class="math inline">\(\pi_2 = 1 - \pi_1 = 0.999999\)</span>. From the test results the GP knows that
+<span class="math inline">\(f_1(\boldsymbol{x}) = 0.5\)</span> and <span class="math inline">\(f_2(\boldsymbol{x}) = 0.01\)</span>, but she
+computes the conditional probability of being diseased given the test
+results as
+<span class="math display">\[{\textsf P}(1 | \boldsymbol{x}) = \frac{ 0.000001 \times 0.5 }{0.000001 \times 0.5 + 0.999999 \times 0.01} \approx 0.00005.\]</span>
+It is extremely unlikely that the patient’s worries are well founded.</p>
+</div>
+</div>
+<div id="misclassification-rates-and-confusion-matrices" class="section level3 hasAnchor" number="6.1.2">
+<h3><span class="header-section-number">6.1.2</span> Misclassification Rates and Confusion Matrices<a href="classification.html#misclassification-rates-and-confusion-matrices" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>In order to implement classification based on the posterior
+probabilities in Equation <a href="classification.html#eq:bayes">(6.1)</a> we need the prior probabilities <span class="math inline">\(\pi_j\)</span> and the
+probability functions <span class="math inline">\(f_j\)</span> for all classes <span class="math inline">\(j=1,\ldots,C\)</span>. Obtaining
+values for <span class="math inline">\(\pi_1,\ldots,\pi_C\)</span> will not usually be a problem, as
+discussed above. The challenge is to obtain estimates of
+<span class="math inline">\(f_1,\ldots,f_C\)</span> from the training data. We shall examine a number of
+options.</p>
+<ul>
+<li><p>Assume that <span class="math inline">\(f_1,\ldots,f_C\)</span> are normal probability density
+functions (for continuous random variables). This leads to the
+method of linear discriminant analysis (Section <a href="classification.html#sec:lda">6.2</a>).</p></li>
+<li><p>Estimate <span class="math inline">\(f_1,\ldots,f_C\)</span> using kernel density estimation. This
+leads to the method of kernel discriminant analysis (Section <a href="classification.html#sec:kda">6.3</a>).</p></li>
+<li><p>Factorize the joint probability functions to facilitate their
+estimation, leading to naive Bayesian classification (Section <a href="classification.html#sec:naive">6.4</a>).</p></li>
+</ul>
+<p>Given this variety of methods, as well as the more generic tree-based
+and neural network classifiers, which should we prefer? We will usually
+want to select the method with the lowest <em>misclassification rate</em>. The
+misclassification rate is simply the proportion of observations that are
+assigned to the wrong class. A more detailed analysis of the performance
+of each classifier can be obtained from the <em>error matrix</em> or <em>confusion
+matrix</em>, which cross-tabulates true and predicted classes. In some cases
+the impact of certain types of misclassification may be far greater than
+others, in which case one my wish to consider a weighted error rate.
+This can occur, for example, in medical testing, where the consequences
+of false positives may be somewhat unpleasant (e.g. unnecessary
+biopsies) but the consequence of false negatives can be fatal
+(e.g. failure to detect a disease while it is still treatable).</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-31" class="example"><strong>Example 6.2  </strong></span><strong>Comparison of Tests for Tuberculosis</strong></p>
+<p>The Mantoux and Heaf tests are both used to detect tuberculosis in
+patients. Suppose that they are each applied to 1000 subjects suspected
+of having the disease, giving the following confusion tables. Note that
+disease status is the true class here (positive or negative for
+tuberculosis) and the test result (positive or negative) is the
+predicted class.</p>
+<table class="kable_wrapper">
+<caption>
+<span id="tab:unnamed-chunk-2">Table 6.1: </span>Performance of the Mantoux (left) and Heaf (right) tests for detecting tuberculosis
+</caption>
+<tbody>
+<tr>
+<td>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Disease +</th>
+<th align="right">Disease -</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Test +</td>
+<td align="right">50</td>
+<td align="right">50</td>
+</tr>
+<tr class="even">
+<td align="left">Test -</td>
+<td align="right">1</td>
+<td align="right">899</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Disease +</th>
+<th align="right">Disease -</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Test +</td>
+<td align="right">40</td>
+<td align="right">30</td>
+</tr>
+<tr class="even">
+<td align="left">Test -</td>
+<td align="right">11</td>
+<td align="right">929</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The overall misclassification rate for the Mantoux test is
+<span class="math inline">\(51/1000 = 5.1\%\)</span>, while the over misclassification rate for the Heaf
+test is <span class="math inline">\(41/1000 = 4.1\%\)</span>. However, if we assign severity weights 1 to
+false positives and 10 to false negatives, then the weighed error is
+<span class="math inline">\((50+1 \times 10)/1000 = 0.06\)</span> for the Mantoux test, which is rather
+better than the figure of <span class="math inline">\((30+11\times 10)/1000 = 0.14\)</span> for the Heaf
+test.</p>
+</div>
+<p>In practice we will need to estimate the misclassification rate for each
+classifier that we use. Recall from the previous chapter that assessing
+predictive accuracy (in terms of mean squared error) based on
+predictions on the training data led to an overly optimistic assessment.
+The methods enjoyed ‘home ground advantage’. The same issue applies in
+classification. If we develop a classification rule on the training
+data, then it will tend to perform especially well on those data, and in
+particular better than it would on real test data. We therefore need a
+more independent method for estimation misclassification rates.</p>
+<p>If we have an independent validation dataset for which the correct class
+assignments are know, then misclassification rates can be assessed based
+on performance thereon. As we saw previously, this could be achieve by
+splitting the original training dataset into a smaller (new) training
+set and a separate validation set, typically in a ratio of around 3:1.
+Alternatively, we can employ cross-validation techniques, following
+along the same lines as in Section <a href="prediction.html#sec:validation">4.4.5</a>
+(but with the squared error performance
+measure replaced by the misclassification rate).</p>
+</div>
+</div>
+<div id="sec:lda" class="section level2 hasAnchor" number="6.2">
+<h2><span class="header-section-number">6.2</span> Linear Discriminant Analysis<a href="classification.html#sec:lda" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="the-method-in-theory" class="section level3 hasAnchor" number="6.2.1">
+<h3><span class="header-section-number">6.2.1</span> The Method in Theory<a href="classification.html#the-method-in-theory" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Linear discriminant analysis (often abbreviated to LDA) is applicable
+when all the features are quantitative. The method relies critically on
+the assumption that that the joint distributions of the features is
+multivariate normal, with a covariance matrix that is the same from
+class to class. The thing which distinguishes the groups is inter-class
+variation of the vector of feature means.</p>
+<p>Consider a very simply case where there are just <span class="math inline">\(C=2\)</span> classes, and just
+<span class="math inline">\(p=2\)</span> numerical features, <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span>. Suppose that these features
+are statistically independent, and that the standard deviation of each
+is equal to one (irrespective of class). Finally, let both features have
+mean zero in group 1, and let both features have mean 1 in group 2. In
+other words, if <span class="math inline">\(\mu_{ij}\)</span> is the mean for feature <span class="math inline">\(i\)</span> in group <span class="math inline">\(j\)</span> then
+<span class="math inline">\(\mu_{11} = \mu_{21} = 0\)</span>, and <span class="math inline">\(\mu_{12} = \mu_{22} = 1\)</span>. Now, using
+standard results for the multivariate normal distribution<a href="#fn52" class="footnote-ref" id="fnref52"><sup>52</sup></a>, we have
+<span class="math display">\[\begin{aligned}
+f_j(\boldsymbol{x}) &amp;= \frac{1}{2 \pi} \exp \left \{ -\frac {(x_1 - \mu_{1j})^2}{2} \right \}  \exp \left \{ -\frac{(x_2 - \mu_{2j})^2}{2} \right \}\\
+         &amp;=
+\left \{
+\begin{array}{ll}
+\frac{1}{2 \pi} \exp \left \{ -\frac{x_1^2}{2} - \frac{x_2^2}{2} \right \}         &amp; \mbox{for class $j=1$}\\
+\frac{1}{2 \pi} \exp \left \{ -\frac{(x_1-1)^2}{2} - \frac{(x_2-1)^2}{2} \right \} &amp; \mbox{for class $j=2$}
+\end{array}
+\right .\end{aligned}\]</span>
+If the prior class probabilities are equal
+(i.e. <span class="math inline">\(\pi_1 = \pi_2 = 0.5\)</span>) then we will assign an observation
+<span class="math inline">\(\boldsymbol{x}= (x_1, x_2)\)</span> to class <span class="math inline">\(1\)</span> if and only if
+<span class="math display">\[\begin{aligned}
+                 f_1(\boldsymbol{x}) &amp;&gt; f_2(\boldsymbol{x}) \\
+\Rightarrow\quad      \exp\{ (-x_1^2/2 - x_2^2/2)\}  &amp;&gt; \exp\{ (-(x_1-1)^2/2 - (x_2-1)^2/2)\} \\
+\Rightarrow\quad      -x_1^2/2 - x_2^2/2  &amp;&gt; -(x_1-1)^2/2 - (x_2-1)^2/2 \\
+\Rightarrow\quad      x_1^2 + x_2^2   &amp;&lt;  x_1^2 - 2 x_1 + 1 + x_2^2 - 2 x_2 +1 \\
+\Rightarrow\quad      0  &amp;&lt; - 2 x_1 + 1 - 2 x_2 +1 \\
+\Rightarrow\quad      x_1 + x_2 &amp;&lt;  1\\\end{aligned}\]</span>
+Time to take stock.
+We have just shown that given an observation <span class="math inline">\((x_1,x_2)\)</span>, we should
+assign it to class 1 if <span class="math inline">\(x_1 + x_2 &lt;  1\)</span>, and to class 2 if
+<span class="math inline">\(x_1 + x_2 \ge 1\)</span>. (In theory the possibility of equality can be
+ignored, because for truly continuous data we will get precise equality
+with probability zero.) In other words, <span class="math inline">\(x_1 + x_2 &lt;  1\)</span> is a decision
+rule that tell us where to classify the observation (class 1 if true,
+class 2 if false). This can be plotted graphically, as in Figure <a href="classification.html#fig:toylda">6.2</a>. Notice
+that the boundary of the regions is given by the straight line
+<span class="math inline">\(x_1 + x_2 = 1\)</span>, hence the nomenclature <em>linear</em> discriminant analysis.
+The combination <span class="math inline">\(x_1 + x_2\)</span> is referred to as a <em>linear discriminant</em> or
+a <em>discriminant variable</em> because of its role in defining the decision
+rule.</p>
+<div class="figure"><span style="display:block;" id="fig:toylda"></span>
+<img src="06-classification_files/figure-html/toylda-1.png" alt="Plot of decision regions for a linear discriminant analysis with two groups. Any observation in the grey region will be assigned to class 1; any observation in the cyan region will be assigned to class 2." width="672" />
+<p class="caption">
+Figure 6.2: Plot of decision regions for a linear discriminant analysis with two groups. Any observation in the grey region will be assigned to class 1; any observation in the cyan region will be assigned to class 2.
+</p>
+</div>
+<p>The result is very intuitive. Each of observation will be assigned to
+the class for which the mean is closest. While we have demonstrated this
+result for two class problems, it extends naturally to cases with three
+or more classes. In such situations the feature space will be divided
+into multiple regions using line segment boundaries. See Figure <a href="classification.html#fig:toylda2">6.3</a> for
+example. If there are more than two features then the boundaries of the
+decision regions will be a defined by the intersection of hyperplanes
+rather than lines.</p>
+<div class="figure"><span style="display:block;" id="fig:toylda2"></span>
+<img src="06-classification_files/figure-html/toylda2-1.png" alt="Plot of decision regions for a linear discriminant analysis with three groups." width="672" />
+<p class="caption">
+Figure 6.3: Plot of decision regions for a linear discriminant analysis with three groups.
+</p>
+</div>
+</div>
+<div id="implementation-in-r-1" class="section level3 hasAnchor" number="6.2.2">
+<h3><span class="header-section-number">6.2.2</span> Implementation in R<a href="classification.html#implementation-in-r-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Linear discriminant analysis can be implemented in R using the <code>lda</code>
+function. This is part of the <code>MASS</code> library, which must be pre-loaded.
+The syntax for <code>lda</code> is of the following form:</p>
+<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb197-1"><a href="classification.html#cb197-1" tabindex="-1"></a><span class="fu">lda</span>(y <span class="sc">~</span> x1 <span class="sc">+</span> x2, <span class="at">data=</span>mydata, <span class="at">CV=</span><span class="cn">FALSE</span>, <span class="at">prior=</span><span class="fu">c</span>(<span class="fl">0.5</span>,<span class="fl">0.5</span>))</span></code></pre></div>
+<p>Here <code>y</code> in the formula is the true class, and <code>x1</code> and <code>x2</code> are
+features. The argument <code>data</code> allows specification of a data frame in
+the usual manner. The optional argument <code>CV</code> is logical, indicating
+whether or not a cross-validation estimate of the posterior
+probabilities <span class="math inline">\(\{{\textsf P}(j | \boldsymbol{x}) \}\)</span> is required. The
+default is <code>CV=FALSE</code>. Finally, prior probabilities can be specified as a
+vector valued argument <code>prior</code>. The default is to use the class
+proportions in the data.</p>
+<p>Predicted classes from an LDA model are obtained by the <code>predict</code>
+function in the usual kind of way.</p>
+<p>While this is relatively consistent with what we’ve seen in the past,
+we’ll be utilising the <code>tidymodels</code> framework instead, using <code>parsnip</code>
+with the <code>discrim_linear()</code> function. We can then use the <code>yardstick</code>
+to evaluate performance.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-32" class="example"><strong>Example 6.3  </strong></span><strong>Prediction for the Wine Data Using LDA</strong></p>
+<p>We start by splitting the wine data into training and test data (which
+we shall refer to throughout this chapter). The <code>wine</code> data is in truth
+a relatively straightforward one for classification, so we make things a
+little more challenging by leaving only 100 observations in the training
+set (with the remaining 78 in the validation dataset). These operations
+are performed in the R code below, where we
+first convert the target variable <code>Cultivar</code> to a factor.</p>
+<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="classification.html#cb198-1" tabindex="-1"></a><span class="fu">library</span>(rsample)</span></code></pre></div>
+<pre><code>#&gt; Warning: package &#39;rsample&#39; was built under R version 4.5.2</code></pre>
+<div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb200-1"><a href="classification.html#cb200-1" tabindex="-1"></a>wine <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../data/wine.csv&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb200-2"><a href="classification.html#cb200-2" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Cultivar =</span> <span class="fu">factor</span>(Cultivar))</span>
+<span id="cb200-3"><a href="classification.html#cb200-3" tabindex="-1"></a></span>
+<span id="cb200-4"><a href="classification.html#cb200-4" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2021</span>)</span>
+<span id="cb200-5"><a href="classification.html#cb200-5" tabindex="-1"></a>split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(wine, <span class="at">prop=</span><span class="dv">100</span><span class="sc">/</span><span class="dv">178</span>)</span>
+<span id="cb200-6"><a href="classification.html#cb200-6" tabindex="-1"></a>wine.train <span class="ot">&lt;-</span> <span class="fu">training</span>(split)</span>
+<span id="cb200-7"><a href="classification.html#cb200-7" tabindex="-1"></a>wine.test <span class="ot">&lt;-</span> <span class="fu">testing</span>(split)</span>
+<span id="cb200-8"><a href="classification.html#cb200-8" tabindex="-1"></a>wine.train</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 100 × 14
+#&gt;    Cultivar Alcohol Malic   Ash Alc.Ash    Mg Phenols  Flav Non.Flav Proan
+#&gt;    &lt;fct&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;
+#&gt;  1 C          12.51  1.24  2.25    17.5    85    2     0.58     0.6   1.25
+#&gt;  2 C          13.73  4.36  2.26    22.5    88    1.28  0.47     0.52  1.15
+#&gt;  3 C          13.71  5.65  2.45    20.5    95    1.68  0.61     0.52  1.06
+#&gt;  4 C          12.84  2.96  2.61    24     101    2.32  0.6      0.53  0.81
+#&gt;  5 B          12.21  1.19  1.75    16.8   151    1.85  1.28     0.14  2.5 
+#&gt;  6 C          13.17  2.59  2.37    20     120    1.65  0.68     0.53  1.46
+#&gt;  7 B          12.6   1.34  1.9     18.5    88    1.45  1.36     0.29  1.35
+#&gt;  8 B          11.61  1.35  2.7     20      94    2.74  2.92     0.29  2.49
+#&gt;  9 B          13.34  0.94  2.36    17     110    2.53  1.3      0.55  0.42
+#&gt; 10 B          12.34  2.45  2.46    21      98    2.56  2.11     0.34  1.31
+#&gt; # ℹ 90 more rows
+#&gt; # ℹ 4 more variables: Colour &lt;dbl&gt;, Hue &lt;dbl&gt;, ODRatio &lt;dbl&gt;, Proline &lt;dbl&gt;</code></pre>
+<p>We initially consider prediction with LDA using all the variables.</p>
+<div class="sourceCode" id="cb202"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb202-1"><a href="classification.html#cb202-1" tabindex="-1"></a><span class="fu">library</span>(discrim)</span></code></pre></div>
+<pre><code>#&gt; Warning: package &#39;discrim&#39; was built under R version 4.5.2</code></pre>
+<pre><code>#&gt; Warning: package &#39;parsnip&#39; was built under R version 4.5.2</code></pre>
+<div class="sourceCode" id="cb205"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb205-1"><a href="classification.html#cb205-1" tabindex="-1"></a><span class="fu">library</span>(yardstick)</span></code></pre></div>
+<pre><code>#&gt; Warning: package &#39;yardstick&#39; was built under R version 4.5.2</code></pre>
+<div class="sourceCode" id="cb207"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb207-1"><a href="classification.html#cb207-1" tabindex="-1"></a>wine.lda1 <span class="ot">&lt;-</span> <span class="fu">discrim_linear</span>() <span class="sc">|&gt;</span> <span class="fu">fit</span>(Cultivar <span class="sc">~</span> ., <span class="at">data=</span>wine.train)</span>
+<span id="cb207-2"><a href="classification.html#cb207-2" tabindex="-1"></a>wine.lda1</span></code></pre></div>
+<pre><code>#&gt; parsnip model object
+#&gt; 
+#&gt; Call:
+#&gt; lda(Cultivar ~ ., data = data)
+#&gt; 
+#&gt; Prior probabilities of groups:
+#&gt;    A    B    C 
+#&gt; 0.27 0.40 0.33 
+#&gt; 
+#&gt; Group means:
+#&gt;    Alcohol    Malic      Ash  Alc.Ash        Mg  Phenols      Flav  Non.Flav
+#&gt; A 13.72333 1.977407 2.509630 17.52593 105.96296 2.831111 3.0022222 0.2981481
+#&gt; B 12.24400 2.103250 2.229750 20.07250  95.50000 2.262500 2.0822500 0.3525000
+#&gt; C 13.11576 3.340909 2.418788 21.28788  99.54545 1.688182 0.7481818 0.4542424
+#&gt;      Proan   Colour       Hue  ODRatio   Proline
+#&gt; A 1.826296 5.444444 1.0566667 3.162593 1079.6296
+#&gt; B 1.690500 2.924250 1.0540000 2.922000  521.7750
+#&gt; C 1.136061 7.250606 0.6809091 1.709697  626.5152
+#&gt; 
+#&gt; Coefficients of linear discriminants:
+#&gt;                   LD1          LD2
+#&gt; Alcohol  -0.010317451  1.175068679
+#&gt; Malic     0.182260164  0.104519875
+#&gt; Ash       0.138964990  2.573625788
+#&gt; Alc.Ash   0.038864464 -0.160828615
+#&gt; Mg       -0.003958634  0.004833826
+#&gt; Phenols   0.767868607 -0.086488945
+#&gt; Flav     -2.569432136  0.050198155
+#&gt; Non.Flav -2.044924752 -0.504567571
+#&gt; Proan     0.358496497 -0.403501573
+#&gt; Colour    0.298461150  0.132267168
+#&gt; Hue      -1.850873874 -1.976866286
+#&gt; ODRatio  -1.288883722  0.078974327
+#&gt; Proline  -0.001686943  0.002915649
+#&gt; 
+#&gt; Proportion of trace:
+#&gt;    LD1    LD2 
+#&gt; 0.7512 0.2488</code></pre>
+<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb209-1"><a href="classification.html#cb209-1" tabindex="-1"></a>wine.lda1.pred <span class="ot">&lt;-</span> wine.lda1 <span class="sc">|&gt;</span> <span class="fu">augment</span>(<span class="at">new_data=</span>wine.test)</span>
+<span id="cb209-2"><a href="classification.html#cb209-2" tabindex="-1"></a>wine.lda1.pred <span class="sc">|&gt;</span></span>
+<span id="cb209-3"><a href="classification.html#cb209-3" tabindex="-1"></a>  <span class="fu">conf_mat</span>(<span class="at">truth=</span>Cultivar, <span class="at">estimate=</span>.pred_class)</span></code></pre></div>
+<pre><code>#&gt;           Truth
+#&gt; Prediction  A  B  C
+#&gt;          A 32  1  0
+#&gt;          B  0 28  0
+#&gt;          C  0  2 15</code></pre>
+<p>Note the following:</p>
+<ul>
+<li><p>We have first loaded the <code>discrim</code> library, an add-on package for
+<code>parsnip</code>, in order to access the <code>discrim_linear</code> function.</p></li>
+<li><p>The dot on the right-hand side of a model formula has the usual
+meaning (of all variables in the data frame barring the response on
+the left-hand side).</p></li>
+<li><p>The fit object <code>wine.lda1</code> is a parsnip model which then prints the
+output from <code>lda()</code>. Much of the resulting output
+is self explanatory. We note that the table of coefficients of the
+linear discriminants is a matrix which transforms standardized
+versions of the original observations to the linear discriminants.</p></li>
+<li><p>We use <code>augment()</code> to add the <code>.pred_class</code>, <code>.pred_A</code>, <code>.pred_B</code>
+and <code>.pred_C</code> columns to the <code>wine.test</code> data. The first of these
+are the “hard” class predictions (based on maximum posterior
+probabilities) while the last 3 are the aforementioned posterior
+probabilities.</p></li>
+<li><p>The <code>yardstick</code> function <code>conf_mat</code> tabulates the predicted classes
+against the true classes; i.e. the confusion matrix. We see that the
+overall misclassification rate is
+<span class="math inline">\(3/78 \approx 3.8\%\)</span>.</p></li>
+</ul>
+<p>We now consider trying to perform LDA using just the variables
+<code>Alcohol</code>, <code>Color</code> and <code>Hue</code>.</p>
+<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb211-1"><a href="classification.html#cb211-1" tabindex="-1"></a>wine.lda2 <span class="ot">&lt;-</span> <span class="fu">discrim_linear</span>() <span class="sc">|&gt;</span> <span class="fu">fit</span>(Cultivar <span class="sc">~</span> Alcohol <span class="sc">+</span> Colour <span class="sc">+</span> Hue, <span class="at">data=</span>wine.train)</span>
+<span id="cb211-2"><a href="classification.html#cb211-2" tabindex="-1"></a>wine.lda2.pred <span class="ot">&lt;-</span> wine.lda2 <span class="sc">|&gt;</span> <span class="fu">augment</span>(<span class="at">new_data=</span>wine.test)</span>
+<span id="cb211-3"><a href="classification.html#cb211-3" tabindex="-1"></a>wine.lda2.pred <span class="sc">|&gt;</span> <span class="fu">conf_mat</span>(<span class="at">truth=</span>Cultivar, <span class="at">estimate=</span>.pred_class)</span></code></pre></div>
+<pre><code>#&gt;           Truth
+#&gt; Prediction  A  B  C
+#&gt;          A 30  3  1
+#&gt;          B  2 27  1
+#&gt;          C  0  1 13</code></pre>
+<p>We get a worse misclassification rate in this case:
+<span class="math inline">\(8/78 \approx 10.3\%\)</span>. Nonetheless, we used many less variables to
+develop the classification model. The question remains, might we improve
+on the initial (full) model by omitting some of the variables? This is
+another instance of a bias-variance trade-off. In principle we could
+perform some kind of variable selection algorithm to address this
+matter, but it turns out that there are better ‘dimension reducing’
+approaches (though these are beyond the scope of this paper).</p>
+</div>
+<p>Finally, we have used the training sample relative frequencies to define
+the prior probabilities in both of these LDA classifiers. As you will
+see from the output for <code>wine.lda1</code>, this gave
+<span class="math inline">\((\pi_1,\pi_2,\pi_3) = (0.27, 0.4, 0.33)\)</span>. We can instead specify our
+own prior probabilities through the <code>prior</code> argument to lda(). For
+example, suppose that we thought that in practice all three cultivars
+are equally prevalent. Then we could perform classification using the
+prior <span class="math inline">\((\pi_1,\pi_2,\pi_3) = (1/3,  1/3,  1/3)\)</span> instead. To pass the <code>prior</code>
+information through from <code>discrim_linear()</code> we would use the <code>set_engine()</code>
+function:</p>
+<div class="sourceCode" id="cb213"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb213-1"><a href="classification.html#cb213-1" tabindex="-1"></a>spec_lda_equal_priors <span class="ot">&lt;-</span> <span class="fu">discrim_linear</span>() <span class="sc">|&gt;</span> <span class="fu">set_engine</span>(<span class="st">&quot;MASS&quot;</span>, <span class="at">prior =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>)<span class="sc">/</span><span class="dv">3</span>)</span></code></pre></div>
+<p>Note that we wouldn’t expect the classifications to change much as the prior
+is only a little different.</p>
+</div>
+</div>
+<div id="sec:kda" class="section level2 hasAnchor" number="6.3">
+<h2><span class="header-section-number">6.3</span> Kernel Discriminant Analysis<a href="classification.html#sec:kda" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>While linear discriminant analysis can work well in many applications,
+it can also fail spectacularly when the boundaries between the groups
+are highly non-linear. Consider, for instance, the (artificial) data set
+displayed in Figure <a href="classification.html#fig:circledata">6.4</a>. The separation between the red and black
+observations is clear to the eye, but linear discriminant analysis
+cannot handle such a scenario.</p>
+<div class="figure"><span style="display:block;" id="fig:circledata"></span>
+<img src="06-classification_files/figure-html/circledata-1.png" alt="An artificial dataset for which linear discriminant analysis will completely fail." width="672" />
+<p class="caption">
+Figure 6.4: An artificial dataset for which linear discriminant analysis will completely fail.
+</p>
+</div>
+<p>A (far) more flexible approach than LDA is to estimate the probability
+functions <span class="math inline">\(f_1,\ldots,f_C\)</span> using kernel density estimation.</p>
+<p>Recall that kernel density estimation in one dimension is where we estimate
+a distribution <span class="math inline">\(f\)</span> using the mean of kernel functions (typically guassian)
+centered at each observation.</p>
+<p><span class="math display">\[
+\hat{f}(x) = \frac{1}{n}\sum_{i=1}^n \frac{1}{h}K(\frac{x - x_i}{h}).
+\]</span></p>
+<p>Here, <span class="math inline">\(h\)</span> is the <em>bandwidth</em> of the kernel density estimator, which essentially
+controls the amount of smoothing: a small value of <span class="math inline">\(h\)</span> will result in a noisy
+distribution, while a large value of <span class="math inline">\(h\)</span> will result in something that may be overly
+smooth and miss fine detail.</p>
+<p>We can extend this concept readily to higher dimensions, though the bandwidth <span class="math inline">\(h\)</span>
+is replaced by a square matrix of bandwidths of size <span class="math inline">\(d\)</span> if the dimension is <span class="math inline">\(d\)</span>.</p>
+<p>In the case where we have continuous predictor variables, we can use the training
+data from each class to construct kernel estimates <span class="math inline">\(\hat f_1, \ldots, \hat f_C\)</span>.
+Substituting these estimates in Equation <a href="classification.html#eq:bayes">(6.1)</a> leads to <em>kernel discriminant analysis</em>.</p>
+<p>While kernel discriminant analysis wins over LDA in terms of
+flexibility, the method can be somewhat unreliable when there are large
+numbers of predictor variables. Indeed, kernel density estimation will
+typically prove difficult in more than 3 dimensions, unless there
+are very large numbers of observations available.</p>
+<p>Kernel discriminant analysis is implemented in R using the <code>kda</code>
+function within the <code>ks</code> library. To keep things consistent, we will
+use the <code>tidykda</code> package<a href="#fn53" class="footnote-ref" id="fnref53"><sup>53</sup></a> which implements a wrapper to coerce kernel
+discriminant analysis into the <code>parsnip</code> framework.</p>
+<p>The bandwidths are automatically found using a plugin-estimator, so
+all we need to do is provide at most 3 predictors and utilise
+the <code>discrim_kernel()</code> function. This can take some time to run for large datasets.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-33" class="example"><strong>Example 6.4  </strong></span><strong>Kernel Discriminant Analysis for the Wine Data</strong></p>
+<p>We apply kernel discriminant analysis to the Italian wine data.
+Specifically, we attempt to classify <code>Cultivar</code> based on the three
+predictors <code>Alcohol</code>, <code>Colour</code> and <code>Hue</code>.</p>
+<div class="sourceCode" id="cb214"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb214-1"><a href="classification.html#cb214-1" tabindex="-1"></a><span class="fu">library</span>(tidykda)</span>
+<span id="cb214-2"><a href="classification.html#cb214-2" tabindex="-1"></a>wine.kda <span class="ot">&lt;-</span> <span class="fu">discrim_kernel</span>() <span class="sc">|&gt;</span> <span class="fu">fit</span>(Cultivar <span class="sc">~</span> Alcohol <span class="sc">+</span> Colour <span class="sc">+</span> Hue, <span class="at">data=</span>wine.train)</span>
+<span id="cb214-3"><a href="classification.html#cb214-3" tabindex="-1"></a>wine.kda.pred <span class="ot">&lt;-</span> wine.kda <span class="sc">|&gt;</span> <span class="fu">augment</span>(<span class="at">new_data=</span>wine.test)</span>
+<span id="cb214-4"><a href="classification.html#cb214-4" tabindex="-1"></a>wine.kda.pred <span class="sc">|&gt;</span> <span class="fu">conf_mat</span>(<span class="at">truth=</span>Cultivar, <span class="at">estimate=</span>.pred_class)</span></code></pre></div>
+<pre><code>#&gt;           Truth
+#&gt; Prediction  A  B  C
+#&gt;          A 29  6  2
+#&gt;          B  0 23  0
+#&gt;          C  3  2 13</code></pre>
+<p>Points to note:</p>
+<ul>
+<li><p>We use only 3 predictors, as this is the most that <code>discrim_kernel</code>
+will accept.</p></li>
+<li><p>The error rate using kernel discriminant analysis is
+<span class="math inline">\(13/78 \approx 16.7\%\)</span>.
+This is worse than we obtained using LDA.
+Hence, while linear boundaries may not be entirely satisfactory for
+distinguishing between classes, the errors thus arising are of a
+little less importance than those due to the extra complexity
+inherent in the kernel approach for this example.</p></li>
+</ul>
+</div>
+</div>
+<div id="sec:naive" class="section level2 hasAnchor" number="6.4">
+<h2><span class="header-section-number">6.4</span> Naive Bayes Classifiers<a href="classification.html#sec:naive" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>As we noted above, kernel discriminant analysis does not usually work at
+all well when there are many predictor variables. Indeed, the R
+implementation of the method can cope with no more than <span class="math inline">\(p=6\)</span>. This is a
+reflection of the <em>curse of dimensionality</em>, which in essence states
+that many statistical estimation problems become much more difficult in
+high dimensions.</p>
+<p>This idea can be illustrated most easily if we consider the situation in
+which the predictor variables are categorical. Specifically, imagine
+that we have <span class="math inline">\(p=10\)</span> factors, each on 3 levels. To specify
+<span class="math inline">\(f_j(\boldsymbol{x})\)</span> we must compute the probability for any
+combination the factors. However, there are <span class="math inline">\(3^{10} = 59049\)</span> different
+combinations. That’s a lot! Even if we had a large training set with
+<span class="math inline">\(10000\)</span> observations per class, it would still be the case that we would
+have no training observations for more than <span class="math inline">\(86\%\)</span> of the possible
+factorial combinations. How then can we hope to estimate the
+probabilities thereof?</p>
+<p>In naive Bayes classification this problem is addressed by making the
+assumption that all the predictors are statistical independent within
+each class. This means that we can factorize the probability functions
+by
+<span class="math display" id="eq:factorize">\[\begin{equation}
+f_j(\boldsymbol{x}) = f_j(x_1) f_j(x_2) \cdots f_j(x_p)
+\tag{6.2}
+\end{equation}\]</span>
+where <span class="math inline">\(f_j(x_i)\)</span> denotes the marginal probability
+function for predictor <span class="math inline">\(x_i\)</span> in class <span class="math inline">\(j\)</span>. To appreciate the extent to
+which this simplifies the problem, let us return to out example with 10
+predictive factors each with 3 levels. In order to estimate the marginal
+probability distribution for any single factor we need only estimate 2
+probabilities<a href="#fn54" class="footnote-ref" id="fnref54"><sup>54</sup></a>. This in turn means that we need only estimate
+<span class="math inline">\(10\times 2=20\)</span> probabilities in total to fully specify the probability
+function in Equation <a href="classification.html#eq:factorize">(6.2)</a>.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-34" class="example"><strong>Example 6.5  </strong></span><strong>Coke or Pepsi?</strong></p>
+<p>A sample of 100 people are questioned as to whether they prefer Coke or
+Pepsi (the target classification). A total of 60 prefer Coke and 40
+prefer Pepsi. The predictive factors are sex and age category (younger
+than 20, or 20 and older) of person. The following results were
+recorded.</p>
+<table class="kable_wrapper">
+<caption>
+<span id="tab:unnamed-chunk-12">Table 6.2: </span>Preference of Pepsi (left) and Coke (right) by sex and age
+</caption>
+<tbody>
+<tr>
+<td>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Younger</th>
+<th align="right">Older</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Male</td>
+<td align="right">20</td>
+<td align="right">10</td>
+</tr>
+<tr class="even">
+<td align="left">Female</td>
+<td align="right">10</td>
+<td align="right">20</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Younger</th>
+<th align="right">Older</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Male</td>
+<td align="right">10</td>
+<td align="right">20</td>
+</tr>
+<tr class="even">
+<td align="left">Female</td>
+<td align="right">5</td>
+<td align="right">5</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<p>To specify the probability distribution <span class="math inline">\(f_1\)</span> for coke drinkers we must
+compute probabilities for each combination of predictive factors. We can
+do so using the observed proportions. Under the full Bayesian model we
+have <span class="math display">\[\hat f_1(\{Male,Older\}) = \tfrac{10}{60} = \tfrac{1}{6}\]</span> for
+example. Using naive Bayes on the other hand, we obtain
+<span class="math display">\[\hat f_1(\{Male,Older\}) \approx \hat f_1(Male) \hat f_1(Older) = \tfrac{30}{60} \times \tfrac{30}{60} = \tfrac{1}{4}.\]</span></p>
+</div>
+<p>Naturally there is a price to pay for such a huge reduction in model
+complexity. The assumption of independence of predictors within each
+class is strong, and will almost certainly be incorrect in practice.
+Nonetheless, such a simplification may still be a good idea, based on
+the kind of bias-variance trade off arguments with which you should now
+be familiar.</p>
+<p>Naive Bayes classification in R is implemented in a range of different packages,
+such as the <code>e1071</code> package (with function <code>naiveBayes()</code>), the <code>naivebayes</code>
+package (with function <code>naivebayes()</code>) and the <code>klaR</code> package (with function <code>NaiveBayes()</code>).</p>
+<p>As before, we will be using the <code>tidymodels</code> framework, where <code>discrim</code> provides
+the model tidier <code>naive_Bayes()</code>. We’ll utilise the <code>naivebayes</code> engine.
+Predictions will then be made in the same way
+(i.e. using <code>predict()</code> or <code>augment()</code>).</p>
+<p>The implementation of the naive Bayes classifier can take
+both quantitative and categorical predictors. The marginal distributions
+(i.e. the <span class="math inline">\(f_j(x_i)\)</span> mentioned above) for the numerical variables are
+estimated using kernel density estimators (or, alternatively univariate normal
+distributions), while marginal probabilities for the categorical variables are
+estimated using class-specific proportions.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-35" class="example"><strong>Example 6.6  </strong></span><strong>Naive Bayes Classification for the Wine Data</strong></p>
+<p>We apply naive Bayes classification to the Italian wine data, first
+using all the predictor variables and then using just <code>Alcohol</code>,
+<code>Colour</code> and <code>Hue</code>. Lastly, we’ll use a normal distribution in place
+of the kernel density estimates.</p>
+<div class="sourceCode" id="cb216"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb216-1"><a href="classification.html#cb216-1" tabindex="-1"></a>spec_nB <span class="ot">&lt;-</span> <span class="fu">naive_Bayes</span>(<span class="at">engine=</span><span class="st">&quot;naivebayes&quot;</span>)</span>
+<span id="cb216-2"><a href="classification.html#cb216-2" tabindex="-1"></a>wine.nB<span class="fl">.1</span> <span class="ot">&lt;-</span> spec_nB <span class="sc">|&gt;</span></span>
+<span id="cb216-3"><a href="classification.html#cb216-3" tabindex="-1"></a>  <span class="fu">fit</span>(Cultivar <span class="sc">~</span> ., <span class="at">data=</span>wine.train)</span>
+<span id="cb216-4"><a href="classification.html#cb216-4" tabindex="-1"></a>wine.nB.<span class="fl">1.</span>pred <span class="ot">&lt;-</span> wine.nB<span class="fl">.1</span> <span class="sc">|&gt;</span></span>
+<span id="cb216-5"><a href="classification.html#cb216-5" tabindex="-1"></a>  <span class="fu">augment</span>(<span class="at">new_data=</span>wine.test)</span>
+<span id="cb216-6"><a href="classification.html#cb216-6" tabindex="-1"></a>wine.nB.<span class="fl">1.</span>pred <span class="sc">|&gt;</span></span>
+<span id="cb216-7"><a href="classification.html#cb216-7" tabindex="-1"></a>  <span class="fu">conf_mat</span>(<span class="at">truth=</span>Cultivar, <span class="at">estimate=</span>.pred_class)</span></code></pre></div>
+<pre><code>#&gt;           Truth
+#&gt; Prediction  A  B  C
+#&gt;          A 30  2  0
+#&gt;          B  2 26  0
+#&gt;          C  0  3 15</code></pre>
+<div class="sourceCode" id="cb218"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb218-1"><a href="classification.html#cb218-1" tabindex="-1"></a>wine.nB<span class="fl">.2</span> <span class="ot">&lt;-</span> spec_nB <span class="sc">|&gt;</span></span>
+<span id="cb218-2"><a href="classification.html#cb218-2" tabindex="-1"></a>  <span class="fu">fit</span>(Cultivar <span class="sc">~</span> Alcohol <span class="sc">+</span> Colour <span class="sc">+</span> Hue, <span class="at">data=</span>wine.train)</span>
+<span id="cb218-3"><a href="classification.html#cb218-3" tabindex="-1"></a>wine.nB.<span class="fl">2.</span>pred <span class="ot">&lt;-</span> wine.nB<span class="fl">.2</span> <span class="sc">|&gt;</span></span>
+<span id="cb218-4"><a href="classification.html#cb218-4" tabindex="-1"></a>  <span class="fu">augment</span>(<span class="at">new_data=</span>wine.test)</span>
+<span id="cb218-5"><a href="classification.html#cb218-5" tabindex="-1"></a>wine.nB.<span class="fl">2.</span>pred <span class="sc">|&gt;</span></span>
+<span id="cb218-6"><a href="classification.html#cb218-6" tabindex="-1"></a>  <span class="fu">conf_mat</span>(<span class="at">truth=</span>Cultivar, <span class="at">estimate=</span>.pred_class)</span></code></pre></div>
+<pre><code>#&gt;           Truth
+#&gt; Prediction  A  B  C
+#&gt;          A 32  4  1
+#&gt;          B  0 25  1
+#&gt;          C  0  2 13</code></pre>
+<div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb220-1"><a href="classification.html#cb220-1" tabindex="-1"></a>wine.nB<span class="fl">.3</span> <span class="ot">&lt;-</span> spec_nB <span class="sc">|&gt;</span></span>
+<span id="cb220-2"><a href="classification.html#cb220-2" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="at">engine=</span><span class="st">&quot;naivebayes&quot;</span>, <span class="at">usekernel=</span><span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb220-3"><a href="classification.html#cb220-3" tabindex="-1"></a>  <span class="fu">fit</span>(Cultivar <span class="sc">~</span> Alcohol <span class="sc">+</span> Colour <span class="sc">+</span> Hue, <span class="at">data=</span>wine.train)</span>
+<span id="cb220-4"><a href="classification.html#cb220-4" tabindex="-1"></a>wine.nB<span class="fl">.3</span></span></code></pre></div>
+<pre><code>#&gt; parsnip model object
+#&gt; 
+#&gt; 
+#&gt; ================================= Naive Bayes ==================================
+#&gt; 
+#&gt; Call:
+#&gt; naive_bayes.default(x = maybe_data_frame(x), y = y, usekernel = ~FALSE)
+#&gt; 
+#&gt; -------------------------------------------------------------------------------- 
+#&gt;  
+#&gt; Laplace smoothing: 0
+#&gt; 
+#&gt; -------------------------------------------------------------------------------- 
+#&gt;  
+#&gt; A priori probabilities: 
+#&gt; 
+#&gt;    A    B    C 
+#&gt; 0.27 0.40 0.33 
+#&gt; 
+#&gt; -------------------------------------------------------------------------------- 
+#&gt;  
+#&gt; Tables: 
+#&gt; 
+#&gt; -------------------------------------------------------------------------------- 
+#&gt; :: Alcohol (Gaussian) 
+#&gt; -------------------------------------------------------------------------------- 
+#&gt;        
+#&gt; Alcohol          A          B          C
+#&gt;    mean 13.7233333 12.2440000 13.1157576
+#&gt;    sd    0.4691646  0.4963188  0.5086258
+#&gt; 
+#&gt; -------------------------------------------------------------------------------- 
+#&gt; :: Colour (Gaussian) 
+#&gt; -------------------------------------------------------------------------------- 
+#&gt;       
+#&gt; Colour         A         B         C
+#&gt;   mean 5.4444444 2.9242500 7.2506060
+#&gt;   sd   1.1854546 0.7474191 2.1912438
+#&gt; 
+#&gt; -------------------------------------------------------------------------------- 
+#&gt; :: Hue (Gaussian) 
+#&gt; -------------------------------------------------------------------------------- 
+#&gt;       
+#&gt; Hue            A         B         C
+#&gt;   mean 1.0566667 1.0540000 0.6809091
+#&gt;   sd   0.1271885 0.1816562 0.1231961
+#&gt; 
+#&gt; --------------------------------------------------------------------------------</code></pre>
+<div class="sourceCode" id="cb222"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb222-1"><a href="classification.html#cb222-1" tabindex="-1"></a>wine.nB.<span class="fl">3.</span>pred <span class="ot">&lt;-</span> wine.nB<span class="fl">.3</span> <span class="sc">|&gt;</span></span>
+<span id="cb222-2"><a href="classification.html#cb222-2" tabindex="-1"></a>  <span class="fu">augment</span>(<span class="at">new_data=</span>wine.test)</span>
+<span id="cb222-3"><a href="classification.html#cb222-3" tabindex="-1"></a>wine.nB.<span class="fl">3.</span>pred <span class="sc">|&gt;</span></span>
+<span id="cb222-4"><a href="classification.html#cb222-4" tabindex="-1"></a>  <span class="fu">conf_mat</span>(<span class="at">truth=</span>Cultivar, <span class="at">estimate=</span>.pred_class)</span></code></pre></div>
+<pre><code>#&gt;           Truth
+#&gt; Prediction  A  B  C
+#&gt;          A 30  4  1
+#&gt;          B  2 24  1
+#&gt;          C  0  3 13</code></pre>
+<p>Points to note:</p>
+<ul>
+<li><p>The output for the fitted objects (e.g. <code>wine.nB.3</code>) aren’t
+strongly useful. There are tables per predictor with a summary of
+the model fit - kernel densities or the mean/sd of the normal
+distributions as seen for <code>wine.nB.3</code>.</p></li>
+<li><p>The naive Bayes classifier implement with all predictors has an
+error rate of <span class="math inline">\(7/78 \approx 9\%\)</span>. With just the predictors
+<code>Alcohol</code>, <code>Colour</code> and <code>Hue</code> this rises to <span class="math inline">\(8/78 \approx 10.3\%\)</span>. Using normal distributions rather than kernel densities
+for the marginal distributions is worse again, at <span class="math inline">\(11/78 \approx 14.1\%\)</span></p></li>
+</ul>
+</div>
+</div>
+<div id="logistic-regression" class="section level2 hasAnchor" number="6.5">
+<h2><span class="header-section-number">6.5</span> Logistic regression<a href="classification.html#logistic-regression" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Logistic regression is a type of discriminatory classifier. This, along
+with the other methods of classification in the next section, attempt to
+learn the probability <span class="math inline">\(P(j|\boldsymbol{x})\)</span> directly, rather than
+generating it from the joint probability function within each class and
+prior probabilities via Bayes’ Theorem.</p>
+<p>Logistic regression learns <span class="math inline">\(P(j|\boldsymbol{x})\)</span> directly by assuming a
+parameteric form for the probability. It is one of a class of methods
+known as <em>generalised linear models</em> (GLMs), and is thus closely related
+to linear regression. The generalisation involved is that the
+distribution of the response variable <span class="math inline">\(y\)</span> need not be a normal
+distribution. In particular, logistic regression is primarily concerned
+with a binary (i.e. 0 and 1) response variable, whose expected value
+will be the probability of a response <span class="math inline">\(y=1\)</span>. Thus, it is useful for
+classifying data into two groups, which we can associate with the two
+outcomes – say <span class="math inline">\(y=0\)</span> codes for group 1, and <span class="math inline">\(y=1\)</span> for group 2.
+Extensions to more than two groups will be given in section <a href="classification.html#sec:multinomial">6.5.3</a>.</p>
+<p>It is linear in the sense that a transformation links a linear
+combination of predictors
+<span class="math display">\[\theta(\boldsymbol{x}) = \beta_0 + \beta_1 x_1 + \cdots + \beta_p x_p,\]</span>
+with the probability
+<span class="math inline">\(p(\boldsymbol{x}) = {\textsf P}(y=1 | \boldsymbol{x})\)</span><a href="#fn55" class="footnote-ref" id="fnref55"><sup>55</sup></a>. This
+transformation is the sigmoid function<a href="#fn56" class="footnote-ref" id="fnref56"><sup>56</sup></a>, also known as the <em>logistic</em>
+function:
+<span class="math display">\[p(\boldsymbol{x}) = \frac{1}{1+e^{-\theta(\boldsymbol{x})}}.\]</span> The
+logistic function ensures that the expected outcome is between 0 and 1,
+see the left-hand panel of Figure <a href="classification.html#fig:logistic">6.5</a>.</p>
+<pre><code>#&gt; Warning: package &#39;patchwork&#39; was built under R version 4.5.2</code></pre>
+<div class="figure"><span style="display:block;" id="fig:logistic"></span>
+<img src="06-classification_files/figure-html/logistic-1.png" alt="The logistic and logit functions." width="672" />
+<p class="caption">
+Figure 6.5: The logistic and logit functions.
+</p>
+</div>
+<p>The inverse of the logistic function is the <em>logit</em> function
+<span class="math display">\[\theta(\boldsymbol{x}) = {\textsf {logit}}(p(\boldsymbol{x})) = \log\left(\frac{p(\boldsymbol{x})}{1-p(\boldsymbol{x})}\right).\]</span>
+See the right-hand panel of Figure <a href="classification.html#fig:logistic">6.5</a>.
+The logit may also be interpreted
+as the log odds, where the odds are defined as
+<span class="math inline">\(\tfrac{p(\boldsymbol{x})}{1-p(\boldsymbol{x})}\)</span>. Odds are an alternate
+scale for interpreting the chance of something happening. Rather than
+writing the probability of it occurring, we instead give a ratio of the
+probability that it occurs to the probability that it does not occur. As
+an example, the odds of something that occurs twice in five are 2:3 –
+you expect it to occur twice for every 3 times it does not occur. Notice
+that, while proportions are restricted between 0 and 1, the odds may
+take any positive number, and hence the log odds may take any real
+number. This makes the log odds appropriate for a linear combination of
+predictors which, if we allow any possible values for the predictors,
+will also produce all real numbers.</p>
+<p>The formulation of logistic regression is therefore:
+<span class="math display">\[\begin{aligned}
+y_i &amp;\sim \mathsf{Bernoulli}(p(\boldsymbol{x}_i))\\
+{\textsf {logit}}(p(\boldsymbol{x}_i)) &amp;= \beta_0 + \beta_1x_{i1} + \cdots+ \beta_p{x_ik}.\end{aligned}\]</span>
+where</p>
+<ul>
+<li><p><span class="math inline">\(y_i\)</span> is the binary outcome for observation <span class="math inline">\(i\)</span>;</p></li>
+<li><p><span class="math inline">\(\boldsymbol{x}_i = (x_{i1}, \ldots, x_{ip})^\mathsf{T}\)</span> is the
+vector of predictor variables for the <span class="math inline">\(i\)</span>th observation;</p></li>
+<li><p><span class="math inline">\(p(\boldsymbol{x}_i) = {\textsf P}(y_i = 1 | \boldsymbol{x}_i)\)</span>;</p></li>
+<li><p><span class="math inline">\(\beta_1, \ldots, \beta_p\)</span> are unknown regression coefficients.</p></li>
+</ul>
+<p>Note that, as with linear regression, we can use either quantitative
+variables or factors as predictors. When factors are used, we code them
+as 0/1 dummy variables in the same way as is done for linear regression.</p>
+<p>There is then a natural way of interpreting the fitted coefficients for
+factors in terms of odds. Suppose we have a factor with one of its
+levels is coded as the binary variable <span class="math inline">\(x_1\)</span>, and let <span class="math inline">\(x_2, \ldots, x_p\)</span>
+be other predictors (including any other levels of the factor). Then if
+<span class="math inline">\(x_1\)</span> is a 1, the log odds will be given by
+<span class="math display">\[{\textsf {logit}}(p(\boldsymbol{x})) = \beta_0 + \beta_1 + \sum_{j=2}^p \beta_j x_j.\]</span>
+If <span class="math inline">\(x_1\)</span> is a 0, the log odds is given by
+<span class="math display">\[{\textsf {logit}}(p(\boldsymbol{x})) = \beta_0 + \sum_{j=2}^p \beta_jx_j.\]</span>
+Thus, the ratio of the odds, or <em>odds ratio</em> associated with <span class="math inline">\(x_1\)</span> is
+given by
+<span class="math display">\[\begin{aligned}
+\mathsf{OR}(x_1) &amp;= \frac{e^{\beta_0 + \beta_1 + \sum_{j=2}^p \beta_jx_j}}{e^{\beta_0 + \sum_{j=2}^p\beta_jx_j}}\\
+&amp; = e^{\beta_1}.\end{aligned}\]</span>
+An odds ratio of <span class="math inline">\(x_1\)</span> greater than one
+means the odds that <span class="math inline">\(y=1\)</span> increase when <span class="math inline">\(x_1\)</span> is 1; an odds ratio less
+than one means the odds that <span class="math inline">\(y=1\)</span> decreases when <span class="math inline">\(x_1\)</span> is 1. Thus, the
+odds increase if <span class="math inline">\(\beta_1 &gt; 0\)</span> and decrease if <span class="math inline">\(\beta_1 &lt; 0\)</span>.</p>
+<div id="fitting-logistic-regression-models" class="section level3 hasAnchor" number="6.5.1">
+<h3><span class="header-section-number">6.5.1</span> Fitting Logistic Regression Models<a href="classification.html#fitting-logistic-regression-models" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Unlike linear regression, we cannot estimate the unknown regression
+coefficients <span class="math inline">\(\beta_1, \ldots, \beta_p\)</span> via a closed form expression
+that minimises the sum of squared errors. Instead, we must find the
+regression coefficients by an iterative procedure which attempts to
+maximise the <em>likelihood</em> of the data<a href="#fn57" class="footnote-ref" id="fnref57"><sup>57</sup></a> The likelihood is simply the
+probability of the data regarded as a function of the parameters.</p>
+<p>For a particular observation <span class="math inline">\(y_i\)</span>, the likelihood for logistic
+regression is
+<span class="math display">\[\begin{aligned}
+{\textsf P}(y_i|\boldsymbol{x}_i,\boldsymbol{\beta}) &amp;= \left\{\begin{array}{ll}p &amp; \textrm{if}\quad y_i = 1\\
+1-p &amp; \textrm{if}\quad y_i = 0,\end{array}\right.\\
+&amp;= \left\{\begin{array}{ll}\frac{1}{1 + e^{-\beta_0 - \sum_j \beta_j x_{ij}}} &amp; \textrm{if}\quad y_i = 1\\
+\\
+\frac{e^{-\beta_0 - \sum_j \beta_j x_{ij}}}{1 + e^{-\beta_0 - \sum_j \beta_j x_{ij}}} &amp; \textrm{if}\quad y_i = 0,\end{array}\right.\\
+&amp; = \frac{e^{(-\beta_0 -\sum_j \beta_j x_{ij})(1-y_i)}}{1 + e^{-\beta_0 -\sum_j \beta_i x_{ij}}}.\end{aligned}\]</span>
+Thus, the likelihood of the full data arising, assuming the data are
+independent, is
+<span class="math display" id="eq:likelihood">\[\begin{equation}
+L(\boldsymbol{\beta}) = P(\boldsymbol{y}|\boldsymbol{x},\boldsymbol{\beta}) = \prod_{i=1}^n \frac{e^{(-\beta_0 - \sum_j \beta_j x_{ij})(1-y_i)}}{1 + e^{-\beta_0 - \sum_j \beta_j x_{ij}}}.
+\tag{6.3}
+\end{equation}\]</span>
+The parameter vector <span class="math inline">\(\boldsymbol{\beta}\)</span> that maximises equation
+<a href="classification.html#eq:likelihood">(6.3)</a> will be the one that is most likely to
+produce the data we observe, known as the <em>maximum likelihood estimate</em>
+<a href="#fn58" class="footnote-ref" id="fnref58"><sup>58</sup></a>. In practice, we typically maximise the log-likelihood function
+instead
+<span class="math display">\[\begin{aligned}
+\ell(\boldsymbol{\beta}) = \log L(\boldsymbol{\beta}) &amp;= \sum_{i=1}^n \log\left(\frac{e^{(-\beta_0 - \sum_j \beta_j x_{ij})(1-y_i)}}{1 + e^{-\beta_0 - \sum_j \beta_j x_{ij}}}\right)\\
+&amp; = \sum_{i=1}^n \log(e^{(-\beta_0 - \sum_j \beta_j x_{ij})(1-y_i)}) - \log(1 + e^{-\beta_0 - \sum_j \beta_j x_{ij}})\\
+&amp; = \sum_{i=1}^n (-\beta_0 - \sum_j \beta_j x_{ij})(1-y_i) - \log(1 + e^{-\beta_0 - \sum_j \beta_j x_{ij}}).\end{aligned}\]</span>
+There is no closed form solution for the maximum of
+<span class="math inline">\(\ell(\boldsymbol{\beta})\)</span>, so the maximum likelihood estimator is
+typically found using numerical techniques such as Newton’s method.</p>
+<p>Logistic regression models may be fit in R using the <code>glm</code> function. The
+basic syntax is</p>
+<div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb225-1"><a href="classification.html#cb225-1" tabindex="-1"></a><span class="fu">glm</span>(formula, family, data)</span></code></pre></div>
+<p>where</p>
+<ul>
+<li><p><code>formula</code> is the model formula,</p></li>
+<li><p><code>family</code> describes the error distribution. Specify <code>family=binomial</code>
+for logistic regression<a href="#fn59" class="footnote-ref" id="fnref59"><sup>59</sup></a>,</p></li>
+<li><p><code>data</code> is the data frame to use (optional).</p></li>
+</ul>
+<p>As with linear regression, the fitted model should be assigned to a
+fitted model object for later use.</p>
+<p>The <code>formula</code> is of the same form as for linear regression</p>
+<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb226-1"><a href="classification.html#cb226-1" tabindex="-1"></a>y <span class="sc">~</span> x1 <span class="sc">+</span> x2</span></code></pre></div>
+<p>where <code>y</code> in this case is a binary variable (0/1) and <code>x1</code> and <code>x2</code> are
+predictor variables, either quantitative or factors.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-36" class="example"><strong>Example 6.7  </strong></span><strong>Logistic regression modelling for Swiss bank notes</strong></p>
+<p>We have measurements on 100 forged and 100 genuine Swiss bank notes. On each
+bank note the size of the bottom margin was recorded, as was the
+diagonal length of the note (all measurements in mm). We are interested
+in classifying the notes into forged and genuine classes based on the
+margin and diagonal measurements. The data has been split into training
+and validation sets, containing 120 and 80 notes respectively.</p>
+<div class="sourceCode" id="cb227"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb227-1"><a href="classification.html#cb227-1" tabindex="-1"></a>swiss.train <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../data/swiss-train.csv&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb227-2"><a href="classification.html#cb227-2" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">type =</span> <span class="fu">factor</span>(type))</span>
+<span id="cb227-3"><a href="classification.html#cb227-3" tabindex="-1"></a>swiss.test <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../data/swiss-test.csv&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb227-4"><a href="classification.html#cb227-4" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">type =</span> <span class="fu">factor</span>(type))</span>
+<span id="cb227-5"><a href="classification.html#cb227-5" tabindex="-1"></a><span class="fu">glimpse</span>(swiss.train)</span></code></pre></div>
+<pre><code>#&gt; Rows: 120
+#&gt; Columns: 3
+#&gt; $ margin   &lt;dbl&gt; 9.7, 9.5, 10.0, 11.2, 10.7, 7.4, 11.6, 7.7, 9.3, 8.0, 8.2, 11…
+#&gt; $ diagonal &lt;dbl&gt; 140.6, 141.1, 139.4, 139.9, 139.5, 141.8, 140.2, 141.8, 138.3…
+#&gt; $ type     &lt;fct&gt; forged, genuine, forged, forged, forged, genuine, forged, gen…</code></pre>
+<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb229-1"><a href="classification.html#cb229-1" tabindex="-1"></a>swiss.glm<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">glm</span>(type <span class="sc">~</span> margin, <span class="at">family=</span>binomial, <span class="at">data=</span>swiss.train)</span>
+<span id="cb229-2"><a href="classification.html#cb229-2" tabindex="-1"></a><span class="fu">summary</span>(swiss.glm<span class="fl">.1</span>)</span></code></pre></div>
+<pre><code>#&gt; 
+#&gt; Call:
+#&gt; glm(formula = type ~ margin, family = binomial, data = swiss.train)
+#&gt; 
+#&gt; Coefficients:
+#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    
+#&gt; (Intercept)  19.9677     3.5250   5.665 1.47e-08 ***
+#&gt; margin       -2.1582     0.3842  -5.618 1.93e-08 ***
+#&gt; ---
+#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+#&gt; 
+#&gt; (Dispersion parameter for binomial family taken to be 1)
+#&gt; 
+#&gt;     Null deviance: 165.822  on 119  degrees of freedom
+#&gt; Residual deviance:  73.596  on 118  degrees of freedom
+#&gt; AIC: 77.596
+#&gt; 
+#&gt; Number of Fisher Scoring iterations: 6</code></pre>
+<div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb231-1"><a href="classification.html#cb231-1" tabindex="-1"></a>swiss.glm<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">glm</span>(type <span class="sc">~</span>., <span class="at">family=</span>binomial, <span class="at">data=</span>swiss.train)</span>
+<span id="cb231-2"><a href="classification.html#cb231-2" tabindex="-1"></a><span class="fu">step</span>(swiss.glm<span class="fl">.2</span>)</span></code></pre></div>
+<pre><code>#&gt; Start:  AIC=13.26
+#&gt; type ~ margin + diagonal
+#&gt; 
+#&gt;            Df Deviance    AIC
+#&gt; &lt;none&gt;           7.260 13.260
+#&gt; - margin    1   12.651 16.651
+#&gt; - diagonal  1   73.596 77.596</code></pre>
+<pre><code>#&gt; 
+#&gt; Call:  glm(formula = type ~ margin + diagonal, family = binomial, data = swiss.train)
+#&gt; 
+#&gt; Coefficients:
+#&gt; (Intercept)       margin     diagonal  
+#&gt;    -985.258       -4.920        7.324  
+#&gt; 
+#&gt; Degrees of Freedom: 119 Total (i.e. Null);  117 Residual
+#&gt; Null Deviance:       165.8 
+#&gt; Residual Deviance: 7.26  AIC: 13.26</code></pre>
+<p>Some comments on this R snippet.</p>
+<ul>
+<li><p>The <code>type</code> variable has two levels, <code>forged</code> and <code>genuine</code> in that
+order. Thus, <code>forged</code> will be taken as the class represented by
+<span class="math inline">\(y=0\)</span>, and <code>genuine</code> will be the class represented by <span class="math inline">\(y=1\)</span> in the
+logistic regression.</p></li>
+<li><p>The <code>glm</code> line is fitting a logistic model with <code>type</code>, a factor
+with two possible values as the response. For <code>swiss.glm.1</code> there is
+just a single predictor, <code>margin</code>. For <code>swiss.glm.2</code> both <code>margin</code>
+and <code>diagonal</code> are predictors.</p></li>
+<li><p>For <code>swiss.glm.1</code> we see that the coefficient of <code>margin</code> is
+negative, so <span class="math inline">\({\textsf P}(y=1 | \texttt{margin})\)</span> (i.e. probability
+of genuine note) decreases as <code>margin</code> increases.</p></li>
+<li><p>For <code>swiss.glm.1</code> linear predictor is
+<span class="math inline">\(\theta(\texttt{margin}) = \beta_0 + \beta_1 \texttt{margin}\)</span>. The
+maximum likelihood estimates for the parameters are
+<span class="math inline">\(\hat \beta_0 = 19.9677\)</span> and <span class="math inline">\(\hat \beta_1 = -2.1582\)</span>.</p></li>
+<li><p>The <em>Deviance</em> mentioned in the output is the logistic regression
+analogue of sum of squares in linear regression.</p></li>
+<li><p>As with linear regression, there is the question of what selection
+of predictor variables provide a model with best bias-variance
+trade-off. Again, mirroring our discussion of linear regression for
+prediction, we can use backwards variable selection implemented to
+minimze AIC as a way of finding a reasonable set of predictor
+variables. In this particular case we see that the model
+<code>swiss.glm.2</code> has a lower AIC than either of the models that can be
+obtained by removing a single predictor, so the backwards variable
+selection algorithm (implemented using <code>step</code>) terminates
+immediately.</p></li>
+</ul>
+</div>
+</div>
+<div id="logistic-regression-as-a-classifier" class="section level3 hasAnchor" number="6.5.2">
+<h3><span class="header-section-number">6.5.2</span> Logistic Regression as a classifier<a href="classification.html#logistic-regression-as-a-classifier" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>When using logistic regression as a classifier, for a given value of the
+predictors <span class="math inline">\(\boldsymbol{x}\)</span> we would classify as a 1 if
+<span class="math inline">\({\textsf P}(Y=1|\boldsymbol{x}) &gt; {\textsf P}(Y=0|\boldsymbol{x})\)</span> and
+as 0 otherwise. i.e. we classify as a 1 if
+<span class="math display">\[\frac{{\textsf P}(Y=1|\boldsymbol{x})}{{\textsf P}(Y=0|\boldsymbol{x})} &gt; 1.\]</span>
+Now, <span class="math inline">\({\textsf P}(Y=1|\boldsymbol{x}) = p(\boldsymbol{x})\)</span>, and thus
+<span class="math inline">\({\textsf P}(Y=0|\boldsymbol{x}) = 1-p(\boldsymbol{x})\)</span>. Hence, we
+classify as a 1 if <span class="math display">\[\begin{aligned}
+&amp; &amp; \frac{P(Y=1|\boldsymbol{x})}{P(Y=0|\boldsymbol{x})} &amp;&gt; 1,\\
+&amp; \iff &amp; \frac{p(\boldsymbol{x})}{1-p(\boldsymbol{x})} &amp;&gt; 1,\\
+&amp; \iff &amp; \log(\frac{p(\boldsymbol{x})}{1-p(\boldsymbol{x})}) &amp;&gt; 0,\\
+&amp; \iff &amp; {\textsf {logit}}(p(\boldsymbol{x})) &amp;&gt; 0.\\
+&amp; \iff &amp; \beta_0 + \beta_1x_1 + \cdots \beta_px_p &amp;&gt; 0.\end{aligned}\]</span>
+This gives a simple formula for classifying: evaluate the linear
+predictor and assign to class 1 if positive and class 0 if negative.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-37" class="example"><strong>Example 6.8  </strong></span><strong>Classifying the Swiss Bank Notes data</strong></p>
+<p>Recall from the previous example that the model <code>swiss.glm.1</code> had
+<span class="math inline">\(\theta(\texttt{margin}) = \beta_0 + \beta_1 \texttt{margin}\)</span> with
+maximum likelihood estimates <span class="math inline">\(\hat \beta_0 = 19.9677\)</span> and
+<span class="math inline">\(\hat \beta_1 = -2.1582\)</span>. It follows that the fitted model (based on
+training data) has linear predictor
+<span class="math inline">\(\hat \theta(\texttt{margin}) = 19.9677 -2.1582~\texttt{margin}\)</span>. We
+would hence classify a test case to genuine notes (coded by <span class="math inline">\(y=1\)</span>) if
+and only if <span class="math display">\[\begin{aligned}
+19.9677 -2.1582~\texttt{margin} \ge 0 &amp;\Leftrightarrow&amp; \texttt{margin} \le \frac{19.9677}{2.1582} \\
+                                      &amp;\Leftrightarrow&amp; \texttt{margin} \le 9.252~~~.\end{aligned}\]</span>
+A quick exploration of the data should persuade you that this is a
+natural result: most of the forged notes are detectable by their
+surprisingly large bottom margins.</p>
+</div>
+<p>The <code>predict</code> command on a fitted model object from <code>glm</code> by default
+returns predictions from the linear predictor, rather than on the
+original scale of the data. This is a bit fiddly - we could optionally
+assign the positive predictions to the second class (class 1),
+and the negative productions to the first class (class 0).</p>
+<p>Alternatively, we can just use the <code>tidymodels</code> framework with the
+<code>logistic_reg()</code> function in place of <code>glm()</code>.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-38" class="example"><strong>Example 6.9  </strong></span><strong>More on Classifying the Swiss Bank Notes data</strong></p>
+<p>We continue our example on the Swiss bank notes by using the output
+from <code>glm()</code> to compute the class probabilities ourselves:</p>
+<div class="sourceCode" id="cb234"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb234-1"><a href="classification.html#cb234-1" tabindex="-1"></a><span class="fu">library</span>(broom)</span></code></pre></div>
+<pre><code>#&gt; Warning: package &#39;broom&#39; was built under R version 4.5.2</code></pre>
+<div class="sourceCode" id="cb236"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb236-1"><a href="classification.html#cb236-1" tabindex="-1"></a>swiss.glm<span class="fl">.2</span> <span class="sc">|&gt;</span> <span class="fu">augment</span>(<span class="at">newdata=</span>swiss.test) <span class="sc">|&gt;</span></span>
+<span id="cb236-2"><a href="classification.html#cb236-2" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">.pred_genuine =</span> <span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span>.fitted)))</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 80 × 5
+#&gt;    margin diagonal type     .fitted .pred_genuine
+#&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;fct&gt;      &lt;dbl&gt;         &lt;dbl&gt;
+#&gt;  1    8.7    137.8 forged  -18.767     7.0707 e-9
+#&gt;  2    8.9    142.3 genuine  13.208     1.00000e+0
+#&gt;  3   10.3    139.7 forged  -12.723     2.9821 e-6
+#&gt;  4   10.2    139.6 forged  -12.963     2.3447 e-6
+#&gt;  5   10.1    139.2 forged  -15.401     2.0483 e-7
+#&gt;  6   10.6    139.7 forged  -14.199     6.8157 e-7
+#&gt;  7    9.1    141.5 genuine   6.3648    9.9828 e-1
+#&gt;  8   10.4    140.3 forged   -8.8203    1.4769 e-4
+#&gt;  9    7.9    140.9 genuine   7.8741    9.9962 e-1
+#&gt; 10    8      139.6 genuine  -2.1396    1.0531 e-1
+#&gt; # ℹ 70 more rows</code></pre>
+<p>The <code>.fitted</code> entry contains the predicted logits for the
+test cases. Hence for test case 1 (the predictors for which
+we denote by the vector <span class="math inline">\(\boldsymbol{x}_0\)</span>),
+<span class="math display">\[\theta(\boldsymbol{x}_0) = \log \left ( \frac{p(\boldsymbol{x}_0)}{1 - p(\boldsymbol{x}_0)} \right ) = -18.77 .\]</span>
+It follows that
+<span class="math display">\[{\textsf P}(y=1 | \boldsymbol{x}_0) = 1/(1+e^{-\theta(\boldsymbol{x}_0)}) = 1/(1+e^{18.77}) \approx 0.\]</span></p>
+<p>Thus, each test case will be assigned to the genuine class (coded <span class="math inline">\(y=1\)</span>) if
+and only if it has a posterior probability <span class="math inline">\(p(\boldsymbol{x}) &gt; 0.5\)</span>, or
+equivalently if and only if its linear predictor
+<span class="math inline">\(\theta(\boldsymbol{x}_0) &gt; 0\)</span>.</p>
+<p>Ofcourse, the <code>tidymodels</code> framework takes care of this for us, so if we
+instead utilise our existing framework knowledge, we can get the same
+predictions as we’re used to:</p>
+<div class="sourceCode" id="cb238"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb238-1"><a href="classification.html#cb238-1" tabindex="-1"></a>swiss.lr<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb238-2"><a href="classification.html#cb238-2" tabindex="-1"></a>  <span class="fu">fit</span>(type <span class="sc">~</span> ., <span class="at">data=</span>swiss.train)</span>
+<span id="cb238-3"><a href="classification.html#cb238-3" tabindex="-1"></a>swiss.lr.<span class="fl">2.</span>pred <span class="ot">&lt;-</span> swiss.lr<span class="fl">.2</span> <span class="sc">|&gt;</span></span>
+<span id="cb238-4"><a href="classification.html#cb238-4" tabindex="-1"></a>  <span class="fu">augment</span>(<span class="at">new_data=</span>swiss.test)</span>
+<span id="cb238-5"><a href="classification.html#cb238-5" tabindex="-1"></a>swiss.lr.<span class="fl">2.</span>pred</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 80 × 6
+#&gt;    .pred_class .pred_forged .pred_genuine margin diagonal type   
+#&gt;    &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt; &lt;fct&gt;  
+#&gt;  1 forged      1.00000         7.0707 e-9    8.7    137.8 forged 
+#&gt;  2 genuine     0.0000018354    1.00000e+0    8.9    142.3 genuine
+#&gt;  3 forged      1.00000         2.9821 e-6   10.3    139.7 forged 
+#&gt;  4 forged      1.00000         2.3447 e-6   10.2    139.6 forged 
+#&gt;  5 forged      1.00000         2.0483 e-7   10.1    139.2 forged 
+#&gt;  6 forged      1.00000         6.8157 e-7   10.6    139.7 forged 
+#&gt;  7 genuine     0.0017181       9.9828 e-1    9.1    141.5 genuine
+#&gt;  8 forged      0.99985         1.4769 e-4   10.4    140.3 forged 
+#&gt;  9 genuine     0.00038034      9.9962 e-1    7.9    140.9 genuine
+#&gt; 10 forged      0.89469         1.0531 e-1    8      139.6 genuine
+#&gt; # ℹ 70 more rows</code></pre>
+<p>As always, <code>augment()</code> augments the test data <code>swiss.test</code> with the
+predicted class <code>.pred_class</code> as well as the predicted probabilies
+of each class (<code>.pred_forged</code> and <code>.pred_genuine</code>). We can thus
+directly cross tabulate the usual way:</p>
+<div class="sourceCode" id="cb240"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb240-1"><a href="classification.html#cb240-1" tabindex="-1"></a>swiss.lr.<span class="fl">2.</span>pred <span class="sc">|&gt;</span></span>
+<span id="cb240-2"><a href="classification.html#cb240-2" tabindex="-1"></a>  <span class="fu">conf_mat</span>(<span class="at">truth=</span>type, <span class="at">estimate=</span>.pred_class)</span></code></pre></div>
+<pre><code>#&gt;           Truth
+#&gt; Prediction forged genuine
+#&gt;    forged      36       1
+#&gt;    genuine      0      43</code></pre>
+<p>Some comments:</p>
+<ul>
+<li>The confusion matrix tabulates the predicted class versus the true
+class from the <code>swiss.valid</code> set. This shows that all but one of the
+bank notes has been correctly classified, a misclassification rate
+of just <span class="math inline">\(1/80\)</span>.</li>
+</ul>
+</div>
+<p>Logistic regression, particularly when being applied to data sets that
+can be relatively easily classified, can end up creating a perfect
+classifier based on the training data. In this case there is no unique
+solution for the maximum likelihood estimate of the coefficients –
+there are an infinite number of possibile coefficients that will produce
+the same perfect predictions. We illustrate this with a slight change of
+the Swiss bank notes data.</p>
+<div class="example">
+<p><span id="exm:swiss5" class="example"><strong>Example 6.10  </strong></span><strong>Classification of modified Swiss Bank Notes</strong></p>
+<p>Consider the following R snippet, where we have changed a single
+observation in the <code>swiss.train</code> data set slightly. The plot is given in
+Figure <a href="classification.html#fig:swiss5">6.6</a>.</p>
+<div class="sourceCode" id="cb242"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb242-1"><a href="classification.html#cb242-1" tabindex="-1"></a>swiss2.train <span class="ot">&lt;-</span> swiss.train <span class="sc">|&gt;</span></span>
+<span id="cb242-2"><a href="classification.html#cb242-2" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">diagonal =</span> <span class="fu">if_else</span>(<span class="fu">row_number</span>() <span class="sc">==</span> <span class="dv">103</span>, <span class="fl">140.2</span>, diagonal))</span>
+<span id="cb242-3"><a href="classification.html#cb242-3" tabindex="-1"></a></span>
+<span id="cb242-4"><a href="classification.html#cb242-4" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>swiss2.train) <span class="sc">+</span></span>
+<span id="cb242-5"><a href="classification.html#cb242-5" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x=</span>margin, <span class="at">y=</span>diagonal, <span class="at">col=</span>type)) <span class="sc">+</span></span>
+<span id="cb242-6"><a href="classification.html#cb242-6" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">guide =</span> <span class="st">&#39;none&#39;</span>, <span class="at">values=</span><span class="fu">c</span>(<span class="st">&#39;red&#39;</span>, <span class="st">&#39;black&#39;</span>))</span></code></pre></div>
+<div class="figure"><span style="display:block;" id="fig:swiss5"></span>
+<img src="06-classification_files/figure-html/swiss5-1.png" alt="Forged (black) and genuine (red) Swiss bank notes from Example \@ref(exm:swiss5)" width="672" />
+<p class="caption">
+Figure 6.6: Forged (black) and genuine (red) Swiss bank notes from Example <a href="classification.html#exm:swiss5">6.10</a>
+</p>
+</div>
+<div class="sourceCode" id="cb243"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb243-1"><a href="classification.html#cb243-1" tabindex="-1"></a>swiss2.lr <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>() <span class="sc">|&gt;</span> <span class="fu">fit</span>(type <span class="sc">~</span> ., <span class="at">data=</span>swiss2.train)</span></code></pre></div>
+<pre><code>#&gt; Warning: glm.fit: algorithm did not converge</code></pre>
+<pre><code>#&gt; Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<p>Some comments on the R code.</p>
+<ul>
+<li><p><code>glm.fit</code> gives two warning messages, firstly that the algorithm did not
+converge, and secondly that fitted probabilities that were
+numerically no different than 0 or 1 occurred.</p></li>
+<li><p>Figure <a href="classification.html#fig:swiss5">6.6</a>
+suggests there is a line that perfectly separates the data into the
+two groups. It is this perfect separation based on a linear
+estimator that causes <code>glm</code> to not find a unique maximum likelihood
+estimate, and thus fail to converge. Further, the predicted
+probabilities on the training set are indistinguishable from 0
+and 1.</p></li>
+<li><p>In this particular case, the coefficients found from the model lead
+to a perfect fit of the training data. However, the algorithm used
+to find the maximum likelihood estimators may fail to converge for
+other reasons, such as collinearity of the predictors, or a lack of
+data (no observations) for certain combinations of factors.</p></li>
+</ul>
+</div>
+</div>
+<div id="sec:multinomial" class="section level3 hasAnchor" number="6.5.3">
+<h3><span class="header-section-number">6.5.3</span> Extending Logistic Regression to more than two classes<a href="classification.html#sec:multinomial" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Logistic regression extends naturally to more than two categories by
+moving from a single probability of success <span class="math inline">\(p\)</span> to the probability of
+each class <span class="math inline">\(p_c\)</span> for <span class="math inline">\(c \in 1, \ldots, C\)</span> where <span class="math inline">\(C\)</span> is the number of
+classes. We then model <span class="math inline">\(p_c\)</span> as
+<span class="math display">\[p_c = \left\{ \begin{array}{ll}\frac{\displaystyle 1}{\displaystyle 1 + \sum_{m=2}^C e^{-\beta_{m0} - \sum_{j=1}^k \beta_{mj}x_j}} &amp; \textrm{if } c=1\\
+\\
+\frac{\displaystyle e^{-\beta_{c0} - \sum_{j=1}^k \beta_{cj}x_j}}{\displaystyle 1 + \sum_{m=2}^C e^{-\beta_{m0} - \sum_{j=1}^k \beta_{mj}x_j}} &amp;   \textrm{if } c\in \{2, \ldots, C\}.
+\end{array}\right.\]</span> Notice that we now have <span class="math inline">\(C-1\)</span> lots of <span class="math inline">\(k\)</span>
+coefficients to estimate, one set for each of the classes excluding one.
+The last class need not have separate estimators, as the probabilities
+<span class="math inline">\(p_c\)</span> must sum to one<a href="#fn60" class="footnote-ref" id="fnref60"><sup>60</sup></a>.</p>
+<p>Such models are typically referred to as <em>multinomial</em> regression
+models, as they extend the binomial distribution to trials with more
+than 2 outcomes.</p>
+<p>The <code>multinom_reg</code> function in <code>parsnip</code> fits this by default using
+a neural network via the <code>nnet</code> library. We illustrate this with an
+analysis of the Italian wine data.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-39" class="example"><strong>Example 6.11  </strong></span><strong>Multinomial Regression for the Wine Data</strong></p>
+<p>We perform classification using the <code>multinom_reg</code> function.</p>
+<div class="sourceCode" id="cb246"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb246-1"><a href="classification.html#cb246-1" tabindex="-1"></a>wine.mn <span class="ot">&lt;-</span> <span class="fu">multinom_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb246-2"><a href="classification.html#cb246-2" tabindex="-1"></a>  <span class="fu">fit</span>(Cultivar <span class="sc">~</span> ., <span class="at">data=</span>wine.train)</span>
+<span id="cb246-3"><a href="classification.html#cb246-3" tabindex="-1"></a>wine.mn <span class="sc">|&gt;</span></span>
+<span id="cb246-4"><a href="classification.html#cb246-4" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>()</span></code></pre></div>
+<pre><code>#&gt; Call:
+#&gt; nnet::multinom(formula = Cultivar ~ ., data = data, trace = FALSE)
+#&gt; 
+#&gt; Coefficients:
+#&gt;   (Intercept)   Alcohol      Malic       Ash  Alc.Ash         Mg  Phenols
+#&gt; B  279.836344  2.510949 -14.231258 -95.03628 2.485551 0.14497172 53.54385
+#&gt; C   -4.627004 23.977218  -9.053405 -26.39729 2.855262 0.09578787 58.79897
+#&gt;        Flav  Non.Flav    Proan    Colour       Hue  ODRatio    Proline
+#&gt; B -92.06688 106.00528 60.79086 -16.23188 218.29240 20.26225 -0.5097276
+#&gt; C -99.62994 -47.82549 35.94083  15.05347 -31.03135 21.60742 -0.4933040
+#&gt; 
+#&gt; Residual Deviance: 4.412777e-06 
+#&gt; AIC: 56</code></pre>
+<div class="sourceCode" id="cb248"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb248-1"><a href="classification.html#cb248-1" tabindex="-1"></a>wine.mn.pred <span class="ot">&lt;-</span> wine.mn <span class="sc">|&gt;</span> <span class="fu">augment</span>(<span class="at">new_data=</span>wine.test)</span>
+<span id="cb248-2"><a href="classification.html#cb248-2" tabindex="-1"></a>wine.mn.pred <span class="sc">|&gt;</span></span>
+<span id="cb248-3"><a href="classification.html#cb248-3" tabindex="-1"></a>  <span class="fu">conf_mat</span>(<span class="at">truth=</span>Cultivar, <span class="at">estimate=</span>.pred_class)</span></code></pre></div>
+<pre><code>#&gt;           Truth
+#&gt; Prediction  A  B  C
+#&gt;          A 32  3  1
+#&gt;          B  0 28  0
+#&gt;          C  0  0 14</code></pre>
+<p>Some comments:</p>
+<ul>
+<li><p>The summary for <code>multinom</code> objects gives the values of the
+coefficients for classes B and C but not for class A, as that is
+then determined as the probabilities sum to 1.</p></li>
+<li><p>A misclassification rate of <span class="math inline">\(4/78 \approx 5.1\%\)</span> is
+similar to that achieved earlier.</p></li>
+</ul>
+<p>We continue by attempting to fit a model containing just the variables
+<code>Alcohol</code>, <code>Color</code>, and <code>Hue</code>.</p>
+<div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb250-1"><a href="classification.html#cb250-1" tabindex="-1"></a>wine.mn2 <span class="ot">&lt;-</span> <span class="fu">multinom_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb250-2"><a href="classification.html#cb250-2" tabindex="-1"></a>  <span class="fu">fit</span>(Cultivar <span class="sc">~</span> Alcohol <span class="sc">+</span> Colour <span class="sc">+</span> Hue, <span class="at">data=</span>wine.train)</span>
+<span id="cb250-3"><a href="classification.html#cb250-3" tabindex="-1"></a>wine.mn2.pred <span class="ot">&lt;-</span> wine.mn2 <span class="sc">|&gt;</span> <span class="fu">augment</span>(<span class="at">new_data=</span>wine.test)</span>
+<span id="cb250-4"><a href="classification.html#cb250-4" tabindex="-1"></a>wine.mn2.pred <span class="sc">|&gt;</span></span>
+<span id="cb250-5"><a href="classification.html#cb250-5" tabindex="-1"></a>  <span class="fu">conf_mat</span>(<span class="at">truth=</span>Cultivar, <span class="at">estimate=</span>.pred_class)</span></code></pre></div>
+<pre><code>#&gt;           Truth
+#&gt; Prediction  A  B  C
+#&gt;          A 30  3  1
+#&gt;          B  2 23  0
+#&gt;          C  0  5 14</code></pre>
+<p>We get a worse misclassification rate in this case of
+<span class="math inline">\(11/78 \approx 14.1\%\)</span>. Nonetheless,
+this used significantly fewer
+variables in the model. Might we improve on the full model by omitting
+some of the variables? We now consider a variable selection algorithm.</p>
+</div>
+</div>
+<div id="model-selection-1" class="section level3 hasAnchor" number="6.5.4">
+<h3><span class="header-section-number">6.5.4</span> Model selection<a href="classification.html#model-selection-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>As with linear regression, model selection is necessary for logistic
+regression in order to eliminate variables that are only weakly
+informative (or not informative at all) for classification. Eliminating
+such a variable will increase the bias of the model but reduce the
+variance, as we need not estimate a coefficient for those variables.
+This variance/bias trade-off requires a balance between model fit and
+model complexity.</p>
+<p>The Akaike Information Criterion (AIC) may be used in logistic
+regression in the same way as it was used in linear regression. Indeed,
+we can utilise the <code>step</code> function to perform backwards elimination from
+a full model.</p>
+<p>Unfortunately, doing so means moving away from the <code>tidymodels</code> framework,
+as <code>step()</code> does not know what to do with the wrapped <code>glm</code> or <code>multinom</code>
+model. The nicest way to do this is to fit the model using <code>multinom</code> and
+then <code>step</code>. Then, refit the resulting model in the <code>tidymodels</code> framework
+to benefit from the improved manipulation tools.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-40" class="example"><strong>Example 6.12  </strong></span><strong>Multinomial model selection for the Wine Data</strong></p>
+<p>We use the <code>step</code> function on the full model <code>wine.mn</code> to produce a
+model with reduced AIC.</p>
+<div class="sourceCode" id="cb252"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb252-1"><a href="classification.html#cb252-1" tabindex="-1"></a>wine.mn.refit <span class="ot">&lt;-</span> nnet<span class="sc">::</span><span class="fu">multinom</span>(Cultivar <span class="sc">~</span> ., <span class="at">data=</span>wine.train, <span class="at">trace=</span><span class="cn">FALSE</span>)</span>
+<span id="cb252-2"><a href="classification.html#cb252-2" tabindex="-1"></a>wine.mn3.refit <span class="ot">&lt;-</span> <span class="fu">step</span>(wine.mn.refit)</span>
+<span id="cb252-3"><a href="classification.html#cb252-3" tabindex="-1"></a><span class="fu">summary</span>(wine.mn3.refit)</span></code></pre></div>
+<pre><code>#&gt; Call:
+#&gt; nnet::multinom(formula = Cultivar ~ Alcohol + Flav + Hue + Proline, 
+#&gt;     data = wine.train, trace = FALSE)
+#&gt; 
+#&gt; Coefficients:
+#&gt;   (Intercept)   Alcohol      Flav       Hue     Proline
+#&gt; B   245.00573 -17.44169 -12.94913  71.47596 -0.08345328
+#&gt; C   -11.09361  15.55645 -42.50990 -73.13526 -0.09441435
+#&gt; 
+#&gt; Std. Errors:
+#&gt;    (Intercept)    Alcohol         Flav          Hue    Proline
+#&gt; B 0.2640822466 3.23025129 14.678344719 0.2261703773 0.01391875
+#&gt; C 0.0005947043 0.00824314  0.005362715 0.0003049169 0.19855427
+#&gt; 
+#&gt; Residual Deviance: 0.3720929 
+#&gt; AIC: 20.37209</code></pre>
+<div class="sourceCode" id="cb254"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb254-1"><a href="classification.html#cb254-1" tabindex="-1"></a>wine.mn3 <span class="ot">&lt;-</span> <span class="fu">multinom_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb254-2"><a href="classification.html#cb254-2" tabindex="-1"></a>  <span class="fu">fit</span>(Cultivar <span class="sc">~</span> Alcohol <span class="sc">+</span> Flav <span class="sc">+</span> Hue <span class="sc">+</span> Proline, <span class="at">data=</span>wine.train)</span>
+<span id="cb254-3"><a href="classification.html#cb254-3" tabindex="-1"></a>wine.mn3.pred <span class="ot">&lt;-</span> wine.mn3 <span class="sc">|&gt;</span> <span class="fu">augment</span>(<span class="at">new_data=</span>wine.test)</span>
+<span id="cb254-4"><a href="classification.html#cb254-4" tabindex="-1"></a>wine.mn3.pred <span class="sc">|&gt;</span></span>
+<span id="cb254-5"><a href="classification.html#cb254-5" tabindex="-1"></a>  <span class="fu">conf_mat</span>(<span class="at">truth=</span>Cultivar, <span class="at">estimate=</span>.pred_class)</span></code></pre></div>
+<pre><code>#&gt;           Truth
+#&gt; Prediction  A  B  C
+#&gt;          A 32  2  0
+#&gt;          B  0 27  0
+#&gt;          C  0  2 15</code></pre>
+<p>Some comments on this R snippet.</p>
+<ul>
+<li><p>The <code>step</code> command can be used in the same way as for linear
+regression, but only if not using the <code>tidymodels</code> framework.
+Note that we’ve used <code>nnet::multinom()</code> - this means we don’t
+have to explicitly load the <code>nnet</code> library (it will be implicitly
+loaded).</p></li>
+<li><p>The final model contained <code>Alcohol</code>, <code>Flav</code>, <code>Hue</code> and <code>Proline</code> as
+predictors. We then re-fit this model in the <code>tidymodels</code> framework
+so we can simply use <code>augment()</code> and <code>conf_mat()</code> as always.</p></li>
+<li><p>The final model has a misclassification rate of <span class="math inline">\(4/78 \approx 5.1\%\)</span>
+which is the same as the full model, however it contains only 4
+predictors.</p></li>
+</ul>
+</div>
+</div>
+<div id="sec:roc" class="section level3 hasAnchor" number="6.5.5">
+<h3><span class="header-section-number">6.5.5</span> ROC curves and the classification threshold<a href="classification.html#sec:roc" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>In the examples above we have used the default classification rule:
+assign to the class with the highest predicted posterior probability.
+For a binary classifier this amounts to predicting class 1 when
+<span class="math inline">\(\hat p(\boldsymbol{x}) &gt; 0.5\)</span> and class 0 otherwise. Not all problems
+are symmetric, however. When the consequences of a false negative differ
+from those of a false positive – as in medical screening, fraud
+detection, or adoption prediction – it can be worthwhile to use a
+different threshold <span class="math inline">\(\tau\)</span>, predicting class 1 when
+<span class="math inline">\(\hat p(\boldsymbol{x}) &gt; \tau\)</span>.</p>
+<p>As <span class="math inline">\(\tau\)</span> varies from 0 to 1, the <em>sensitivity</em> (true positive rate,
+TPR) and <em>specificity</em> (true negative rate, TNR) of the classifier
+change in opposite directions:
+<span class="math display" id="eq:tpr-fpr">\[\begin{align}
+\text{Sensitivity}(\tau) &amp;= \frac{\text{TP}(\tau)}{\text{TP}(\tau) + \text{FN}(\tau)}, \\
+1 - \text{Specificity}(\tau) &amp;= \frac{\text{FP}(\tau)}{\text{FP}(\tau) + \text{TN}(\tau)}.
+\tag{6.4}
+\end{align}\]</span>
+The <em>Receiver Operating Characteristic</em> (ROC) curve is a plot of
+sensitivity against <span class="math inline">\(1 - \text{specificity}\)</span> as <span class="math inline">\(\tau\)</span> ranges over
+<span class="math inline">\([0, 1]\)</span>. A perfect classifier produces a point at <span class="math inline">\((0, 1)\)</span> for some
+threshold (all positives detected, no false alarms). A random classifier
+produces a diagonal line from <span class="math inline">\((0, 0)\)</span> to <span class="math inline">\((1, 1)\)</span>.</p>
+<p>The <em>area under the ROC curve</em> (AUC) summarises the overall
+discrimination ability of a model in a single number. It has a useful
+probabilistic interpretation: it is the probability that a randomly
+selected positive case receives a higher predicted probability than a
+randomly selected negative case:
+<span class="math display">\[\text{AUC} = P\!\left(\hat p(\boldsymbol{x}^+) &gt; \hat p(\boldsymbol{x}^-)\right)\]</span>
+where <span class="math inline">\(\boldsymbol{x}^+\)</span> and <span class="math inline">\(\boldsymbol{x}^-\)</span> are drawn from the
+positive and negative class distributions respectively. AUC = 0.5
+corresponds to a coin-flip classifier; practical classifiers typically
+achieve AUC <span class="math inline">\(&gt; 0.7\)</span>, and values above 0.9 are considered excellent.</p>
+<p>AUC has the advantage over accuracy of being independent of the
+classification threshold and of class proportions, making it suitable
+for comparing models in the presence of class imbalance.</p>
+<p>When the positive class is rare, a complementary summary is the
+<em>area under the precision-recall curve</em> (AUCPR). The precision
+<span class="math inline">\(\frac{\text{TP}}{\text{TP} + \text{FP}}\)</span> and recall
+<span class="math inline">\(\frac{\text{TP}}{\text{TP} + \text{FN}}\)</span> are plotted against each
+other as <span class="math inline">\(\tau\)</span> varies; a perfect classifier achieves
+<span class="math inline">\((\text{recall}, \text{precision}) = (1, 1)\)</span> for some threshold.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-41" class="example"><strong>Example 6.13  </strong></span><strong>ROC curve and AUC for logistic regression on the Swiss bank notes</strong></p>
+<div class="sourceCode" id="cb256"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb256-1"><a href="classification.html#cb256-1" tabindex="-1"></a><span class="fu">library</span>(yardstick)</span>
+<span id="cb256-2"><a href="classification.html#cb256-2" tabindex="-1"></a></span>
+<span id="cb256-3"><a href="classification.html#cb256-3" tabindex="-1"></a>swiss.lr.<span class="fl">2.</span>pred <span class="sc">|&gt;</span></span>
+<span id="cb256-4"><a href="classification.html#cb256-4" tabindex="-1"></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> type, .pred_genuine) <span class="sc">|&gt;</span></span>
+<span id="cb256-5"><a href="classification.html#cb256-5" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code></pre></div>
+<p><img src="06-classification_files/figure-html/roc-swiss-1.png" alt="" width="672" /></p>
+<div class="sourceCode" id="cb257"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb257-1"><a href="classification.html#cb257-1" tabindex="-1"></a>swiss.lr.<span class="fl">2.</span>pred <span class="sc">|&gt;</span></span>
+<span id="cb257-2"><a href="classification.html#cb257-2" tabindex="-1"></a>  <span class="fu">roc_auc</span>(<span class="at">truth =</span> type, .pred_genuine)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 1 × 3
+#&gt;   .metric .estimator .estimate
+#&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+#&gt; 1 roc_auc binary             0</code></pre>
+<p>The curve hugs the top-left corner, confirming that the logistic
+regression model is a strong discriminator for this dataset.</p>
+<p>The <code>roc_curve()</code> function from <code>yardstick</code> requires the predicted
+probabilities for one of the classes (here <code>type = genuine</code>). The
+<code>autoplot()</code> method produces the standard ROC plot; <code>roc_auc()</code>
+computes the AUC directly.</p>
+</div>
+<p>When the costs of misclassification differ between the two classes, an
+alternative to changing the threshold is to incorporate
+misclassification costs explicitly into the training or evaluation.
+If a false negative costs <span class="math inline">\(c_{\text{FN}}\)</span> and a false positive costs
+<span class="math inline">\(c_{\text{FP}}\)</span>, the expected cost-weighted misclassification rate is
+<span class="math display">\[C(\tau) = c_{\text{FN}} \cdot \text{FNR}(\tau) \cdot \pi_+ + c_{\text{FP}} \cdot \text{FPR}(\tau) \cdot \pi_-\]</span>
+where <span class="math inline">\(\pi_+\)</span> and <span class="math inline">\(\pi_-\)</span> are the class prior probabilities, and one
+minimises <span class="math inline">\(C(\tau)\)</span> over <span class="math inline">\(\tau\)</span> to obtain the optimal threshold for
+deployment.</p>
+</div>
+</div>
+<div id="other-methods-of-classification" class="section level2 hasAnchor" number="6.6">
+<h2><span class="header-section-number">6.6</span> Other Methods of Classification<a href="classification.html#other-methods-of-classification" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The classifiers that we have considered to date have either been based
+on Equation <a href="classification.html#eq:bayes">(6.1)</a> using various explicit models for the probability
+functions <span class="math inline">\(\{f_j\}\)</span> or, in the case of Logistic regression, based on a
+functional form of the probabilities <span class="math inline">\(P(j | \boldsymbol{x})\)</span>. We now
+turn to some classification techniques that are more model-free in
+nature, namely k-nearest neighbour classifiers, classification trees and
+neural networks. The first of these is designed to work with
+quantitative predictors only, but the latter pair can also incorporate
+factors.</p>
+<div id="k-nearest-neighbour-classification" class="section level3 hasAnchor" number="6.6.1">
+<h3><span class="header-section-number">6.6.1</span> k-Nearest Neighbour Classification<a href="classification.html#k-nearest-neighbour-classification" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The idea behind k-nearest neighbour classification is to find the <span class="math inline">\(k\)</span>
+data points in the training set that are most similar to the test
+observation at hand, and then assign the test case to the most common
+class for these proximate training data. This general idea should ring
+some bells – we discussed nearest neighbour imputation for handling
+missing values.</p>
+<p>Two important issues to consider are the scaling of the data, and the
+choice of <span class="math inline">\(k\)</span>. With regard to the former, note that k-nearest neighbour
+classification is (usually) based on Euclidean distances between
+observations. This means that if there is disparity in the scales of the
+variables, those taking larger values will tend to dominate.
+Furthermore, it means that the methodology will not be scale invariant.
+For example, changing the unit of measurement for a variable from metres
+to centimetres will change the resulting classifier, which is
+undesirable. If the raw variables are on comparable, natural scales then
+this may not be a significant problem, but otherwise it will usually be
+wise to transform the predictors so that they have common means and
+standard deviations. Fortunately, the default engine for nearest neighbours
+in the <code>tidymodels</code> framework automatically scales the predictors to have
+common standard deviations for us.</p>
+<p>Turning to the choice of <span class="math inline">\(k\)</span>, the usual considerations of the
+bias-variance trade-off apply. A small value of <span class="math inline">\(k\)</span> (e.g. <span class="math inline">\(k=1\)</span>) will
+result in a method with considerable variability. A large value of <span class="math inline">\(k\)</span>
+will reduce the variability (since the choice of class will now be
+determined by majority vote over a larger number of observations), but
+at the expense of introducing bias (since we will be comparing
+observations with greater disparity in the pattern of predictor values).</p>
+<p>The method of k-nearest neighbour classification is implemented in R by
+several packages. We’ll be utilising the <code>kknn</code> package for this via
+the <code>parsnip</code> wrapper <code>nearest_neighbour()</code>.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-42" class="example"><strong>Example 6.14  </strong></span><strong>k-Nearest Neighbour Classification for the Wine Data</strong></p>
+<p>We perform classification using the k-nearest neighbour method. Note
+that this automatically scales our predictor variables to have a common
+variance. We try <span class="math inline">\(k=1\)</span> and <span class="math inline">\(k=20\)</span> to compare.</p>
+<div class="sourceCode" id="cb259"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb259-1"><a href="classification.html#cb259-1" tabindex="-1"></a>wine.knn1 <span class="ot">&lt;-</span> <span class="fu">nearest_neighbor</span>(<span class="at">mode=</span><span class="st">&quot;classification&quot;</span>, <span class="at">neighbors =</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb259-2"><a href="classification.html#cb259-2" tabindex="-1"></a>  <span class="fu">fit</span>(Cultivar <span class="sc">~</span> ., <span class="at">data=</span>wine.train)</span></code></pre></div>
+<pre><code>#&gt; Warning: package &#39;kknn&#39; was built under R version 4.5.2</code></pre>
+<div class="sourceCode" id="cb261"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb261-1"><a href="classification.html#cb261-1" tabindex="-1"></a>wine.knn1.pred <span class="ot">&lt;-</span> wine.knn1 <span class="sc">|&gt;</span></span>
+<span id="cb261-2"><a href="classification.html#cb261-2" tabindex="-1"></a>  <span class="fu">augment</span>(<span class="at">new_data =</span> wine.test)</span>
+<span id="cb261-3"><a href="classification.html#cb261-3" tabindex="-1"></a>wine.knn1.pred <span class="sc">|&gt;</span></span>
+<span id="cb261-4"><a href="classification.html#cb261-4" tabindex="-1"></a>  <span class="fu">conf_mat</span>(<span class="at">truth=</span>Cultivar, <span class="at">estimate=</span>.pred_class)</span></code></pre></div>
+<pre><code>#&gt;           Truth
+#&gt; Prediction  A  B  C
+#&gt;          A 32  5  0
+#&gt;          B  0 22  0
+#&gt;          C  0  4 15</code></pre>
+<div class="sourceCode" id="cb263"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb263-1"><a href="classification.html#cb263-1" tabindex="-1"></a>wine.knn2 <span class="ot">&lt;-</span> <span class="fu">nearest_neighbor</span>(<span class="at">mode=</span><span class="st">&quot;classification&quot;</span>, <span class="at">neighbors =</span> <span class="dv">20</span>) <span class="sc">|&gt;</span></span>
+<span id="cb263-2"><a href="classification.html#cb263-2" tabindex="-1"></a>  <span class="fu">fit</span>(Cultivar <span class="sc">~</span> ., <span class="at">data=</span>wine.train)</span>
+<span id="cb263-3"><a href="classification.html#cb263-3" tabindex="-1"></a>wine.knn2.pred <span class="ot">&lt;-</span> wine.knn2 <span class="sc">|&gt;</span></span>
+<span id="cb263-4"><a href="classification.html#cb263-4" tabindex="-1"></a>  <span class="fu">augment</span>(<span class="at">new_data =</span> wine.test)</span>
+<span id="cb263-5"><a href="classification.html#cb263-5" tabindex="-1"></a>wine.knn2.pred <span class="sc">|&gt;</span></span>
+<span id="cb263-6"><a href="classification.html#cb263-6" tabindex="-1"></a>  <span class="fu">conf_mat</span>(<span class="at">truth=</span>Cultivar, <span class="at">estimate=</span>.pred_class)</span></code></pre></div>
+<pre><code>#&gt;           Truth
+#&gt; Prediction  A  B  C
+#&gt;          A 32  1  0
+#&gt;          B  0 27  0
+#&gt;          C  0  3 15</code></pre>
+<p>Using <span class="math inline">\(k=1\)</span> results in a misclassification rate of <span class="math inline">\(9/78 \approx 11.5\%\)</span>, while using <span class="math inline">\(k=20\)</span> results in a missclassification rate of <span class="math inline">\(4/78 \approx 5.1\%\)</span>.</p>
+</div>
+</div>
+<div id="classification-trees" class="section level3 hasAnchor" number="6.6.2">
+<h3><span class="header-section-number">6.6.2</span> Classification Trees<a href="classification.html#classification-trees" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The regression trees introduced in Section <a href="prediction.html#sec:regtree">4.4</a>
+are easily adapted to the problem of
+classification. We will continue to use binary trees, but with the
+sequence of splits now chosen so as to most improve classification (as
+opposed to prediction) performance. This means that we need to modify
+the sum of squares error criterion that was used to assess splits with
+regression trees.</p>
+<p>A common option (and the default with the R function <code>rpart</code>) is to
+measure node <em>impurity</em> using the <em>Gini splitting index</em>. The Gini index
+measures how often a randomly selected observation would be
+misclassified if the class labels of all observations at the node were
+randomly reallocated, and so is given by
+<span class="math display" id="eq:gini">\[\begin{equation}
+G = \sum_{j=1}^C \hat p_j (1 - \hat p_j) = 1 - \sum_{j=1}^C \hat p_j^2
+\tag{6.5}
+\end{equation}\]</span>
+where <span class="math inline">\(\hat p_j\)</span> is the proportion of observations at
+the node in question which are of class <span class="math inline">\(j\)</span>. Note that if the node is
+entirely pure, in the sense that only observations from one class are
+present, then <span class="math inline">\(G = 0\)</span>. On the other hand, if the observations at the
+node are equally split between all classes, then <span class="math inline">\(G = 1 - 1/C\)</span> (the
+maximum value it can take). We will seek splits that minimize Gini index
+and hence minimize impurity.</p>
+<p>An alternative (which can be implemented using <code>rpart</code>) is to instead
+aim to minimize the cross-entropy information criterion
+<span class="math display" id="eq:entropy">\[\begin{equation}
+I_E = \sum_{j=1}^C \hat p_j \log(\hat p_j).
+\tag{6.6}
+\end{equation}\]</span></p>
+<div class="example">
+<p><span id="exm:unlabeled-div-43" class="example"><strong>Example 6.15  </strong></span><strong>Growing Classification Trees for the Wine Data</strong></p>
+<p>We grow a classification tree for the wine data using the default
+settings.</p>
+<div class="sourceCode" id="cb265"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb265-1"><a href="classification.html#cb265-1" tabindex="-1"></a>wine.rp<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">decision_tree</span>(<span class="at">mode=</span><span class="st">&quot;classification&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb265-2"><a href="classification.html#cb265-2" tabindex="-1"></a>  <span class="fu">fit</span>(Cultivar <span class="sc">~</span> . ,<span class="at">data=</span>wine.train)</span>
+<span id="cb265-3"><a href="classification.html#cb265-3" tabindex="-1"></a>wine.rp.<span class="fl">1.</span>pred <span class="ot">&lt;-</span> wine.rp<span class="fl">.1</span> <span class="sc">|&gt;</span></span>
+<span id="cb265-4"><a href="classification.html#cb265-4" tabindex="-1"></a>  <span class="fu">augment</span>(<span class="at">new_data=</span>wine.test)</span>
+<span id="cb265-5"><a href="classification.html#cb265-5" tabindex="-1"></a>wine.rp.<span class="fl">1.</span>pred <span class="sc">|&gt;</span></span>
+<span id="cb265-6"><a href="classification.html#cb265-6" tabindex="-1"></a>  <span class="fu">conf_mat</span>(<span class="at">truth=</span>Cultivar, <span class="at">estimate=</span>.pred_class)</span></code></pre></div>
+<pre><code>#&gt;           Truth
+#&gt; Prediction  A  B  C
+#&gt;          A 29  5  0
+#&gt;          B  3 24  1
+#&gt;          C  0  2 14</code></pre>
+<p>This R snippet should largely be self explanatory, as it largely follows
+the same pattern that should now be familiar. The overall misclassification rate is <span class="math inline">\(11/78 \approx 14.1\%\)</span>.</p>
+<div class="figure"><span style="display:block;" id="fig:winetree"></span>
+<img src="06-classification_files/figure-html/winetree-1.png" alt="Classification tree for the wine data." width="672" />
+<p class="caption">
+Figure 6.7: Classification tree for the wine data.
+</p>
+</div>
+<p>The tree employed is displayed in Figure <a href="classification.html#fig:winetree">6.7</a>. It is
+very simple, being built on just the variables <code>Colour</code> and <code>Flav</code>.
+Nonetheless, it is difficult to improve on this. Changing the
+complexity parameter to <code>cost_complexity=0.0001</code> (output not shown) results in no
+change to the model, for example.</p>
+</div>
+</div>
+<div id="random-forests-for-classification" class="section level3 hasAnchor" number="6.6.3">
+<h3><span class="header-section-number">6.6.3</span> Random Forests for Classification<a href="classification.html#random-forests-for-classification" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Random Forests may be adapted to the task of classification in the same
+way as decision trees are adapted: We change the trees to classification
+trees rather than regression trees, and assemble an ensemble of trees.
+Prediction is then done by each tree creating its individual predicted
+classes for each observation, and voting across all the trees, choosing
+the most frequently predicted class. Note that in some cases this choice
+may result in an even split (e.g. 200 trees might say class “A”, 200 trees
+say class “B”, and 100 trees class “C”) where the assignment may then
+be implementation-specific, but typically decided through random allocation.</p>
+<p>In modern R workflows, <code>ranger</code> is usually the default random-forest
+engine because it is fast and integrates cleanly with <code>tidymodels</code>.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-44" class="example"><strong>Example 6.16  </strong></span><strong>A Classification Forest for the Wine Data</strong></p>
+<p>Our classification forest is fit in the same way as we did for prediction,
+switching out the <code>mode</code> to be “classification”. We’ll utilise the
+<code>ranger</code> engine here.</p>
+<div class="sourceCode" id="cb267"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb267-1"><a href="classification.html#cb267-1" tabindex="-1"></a>wine.rf <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">mode=</span><span class="st">&quot;classification&quot;</span>, <span class="at">engine=</span><span class="st">&quot;ranger&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb267-2"><a href="classification.html#cb267-2" tabindex="-1"></a>  <span class="fu">fit</span>(Cultivar <span class="sc">~</span> . ,<span class="at">data=</span>wine.train)</span>
+<span id="cb267-3"><a href="classification.html#cb267-3" tabindex="-1"></a>wine.rf.pred <span class="ot">&lt;-</span> wine.rf <span class="sc">|&gt;</span></span>
+<span id="cb267-4"><a href="classification.html#cb267-4" tabindex="-1"></a>  <span class="fu">augment</span>(<span class="at">new_data=</span>wine.test)</span>
+<span id="cb267-5"><a href="classification.html#cb267-5" tabindex="-1"></a>wine.rf.pred <span class="sc">|&gt;</span></span>
+<span id="cb267-6"><a href="classification.html#cb267-6" tabindex="-1"></a>  <span class="fu">conf_mat</span>(<span class="at">truth=</span>Cultivar, <span class="at">estimate=</span>.pred_class)</span></code></pre></div>
+<pre><code>#&gt;           Truth
+#&gt; Prediction  A  B  C
+#&gt;          A 32  1  0
+#&gt;          B  0 28  0
+#&gt;          C  0  2 15</code></pre>
+<p>The misclassification error is <span class="math inline">\(3/78 \approx 3.8\%\)</span>,
+similar to many of the other models. These data are not hard to classify!</p>
+<p>For a more systematic tuning workflow for forests and other classifiers,
+see Chapter 5.</p>
+</div>
+</div>
+<div id="neural-networks-for-classification" class="section level3 hasAnchor" number="6.6.4">
+<h3><span class="header-section-number">6.6.4</span> Neural Networks for Classification<a href="classification.html#neural-networks-for-classification" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Neural networks for classification work much like neural networks for
+prediction, although the model fitting criterion is changed from least
+squares (as it was for prediction). The R implementation <code>nnet</code> handles
+situations with two classes a little differently to cases with three or
+more classes. In the former case there is need for just one output node,
+and model fitting is done with respect to the entropy criterion of
+Equation <a href="classification.html#eq:entropy">(6.6)</a>. When the target variable has three or more
+classes, the number of output nodes equals the number of classes, and
+fitting is done using conditional maximum likelihood estimation<a href="#fn61" class="footnote-ref" id="fnref61"><sup>61</sup></a>. In
+either case, the the output is a classification probability (and so
+constrained to the interval <span class="math inline">\([0,1]\)</span>) given by
+<span class="math display">\[\hat p = \psi(\beta_0 + \beta_1 z_1 + \cdots + \beta_M z_M)\]</span>
+where <span class="math inline">\(z_1,\ldots,z_M\)</span> are the derived features of the hidden nodes, and
+<span class="math inline">\(\psi\)</span> is a sigmoid transformation of the form that we saw previously in
+Figure <a href="prediction.html#fig:activation">4.13</a>. With the R function <code>nnet</code> this means that
+the argument <code>linout</code> must be set to <code>FALSE</code> (which is the default, so
+there is no need to do so explicitly).</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-45" class="example"><strong>Example 6.17  </strong></span><strong>Neural Network Classification for the Wine Data</strong></p>
+<p>We will apply a neural network for classifying the Italian wine data. As
+was indicated in the chapter on prediction, the <code>nnet</code> function does not work well if
+there is significant variation in the scales of the predictor variables.
+This is certainly the case with the wine data; for example, in the
+training set the variable <code>Proline</code> ranges from 290 to 1680, while
+<code>Non.Flav</code> ranges from 0.14 to 0.66. We therefore use a <code>recipe</code> to scale
+the data first.</p>
+<div class="sourceCode" id="cb269"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb269-1"><a href="classification.html#cb269-1" tabindex="-1"></a><span class="fu">library</span>(recipes)</span></code></pre></div>
+<pre><code>#&gt; Warning: package &#39;recipes&#39; was built under R version 4.5.2</code></pre>
+<div class="sourceCode" id="cb271"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb271-1"><a href="classification.html#cb271-1" tabindex="-1"></a>scaling <span class="ot">&lt;-</span> <span class="fu">recipe</span>(Cultivar <span class="sc">~</span> ., <span class="at">data=</span>wine.train) <span class="sc">|&gt;</span></span>
+<span id="cb271-2"><a href="classification.html#cb271-2" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb271-3"><a href="classification.html#cb271-3" tabindex="-1"></a>  <span class="fu">prep</span>(wine.train)</span>
+<span id="cb271-4"><a href="classification.html#cb271-4" tabindex="-1"></a></span>
+<span id="cb271-5"><a href="classification.html#cb271-5" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1000</span>)</span>
+<span id="cb271-6"><a href="classification.html#cb271-6" tabindex="-1"></a>wine.nn<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">mlp</span>(<span class="at">mode=</span><span class="st">&quot;classification&quot;</span>, <span class="at">hidden_units =</span> <span class="dv">7</span>) <span class="sc">|&gt;</span></span>
+<span id="cb271-7"><a href="classification.html#cb271-7" tabindex="-1"></a>  <span class="fu">fit</span>(Cultivar <span class="sc">~</span> ., <span class="at">data =</span> <span class="fu">bake</span>(scaling, wine.train))</span>
+<span id="cb271-8"><a href="classification.html#cb271-8" tabindex="-1"></a>wine.nn<span class="fl">.1</span> <span class="sc">|&gt;</span> <span class="fu">extract_fit_engine</span>() <span class="sc">|&gt;</span> <span class="fu">pluck</span>(<span class="st">&quot;convergence&quot;</span>)</span></code></pre></div>
+<pre><code>#&gt; [1] 0</code></pre>
+<div class="sourceCode" id="cb273"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb273-1"><a href="classification.html#cb273-1" tabindex="-1"></a>wine.nn.<span class="fl">1.</span>pred <span class="ot">&lt;-</span> wine.nn<span class="fl">.1</span> <span class="sc">|&gt;</span></span>
+<span id="cb273-2"><a href="classification.html#cb273-2" tabindex="-1"></a>  <span class="fu">augment</span>(<span class="at">new_data =</span> <span class="fu">bake</span>(scaling, wine.test))</span>
+<span id="cb273-3"><a href="classification.html#cb273-3" tabindex="-1"></a>wine.nn.<span class="fl">1.</span>pred <span class="sc">|&gt;</span></span>
+<span id="cb273-4"><a href="classification.html#cb273-4" tabindex="-1"></a>  <span class="fu">conf_mat</span>(<span class="at">truth=</span>Cultivar, <span class="at">estimate=</span>.pred_class)</span></code></pre></div>
+<pre><code>#&gt;           Truth
+#&gt; Prediction  A  B  C
+#&gt;          A 32  0  0
+#&gt;          B  0 28  0
+#&gt;          C  0  3 15</code></pre>
+<p>Some notes:</p>
+<ul>
+<li><p>Our <code>scaling</code> recipe is setup the usual way, adding a step to normalise all
+the numeric predictors, and then preparing the recipe using the training data.
+We then <code>bake()</code> the data prior to passing to <code>fit()</code> or <code>augment()/predict()</code>.</p></li>
+<li><p>The line with <code>pluck("convergence")</code> is checking whether the neural network has
+converged: The fitted neural network object (extracted via <code>extract_fit_engine()</code>)
+is a list (as are many R model objects) with a ‘convergence’ entry - you can see
+this from the help for <code>nnet()</code>. The <code>pluck()</code> function is for pulling information
+out of (possibly nested) lists. In this case we could have also used:</p>
+<div class="sourceCode" id="cb275"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb275-1"><a href="classification.html#cb275-1" tabindex="-1"></a>wine.nn<span class="fl">.1</span> <span class="sc">|&gt;</span> <span class="fu">pluck</span>(<span class="st">&quot;fit&quot;</span>, <span class="st">&quot;convergence&quot;</span>)</span></code></pre></div>
+<p>as the <code>wine.nn.1</code> object returned from <code>parsnip</code> is itself a list, with the engine
+fit object in the entry <code>fit</code>. Thus, the pluck here would traverse the first list
+to find the <code>fit</code> entry, and then traverse within that list to find <code>convergence</code>.</p></li>
+<li><p>The overall model fit here is pretty good, with misclassification rate
+<span class="math inline">\(3/78 \approx 3.8\%\)</span>,
+although it should be remembered that results
+from <code>nnet</code> may vary a little depending on the (random) choice of
+initial conditions. It follows that running the above code with a
+different setting of <code>set.seed</code> may give a slightly different error
+rate.</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="sec:classimbalance" class="section level2 hasAnchor" number="6.7">
+<h2><span class="header-section-number">6.7</span> Dealing with Class Imbalance<a href="classification.html#sec:classimbalance" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Many real classification problems have highly unequal class sizes: fraud
+transactions are a tiny fraction of all transactions; disease cases are
+rare relative to healthy individuals; adoption events may be
+considerably less common than other shelter outcomes. When one class
+greatly outnumbers another, standard classifiers tend to predict the
+majority class most of the time, achieving high accuracy while failing
+to detect the minority class.</p>
+<p>A simple baseline illustrates the problem: if <span class="math inline">\(5\%\)</span> of cases are
+positive, a classifier that always predicts negative achieves <span class="math inline">\(95\%\)</span>
+accuracy while having zero sensitivity. Standard accuracy is therefore a
+misleading metric in this setting; AUC, F1-score, or cost-weighted
+metrics (Section <a href="classification.html#sec:roc">6.5.5</a>) are more informative.</p>
+<div id="resampling-strategies" class="section level3 hasAnchor" number="6.7.1">
+<h3><span class="header-section-number">6.7.1</span> Resampling strategies<a href="classification.html#resampling-strategies" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>One direct remedy is to modify the training set to make the class
+distribution less extreme before fitting the classifier.</p>
+<p><strong>Undersampling</strong> randomly removes majority-class observations from
+the training set until the desired ratio is achieved. It is simple and
+fast, but discards potentially informative data.</p>
+<p><strong>Oversampling</strong> duplicates minority-class observations. Naïve random
+oversampling creates exact duplicates, which can cause overfitting.</p>
+</div>
+<div id="sec:smote" class="section level3 hasAnchor" number="6.7.2">
+<h3><span class="header-section-number">6.7.2</span> SMOTE: synthetic minority oversampling<a href="classification.html#sec:smote" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>SMOTE (Synthetic Minority Over-sampling Technique, Chawla et al. 2002)
+creates <em>synthetic</em> minority-class observations rather than exact
+duplicates.</p>
+<p>For each minority-class observation <span class="math inline">\(x_i\)</span>, SMOTE:</p>
+<ol style="list-style-type: decimal">
+<li>Finds the <span class="math inline">\(k\)</span> nearest neighbours of <span class="math inline">\(x_i\)</span> among the minority class
+(typically <span class="math inline">\(k = 5\)</span>).</li>
+<li>Selects one neighbour <span class="math inline">\(x_j\)</span> at random.</li>
+<li>Creates a new synthetic observation
+<span class="math inline">\(x_{\text{new}} = x_i + u(x_j - x_i)\)</span> where <span class="math inline">\(u \sim
+\operatorname{Uniform}(0, 1)\)</span>.</li>
+</ol>
+<p>The new point <span class="math inline">\(x_{\text{new}}\)</span> lies on the line segment between <span class="math inline">\(x_i\)</span>
+and <span class="math inline">\(x_j\)</span> at a random position, interpolating between real minority-class
+cases. This fills in the minority-class region of the feature space
+rather than simply repeating existing points, making it more difficult
+for the classifier to find a shortcut boundary that ignores the minority
+class.</p>
+<p>SMOTE as originally defined applies to continuous features. The
+extension SMOTE-NC (SMOTE for Nominal and Continuous) handles datasets
+with a mix of numeric and categorical predictors: numeric features are
+interpolated as above, while the synthetic observation’s categorical
+features are copied from the most frequent value among the <span class="math inline">\(k\)</span> nearest
+neighbours.</p>
+<p>In <code>tidymodels</code>, the <code>themis</code> package provides <code>step_smote()</code> and
+<code>step_smotenc()</code> as recipe steps, ensuring that the synthetic
+observations are created only within the training data of each
+cross-validation fold and are never applied to the validation fold.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-46" class="example"><strong>Example 6.18  </strong></span><strong>SMOTE-NC for a binary classification recipe</strong></p>
+<p>Suppose we are building a classifier where <code>outcome</code> is highly
+imbalanced. The recipe below illustrates the standard placement of
+<code>step_smotenc()</code>:</p>
+<div class="sourceCode" id="cb276"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb276-1"><a href="classification.html#cb276-1" tabindex="-1"></a><span class="fu">library</span>(themis)</span>
+<span id="cb276-2"><a href="classification.html#cb276-2" tabindex="-1"></a></span>
+<span id="cb276-3"><a href="classification.html#cb276-3" tabindex="-1"></a>imbalanced_recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(outcome <span class="sc">~</span> ., <span class="at">data =</span> train_data) <span class="sc">|&gt;</span></span>
+<span id="cb276-4"><a href="classification.html#cb276-4" tabindex="-1"></a>  <span class="fu">step_novel</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb276-5"><a href="classification.html#cb276-5" tabindex="-1"></a>  <span class="fu">step_unknown</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb276-6"><a href="classification.html#cb276-6" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>())   <span class="sc">|&gt;</span>  <span class="co"># must come before smotenc</span></span>
+<span id="cb276-7"><a href="classification.html#cb276-7" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb276-8"><a href="classification.html#cb276-8" tabindex="-1"></a>  <span class="fu">step_smotenc</span>(outcome, <span class="at">over_ratio =</span> <span class="fl">0.5</span>)</span></code></pre></div>
+<p>Some notes on this code:</p>
+<ul>
+<li><p><code>step_smotenc()</code> requires that dummy encoding has already been
+applied, because it uses Euclidean distances over the numeric
+columns while handling the binary dummy variables through the
+majority-value rule.</p></li>
+<li><p>The <code>over_ratio</code> argument sets the ratio of minority to majority
+class observations after oversampling. <code>over_ratio = 0.5</code> results
+in the minority class being brought up to half the size of the
+majority class.</p></li>
+<li><p>Because oversampling is a recipe step, it is applied <em>only</em> during
+training when the recipe is <code>prep()</code>-ed or baked via a workflow.
+Validation and test folds are never oversampled, which is
+essential for honest evaluation.</p></li>
+</ul>
+</div>
+<p>SMOTE can improve classifier performance on the minority class, but it
+is not a universal remedy. If the minority class genuinely overlaps with
+the majority class in feature space, synthetic interpolation will create
+ambiguous extra observations and may hurt overall accuracy. Adjusting
+the classification threshold (Section <a href="classification.html#sec:roc">6.5.5</a>) is often a simpler
+and equally effective first step.</p>
+</div>
+</div>
+<div id="high-class-classifiers" class="section level2 hasAnchor" number="6.8">
+<h2><span class="header-section-number">6.8</span> High Class Classifiers<a href="classification.html#high-class-classifiers" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We have discussed a variety of techniques for classification. As usual,
+the ones that require the greatest number of assumptions regarding the
+data will typically perform best when those assumptions hold, but can do
+very poorly when they do not. Given that in practice we will not know
+for certain what assumptions are valid, many data miners prefer to use
+more flexible tools like classification trees and neural networks.</p>
+<p>In these notes we have provided an outline of how each method works.
+Nonetheless, there is considerable scope for tinkering with the details!
+In particular, much time and effort continues to be expended in
+attempting to improve classification accuracy by fractions of one
+percent. There are frequently competitions on the Internet where teams
+of researchers seek to obtain the best classifications possible. At
+present, Kaggle (<code>www.kaggle.com</code>) hosts arguably the most well known
+website for such competitions.</p>
+</div>
+<div id="summary-3" class="section level2 hasAnchor" number="6.9">
+<h2><span class="header-section-number">6.9</span> Summary<a href="classification.html#summary-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Classification is the supervised-learning task where the target variable
+is categorical rather than numeric.</p>
+<ul>
+<li><p>Different classifiers make different assumptions about class
+structure. Stronger assumptions can help when they are reasonable,
+but they can also fail badly when they are not.</p></li>
+<li><p>Evaluation needs more than one number. Confusion matrices, class
+probabilities, ROC curves, and threshold choice all matter.</p></li>
+<li><p>Flexible modern workflows still rest on the same basic sequence:
+split the data, preprocess carefully, fit the model, and evaluate it
+honestly on held-out cases.</p></li>
+</ul>
+<p>Looking ahead, Section <a href="cluster-analysis.html#sec:cluster-compare">7.9.3</a> drops the labelled
+response entirely and turns to clustering, where the groups must be
+discovered from the predictors alone.</p>
+
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol start="49">
+<li id="fn49"><p>As the names of the first two listed techniques suggest,
+statistical classification can also be referred to as discriminant
+analysis. As we saw earlier, <em>supervised learning</em> is another name
+for classification, favoured in computer science and related areas.<a href="classification.html#fnref49" class="footnote-back">↩︎</a></p></li>
+<li id="fn50"><p>We use the somewhat ambiguous term <em>probability function</em> to refer
+to the probability mass function for discrete random variables, or
+the probability density function for continuous random variables, as
+appropriate.<a href="classification.html#fnref50" class="footnote-back">↩︎</a></p></li>
+<li id="fn51"><p>Bayes’ Theorem is a result of huge importance in Statistics. The
+result is credited to English mathematician and Presbyterian
+minister, Reverend Thomas Bayes (1701?-1760).<a href="classification.html#fnref51" class="footnote-back">↩︎</a></p></li>
+<li id="fn52"><p>If you would like to learn more about the multivariate normal
+distribution, and the theory of statistics in general (which is both
+wonderfully elegant and useful) then you should consider taking the
+paper 161.304.<a href="classification.html#fnref52" class="footnote-back">↩︎</a></p></li>
+<li id="fn53"><p>Note that this package is not on CRAN but can be installed from Github
+using the <code>remotes</code> package. See <a href="https://github.com/jmarshallnz/tidykda" class="uri">https://github.com/jmarshallnz/tidykda</a> for details.<a href="classification.html#fnref53" class="footnote-back">↩︎</a></p></li>
+<li id="fn54"><p>We need estimate only 2 of the probabilities because the third is
+then determined by the constraint that the probabilities in a
+distribution must sum to one.<a href="classification.html#fnref54" class="footnote-back">↩︎</a></p></li>
+<li id="fn55"><p>Beware of a possible notational confusion between
+<span class="math inline">\(p=p(\boldsymbol{x})\)</span>, the probability of a response <span class="math inline">\(y=1\)</span> given
+predictors <span class="math inline">\(\boldsymbol{x}=(x_1, \ldots, x_p)^\mathsf{T}\)</span>, and <span class="math inline">\(p\)</span>
+the number of predictors. The distinction will usually be obvious by
+the context. Moreover, we will usually write <span class="math inline">\(p(\boldsymbol{x})\)</span> for
+the probability, emphasising its dependence on the predictor
+variables.<a href="classification.html#fnref55" class="footnote-back">↩︎</a></p></li>
+<li id="fn56"><p>Recall the sigmoid function was also used for the activation
+function in neural networks.<a href="classification.html#fnref56" class="footnote-back">↩︎</a></p></li>
+<li id="fn57"><p>If the mathematics that follows below is beyond you, do not worry:
+you won’t be examined on this. We include it for the mathematically
+interested. Nonetheless, be aware that if you want to learn more
+about statistics and data mining, then it is important to learn
+enough mathematics so that you can cope with this type of material.<a href="classification.html#fnref57" class="footnote-back">↩︎</a></p></li>
+<li id="fn58"><p>The maximum likelihood estimate in linear regression is given by
+the least squares solution, as the log-likelihood reduces to the sum
+of squared residuals.<a href="classification.html#fnref58" class="footnote-back">↩︎</a></p></li>
+<li id="fn59"><p>The <code>glm</code> function may be used for more than just logistic
+regression. It can be used in place of <code>lm</code> for linear regression
+via <code>family=gaussian</code>, or used for Poisson regression via
+<code>family=poisson</code>.<a href="classification.html#fnref59" class="footnote-back">↩︎</a></p></li>
+<li id="fn60"><p>For the same reason, we required only one probability <span class="math inline">\(p\)</span> for the
+binary case, as the other probability was necessarily <span class="math inline">\(1-p\)</span>.<a href="classification.html#fnref60" class="footnote-back">↩︎</a></p></li>
+<li id="fn61"><p>We do not cover the details of conditional maximum likelihood
+here. An introduction to the method of maximum likelihood estimation
+is provided in the paper 161.304 Statistical Modelling.<a href="classification.html#fnref61" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="tidy-modelling.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="cluster-analysis.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": "https://github.com/jmarshallnz/161324/edit/main/notes/06-classification.Rmd",
+    "text": "Edit"
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": ["_main.pdf", "_main.epub"],
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

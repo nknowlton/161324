@@ -255,6 +255,13 @@ A near-zero value suggests the variable is irrelevant.
 
 ``` r
 library(ranger)
+```
+
+```
+#> Warning: package 'ranger' was built under R version 4.5.2
+```
+
+``` r
 rf_spec <- rand_forest(mode = "classification", trees = 500,
                        mtry = tune()) |>
   set_engine("ranger", importance = "impurity")
@@ -457,7 +464,13 @@ the more portable `xgboost` engine.
 
 ``` r
 library(xgboost)
+```
 
+```
+#> Warning: package 'xgboost' was built under R version 4.5.2
+```
+
+``` r
 boost_spec <- boost_tree(
   mode       = "classification",
   trees      = tune(),

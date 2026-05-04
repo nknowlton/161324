@@ -14,5 +14,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets['324_Deploy_token'] || secrets.HUB_DEPLOY_TOKEN }}
         run: |
-          gh workflow run deploy.yml --repo nknowlton/nknowlton.github.io --ref master
-          echo "Hub deploy workflow triggered."
+          if [ -z "$GH_TOKEN" ]; then
+            echo "Hub deploy token missing; cannot trigger knowlton.co.nz rebuild."
+            exit 1
+          fi
+
+          gh api repos/nknowlton/nknowlton.github.io/dispatches \
+            -f event_type=deploy-course-content
+          echo "Hub deploy event triggered."

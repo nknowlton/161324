@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Data mining</title>
+  <meta name="description" content="Data mining notes" />
+  <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Data mining" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="Data mining notes" />
+  <meta name="github-repo" content="jmarshallnz/161324" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Data mining" />
+  
+  <meta name="twitter:description" content="Data mining notes" />
+  
+
+<meta name="author" content="Jonathan Marshall, Martin Hazelton, Nick Knowlton" />
+
+
+<meta name="date" content="2026-05-03" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+
+<link rel="next" href="introduction.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet" />
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="libs/datatables-binding-0.34.0/datatables.js"></script>
+<link href="libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+<link href="libs/nouislider-7.0.10/jquery.nouislider.min.css" rel="stylesheet" />
+<script src="libs/nouislider-7.0.10/jquery.nouislider.min.js"></script>
+<link href="libs/selectize-0.12.0/selectize.bootstrap3.css" rel="stylesheet" />
+<script src="libs/selectize-0.12.0/selectize.min.js"></script>
+<link href="libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+
+
+<style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">161.324 Data Mining</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="introduction.html"><a href="introduction.html#sec:intro1"><i class="fa fa-check"></i><b>1.1</b> What is Data Mining?</a></li>
+<li class="chapter" data-level="1.2" data-path="introduction.html"><a href="introduction.html#sec:Rinitial"><i class="fa fa-check"></i><b>1.2</b> Statistical Computing with R</a></li>
+<li class="chapter" data-level="1.3" data-path="introduction.html"><a href="introduction.html#the-tidyverse"><i class="fa fa-check"></i><b>1.3</b> The tidyverse</a></li>
+<li class="chapter" data-level="1.4" data-path="introduction.html"><a href="introduction.html#sec:notes-roadmap"><i class="fa fa-check"></i><b>1.4</b> A roadmap for these notes</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="introduction.html"><a href="introduction.html#sec:task-compare"><i class="fa fa-check"></i><b>1.4.1</b> Comparing the main task families</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html"><i class="fa fa-check"></i><b>2</b> Data Acquisition and Processing</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#obtaining-data"><i class="fa fa-check"></i><b>2.1</b> Obtaining Data</a></li>
+<li class="chapter" data-level="2.2" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#sec:dataload"><i class="fa fa-check"></i><b>2.2</b> Loading Data into R</a></li>
+<li class="chapter" data-level="2.3" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#organizing-the-data-in-r"><i class="fa fa-check"></i><b>2.3</b> Organizing the Data in R</a></li>
+<li class="chapter" data-level="2.4" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#sec:missing1"><i class="fa fa-check"></i><b>2.4</b> Missing Values</a></li>
+<li class="chapter" data-level="2.5" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#summary"><i class="fa fa-check"></i><b>2.5</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>3</b> Missing values</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="missing-values.html"><a href="missing-values.html#sec:missing"><i class="fa fa-check"></i><b>3.1</b> Patterns of Missingness</a></li>
+<li class="chapter" data-level="3.2" data-path="missing-values.html"><a href="missing-values.html#visualising-missing-values"><i class="fa fa-check"></i><b>3.2</b> Visualising missing values</a></li>
+<li class="chapter" data-level="3.3" data-path="missing-values.html"><a href="missing-values.html#working-with-complete-cases"><i class="fa fa-check"></i><b>3.3</b> Working with Complete Cases</a></li>
+<li class="chapter" data-level="3.4" data-path="missing-values.html"><a href="missing-values.html#sec:imputation"><i class="fa fa-check"></i><b>3.4</b> Missing Data Imputation</a></li>
+<li class="chapter" data-level="3.5" data-path="missing-values.html"><a href="missing-values.html#alternative-methods-of-imputation"><i class="fa fa-check"></i><b>3.5</b> Alternative Methods of Imputation</a></li>
+<li class="chapter" data-level="3.6" data-path="missing-values.html"><a href="missing-values.html#summary-1"><i class="fa fa-check"></i><b>3.6</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="prediction.html"><a href="prediction.html"><i class="fa fa-check"></i><b>4</b> Prediction</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="prediction.html"><a href="prediction.html#prediction-classification-and-clustering"><i class="fa fa-check"></i><b>4.1</b> Prediction, Classification and Clustering</a></li>
+<li class="chapter" data-level="4.2" data-path="prediction.html"><a href="prediction.html#sec:predictionbasics"><i class="fa fa-check"></i><b>4.2</b> The Basics of Prediction</a></li>
+<li class="chapter" data-level="4.3" data-path="prediction.html"><a href="prediction.html#sec:regress"><i class="fa fa-check"></i><b>4.3</b> Linear Regression for Prediction</a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="prediction.html"><a href="prediction.html#data-structures-and-notation"><i class="fa fa-check"></i><b>4.3.1</b> Data Structures and Notation</a></li>
+<li class="chapter" data-level="4.3.2" data-path="prediction.html"><a href="prediction.html#the-linear-regression-model"><i class="fa fa-check"></i><b>4.3.2</b> The Linear Regression Model</a></li>
+<li class="chapter" data-level="4.3.3" data-path="prediction.html"><a href="prediction.html#fitting-linear-regression-models"><i class="fa fa-check"></i><b>4.3.3</b> Fitting Linear Regression Models</a></li>
+<li class="chapter" data-level="4.3.4" data-path="prediction.html"><a href="prediction.html#prediction-1"><i class="fa fa-check"></i><b>4.3.4</b> Prediction</a></li>
+<li class="chapter" data-level="4.3.5" data-path="prediction.html"><a href="prediction.html#prediction-accuracy-and-the-bias-variance-trade-off"><i class="fa fa-check"></i><b>4.3.5</b> Prediction Accuracy and the Bias-Variance Trade-Off</a></li>
+<li class="chapter" data-level="4.3.6" data-path="prediction.html"><a href="prediction.html#model-selection"><i class="fa fa-check"></i><b>4.3.6</b> Model Selection</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="prediction.html"><a href="prediction.html#sec:regtree"><i class="fa fa-check"></i><b>4.4</b> Regression Trees</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="prediction.html"><a href="prediction.html#sec:introtree"><i class="fa fa-check"></i><b>4.4.1</b> Introduction to Regression Trees</a></li>
+<li class="chapter" data-level="4.4.2" data-path="prediction.html"><a href="prediction.html#how-to-grow-a-tree"><i class="fa fa-check"></i><b>4.4.2</b> How to Grow a Tree</a></li>
+<li class="chapter" data-level="4.4.3" data-path="prediction.html"><a href="prediction.html#implementing-regression-trees-in-r"><i class="fa fa-check"></i><b>4.4.3</b> Implementing Regression Trees in R</a></li>
+<li class="chapter" data-level="4.4.4" data-path="prediction.html"><a href="prediction.html#sec:treeprune"><i class="fa fa-check"></i><b>4.4.4</b> Pruning</a></li>
+<li class="chapter" data-level="4.4.5" data-path="prediction.html"><a href="prediction.html#sec:validation"><i class="fa fa-check"></i><b>4.4.5</b> Validation and Cross-Validation</a></li>
+<li class="chapter" data-level="4.4.6" data-path="prediction.html"><a href="prediction.html#sec:treeinstability"><i class="fa fa-check"></i><b>4.4.6</b> Tree instability</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="prediction.html"><a href="prediction.html#sec:randomforest"><i class="fa fa-check"></i><b>4.5</b> Random forests</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="prediction.html"><a href="prediction.html#implementation-in-r"><i class="fa fa-check"></i><b>4.5.1</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="prediction.html"><a href="prediction.html#sec:neuralnet"><i class="fa fa-check"></i><b>4.6</b> Neural Networks</a>
+<ul>
+<li class="chapter" data-level="4.6.1" data-path="prediction.html"><a href="prediction.html#an-introduction-to-neural-networks"><i class="fa fa-check"></i><b>4.6.1</b> An Introduction to Neural Networks</a></li>
+<li class="chapter" data-level="4.6.2" data-path="prediction.html"><a href="prediction.html#building-a-neural-network"><i class="fa fa-check"></i><b>4.6.2</b> Building a Neural Network</a></li>
+<li class="chapter" data-level="4.6.3" data-path="prediction.html"><a href="prediction.html#prediction-using-neural-networks-in-r"><i class="fa fa-check"></i><b>4.6.3</b> Prediction Using Neural Networks in R</a></li>
+</ul></li>
+<li class="chapter" data-level="4.7" data-path="prediction.html"><a href="prediction.html#summary-of-prediction-methods"><i class="fa fa-check"></i><b>4.7</b> Summary of Prediction Methods</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="tidy-modelling.html"><a href="tidy-modelling.html"><i class="fa fa-check"></i><b>5</b> Tidy modelling</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="tidy-modelling.html"><a href="tidy-modelling.html#splitting-and-resampling-data"><i class="fa fa-check"></i><b>5.1</b> Splitting and resampling data</a></li>
+<li class="chapter" data-level="5.2" data-path="tidy-modelling.html"><a href="tidy-modelling.html#data-processing-with-recipes"><i class="fa fa-check"></i><b>5.2</b> Data processing with recipes</a></li>
+<li class="chapter" data-level="5.3" data-path="tidy-modelling.html"><a href="tidy-modelling.html#modelling-with-parsnip"><i class="fa fa-check"></i><b>5.3</b> Modelling with parsnip</a></li>
+<li class="chapter" data-level="5.4" data-path="tidy-modelling.html"><a href="tidy-modelling.html#model-performance-with-yardstick"><i class="fa fa-check"></i><b>5.4</b> Model performance with yardstick</a></li>
+<li class="chapter" data-level="5.5" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-workflow"><i class="fa fa-check"></i><b>5.5</b> Workflows</a></li>
+<li class="chapter" data-level="5.6" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-resamples"><i class="fa fa-check"></i><b>5.6</b> Resampling with <code>fit_resamples()</code></a></li>
+<li class="chapter" data-level="5.7" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-tuning"><i class="fa fa-check"></i><b>5.7</b> Simple tuning with <code>tune_grid()</code></a></li>
+<li class="chapter" data-level="5.8" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-final"><i class="fa fa-check"></i><b>5.8</b> Final model fitting with <code>last_fit()</code></a></li>
+<li class="chapter" data-level="5.9" data-path="tidy-modelling.html"><a href="tidy-modelling.html#summary-2"><i class="fa fa-check"></i><b>5.9</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="classification.html"><a href="classification.html"><i class="fa fa-check"></i><b>6</b> Classification</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="classification.html"><a href="classification.html#introduction-to-classification"><i class="fa fa-check"></i><b>6.1</b> Introduction to Classification</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="classification.html"><a href="classification.html#statistical-theory-for-classification"><i class="fa fa-check"></i><b>6.1.1</b> Statistical Theory for Classification</a></li>
+<li class="chapter" data-level="6.1.2" data-path="classification.html"><a href="classification.html#misclassification-rates-and-confusion-matrices"><i class="fa fa-check"></i><b>6.1.2</b> Misclassification Rates and Confusion Matrices</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="classification.html"><a href="classification.html#sec:lda"><i class="fa fa-check"></i><b>6.2</b> Linear Discriminant Analysis</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="classification.html"><a href="classification.html#the-method-in-theory"><i class="fa fa-check"></i><b>6.2.1</b> The Method in Theory</a></li>
+<li class="chapter" data-level="6.2.2" data-path="classification.html"><a href="classification.html#implementation-in-r-1"><i class="fa fa-check"></i><b>6.2.2</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="classification.html"><a href="classification.html#sec:kda"><i class="fa fa-check"></i><b>6.3</b> Kernel Discriminant Analysis</a></li>
+<li class="chapter" data-level="6.4" data-path="classification.html"><a href="classification.html#sec:naive"><i class="fa fa-check"></i><b>6.4</b> Naive Bayes Classifiers</a></li>
+<li class="chapter" data-level="6.5" data-path="classification.html"><a href="classification.html#logistic-regression"><i class="fa fa-check"></i><b>6.5</b> Logistic regression</a>
+<ul>
+<li class="chapter" data-level="6.5.1" data-path="classification.html"><a href="classification.html#fitting-logistic-regression-models"><i class="fa fa-check"></i><b>6.5.1</b> Fitting Logistic Regression Models</a></li>
+<li class="chapter" data-level="6.5.2" data-path="classification.html"><a href="classification.html#logistic-regression-as-a-classifier"><i class="fa fa-check"></i><b>6.5.2</b> Logistic Regression as a classifier</a></li>
+<li class="chapter" data-level="6.5.3" data-path="classification.html"><a href="classification.html#sec:multinomial"><i class="fa fa-check"></i><b>6.5.3</b> Extending Logistic Regression to more than two classes</a></li>
+<li class="chapter" data-level="6.5.4" data-path="classification.html"><a href="classification.html#model-selection-1"><i class="fa fa-check"></i><b>6.5.4</b> Model selection</a></li>
+<li class="chapter" data-level="6.5.5" data-path="classification.html"><a href="classification.html#sec:roc"><i class="fa fa-check"></i><b>6.5.5</b> ROC curves and the classification threshold</a></li>
+</ul></li>
+<li class="chapter" data-level="6.6" data-path="classification.html"><a href="classification.html#other-methods-of-classification"><i class="fa fa-check"></i><b>6.6</b> Other Methods of Classification</a>
+<ul>
+<li class="chapter" data-level="6.6.1" data-path="classification.html"><a href="classification.html#k-nearest-neighbour-classification"><i class="fa fa-check"></i><b>6.6.1</b> k-Nearest Neighbour Classification</a></li>
+<li class="chapter" data-level="6.6.2" data-path="classification.html"><a href="classification.html#classification-trees"><i class="fa fa-check"></i><b>6.6.2</b> Classification Trees</a></li>
+<li class="chapter" data-level="6.6.3" data-path="classification.html"><a href="classification.html#random-forests-for-classification"><i class="fa fa-check"></i><b>6.6.3</b> Random Forests for Classification</a></li>
+<li class="chapter" data-level="6.6.4" data-path="classification.html"><a href="classification.html#neural-networks-for-classification"><i class="fa fa-check"></i><b>6.6.4</b> Neural Networks for Classification</a></li>
+</ul></li>
+<li class="chapter" data-level="6.7" data-path="classification.html"><a href="classification.html#sec:classimbalance"><i class="fa fa-check"></i><b>6.7</b> Dealing with Class Imbalance</a>
+<ul>
+<li class="chapter" data-level="6.7.1" data-path="classification.html"><a href="classification.html#resampling-strategies"><i class="fa fa-check"></i><b>6.7.1</b> Resampling strategies</a></li>
+<li class="chapter" data-level="6.7.2" data-path="classification.html"><a href="classification.html#sec:smote"><i class="fa fa-check"></i><b>6.7.2</b> SMOTE: synthetic minority oversampling</a></li>
+</ul></li>
+<li class="chapter" data-level="6.8" data-path="classification.html"><a href="classification.html#high-class-classifiers"><i class="fa fa-check"></i><b>6.8</b> High Class Classifiers</a></li>
+<li class="chapter" data-level="6.9" data-path="classification.html"><a href="classification.html#summary-3"><i class="fa fa-check"></i><b>6.9</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="cluster-analysis.html"><a href="cluster-analysis.html"><i class="fa fa-check"></i><b>7</b> Cluster Analysis</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#dissimilarity-matrices-for-multivariate-data"><i class="fa fa-check"></i><b>7.1</b> Dissimilarity Matrices for Multivariate Data</a></li>
+<li class="chapter" data-level="7.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering"><i class="fa fa-check"></i><b>7.2</b> Hierarchical Clustering</a></li>
+<li class="chapter" data-level="7.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means-clustering"><i class="fa fa-check"></i><b>7.3</b> K-means clustering</a></li>
+<li class="chapter" data-level="7.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-medoids-clustering"><i class="fa fa-check"></i><b>7.4</b> K-medoids clustering</a></li>
+<li class="chapter" data-level="7.5" data-path="cluster-analysis.html"><a href="cluster-analysis.html#silhouette-plots"><i class="fa fa-check"></i><b>7.5</b> Silhouette plots</a></li>
+<li class="chapter" data-level="7.6" data-path="cluster-analysis.html"><a href="cluster-analysis.html#bootstrap-stability-and-the-adjusted-rand-index"><i class="fa fa-check"></i><b>7.6</b> Bootstrap stability and the adjusted Rand index</a></li>
+<li class="chapter" data-level="7.7" data-path="cluster-analysis.html"><a href="cluster-analysis.html#density-based-clustering"><i class="fa fa-check"></i><b>7.7</b> Density-based clustering</a></li>
+<li class="chapter" data-level="7.8" data-path="cluster-analysis.html"><a href="cluster-analysis.html#choosing-varepsilon-using-a-k-distance-plot"><i class="fa fa-check"></i><b>7.8</b> Choosing <span class="math inline">\(\varepsilon\)</span> using a <span class="math inline">\(k\)</span>-distance plot</a></li>
+<li class="chapter" data-level="7.9" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hdbscan-and-umap"><i class="fa fa-check"></i><b>7.9</b> HDBSCAN and UMAP</a>
+<ul>
+<li class="chapter" data-level="7.9.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#sec:hdbscan"><i class="fa fa-check"></i><b>7.9.1</b> HDBSCAN</a></li>
+<li class="chapter" data-level="7.9.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#sec:umap"><i class="fa fa-check"></i><b>7.9.2</b> UMAP</a></li>
+<li class="chapter" data-level="7.9.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#sec:cluster-compare"><i class="fa fa-check"></i><b>7.9.3</b> Practical method comparison</a></li>
+</ul></li>
+<li class="chapter" data-level="7.10" data-path="cluster-analysis.html"><a href="cluster-analysis.html#summary-4"><i class="fa fa-check"></i><b>7.10</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="association-rule-mining.html"><a href="association-rule-mining.html"><i class="fa fa-check"></i><b>8</b> Association rule mining</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="association-rule-mining.html"><a href="association-rule-mining.html#transaction-data-as-a-binary-matrix"><i class="fa fa-check"></i><b>8.1</b> Transaction data as a binary matrix</a></li>
+<li class="chapter" data-level="8.2" data-path="association-rule-mining.html"><a href="association-rule-mining.html#the-apriori-principle"><i class="fa fa-check"></i><b>8.2</b> The Apriori principle</a></li>
+<li class="chapter" data-level="8.3" data-path="association-rule-mining.html"><a href="association-rule-mining.html#the-apriori-algorithm"><i class="fa fa-check"></i><b>8.3</b> The Apriori algorithm</a></li>
+<li class="chapter" data-level="8.4" data-path="association-rule-mining.html"><a href="association-rule-mining.html#apriori-and-eclat"><i class="fa fa-check"></i><b>8.4</b> Apriori and Eclat</a></li>
+<li class="chapter" data-level="8.5" data-path="association-rule-mining.html"><a href="association-rule-mining.html#inspecting-and-filtering-rules-in-arules"><i class="fa fa-check"></i><b>8.5</b> Inspecting and filtering rules in <code>arules</code></a></li>
+<li class="chapter" data-level="8.6" data-path="association-rule-mining.html"><a href="association-rule-mining.html#sec:association-fit"><i class="fa fa-check"></i><b>8.6</b> Where association rules fit</a></li>
+<li class="chapter" data-level="8.7" data-path="association-rule-mining.html"><a href="association-rule-mining.html#summary-5"><i class="fa fa-check"></i><b>8.7</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="sec:ensemble.html"><a href="sec:ensemble.html"><i class="fa fa-check"></i><b>9</b> Ensemble Learning</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:ensemble-motivation"><i class="fa fa-check"></i><b>9.1</b> Motivation: Why Combine Models?</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#the-variance-reduction-argument"><i class="fa fa-check"></i><b>9.1.1</b> The variance reduction argument</a></li>
+<li class="chapter" data-level="9.1.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#bias-vs-variance-in-ensembles"><i class="fa fa-check"></i><b>9.1.2</b> Bias vs variance in ensembles</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:bagging"><i class="fa fa-check"></i><b>9.2</b> Bagging</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#the-bootstrap-aggregating-algorithm"><i class="fa fa-check"></i><b>9.2.1</b> The bootstrap aggregating algorithm</a></li>
+<li class="chapter" data-level="9.2.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:oob"><i class="fa fa-check"></i><b>9.2.2</b> Out-of-bag error</a></li>
+<li class="chapter" data-level="9.2.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#implementation-in-r-2"><i class="fa fa-check"></i><b>9.2.3</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:ensemblerf"><i class="fa fa-check"></i><b>9.3</b> Random Forests</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:varimp"><i class="fa fa-check"></i><b>9.3.1</b> Variable importance</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:boosting"><i class="fa fa-check"></i><b>9.4</b> Boosting</a>
+<ul>
+<li class="chapter" data-level="9.4.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#forward-stagewise-additive-modelling"><i class="fa fa-check"></i><b>9.4.1</b> Forward stagewise additive modelling</a></li>
+<li class="chapter" data-level="9.4.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:gradboosting"><i class="fa fa-check"></i><b>9.4.2</b> Gradient boosting</a></li>
+<li class="chapter" data-level="9.4.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:xgboost"><i class="fa fa-check"></i><b>9.4.3</b> XGBoost: regularised gradient boosting</a></li>
+<li class="chapter" data-level="9.4.4" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:boost-r"><i class="fa fa-check"></i><b>9.4.4</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="9.5" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:stacking"><i class="fa fa-check"></i><b>9.5</b> Stacking</a>
+<ul>
+<li class="chapter" data-level="9.5.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#stacked-generalisation"><i class="fa fa-check"></i><b>9.5.1</b> Stacked generalisation</a></li>
+<li class="chapter" data-level="9.5.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:cv-meta"><i class="fa fa-check"></i><b>9.5.2</b> Cross-validated meta-features</a></li>
+<li class="chapter" data-level="9.5.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:stacking-r"><i class="fa fa-check"></i><b>9.5.3</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="9.6" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:automl"><i class="fa fa-check"></i><b>9.6</b> AutoML: Automated Model Selection</a></li>
+<li class="chapter" data-level="9.7" data-path="sec:ensemble.html"><a href="sec:ensemble.html#summary-6"><i class="fa fa-check"></i><b>9.7</b> Summary</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Data mining</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="header">
+<h1 class="title">Data mining</h1>
+<p class="author"><em>Jonathan Marshall, Martin Hazelton, Nick Knowlton</em></p>
+<p class="date"><em>2026-05-03</em></p>
+</div>
+<div id="preface" class="section level1 unnumbered hasAnchor">
+<h1>Preface<a href="index.html#preface" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>This is the study guide for 161.324 Data Mining and 161.777 Practical Data Mining at Massey University.</p>
+<p>It is put together based on existing notes from previous courses, updated in 2022 to utilise
+the tidyverse suite of packages.</p>
+<p>It will be progressively updated over time.</p>
+
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+
+<a href="introduction.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": "https://github.com/jmarshallnz/161324/edit/main/notes/index.Rmd",
+    "text": "Edit"
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": ["_main.pdf", "_main.epub"],
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

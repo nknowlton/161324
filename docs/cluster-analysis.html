@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 7 Cluster Analysis | Data mining</title>
+  <meta name="description" content="Chapter 7 Cluster Analysis | Data mining notes" />
+  <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 7 Cluster Analysis | Data mining" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="Chapter 7 Cluster Analysis | Data mining notes" />
+  <meta name="github-repo" content="jmarshallnz/161324" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 7 Cluster Analysis | Data mining" />
+  
+  <meta name="twitter:description" content="Chapter 7 Cluster Analysis | Data mining notes" />
+  
+
+<meta name="author" content="Jonathan Marshall, Martin Hazelton, Nick Knowlton" />
+
+
+<meta name="date" content="2026-05-03" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="classification.html"/>
+<link rel="next" href="association-rule-mining.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet" />
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="libs/datatables-binding-0.34.0/datatables.js"></script>
+<link href="libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+<link href="libs/nouislider-7.0.10/jquery.nouislider.min.css" rel="stylesheet" />
+<script src="libs/nouislider-7.0.10/jquery.nouislider.min.js"></script>
+<link href="libs/selectize-0.12.0/selectize.bootstrap3.css" rel="stylesheet" />
+<script src="libs/selectize-0.12.0/selectize.min.js"></script>
+<link href="libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+
+
+<style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">161.324 Data Mining</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="introduction.html"><a href="introduction.html#sec:intro1"><i class="fa fa-check"></i><b>1.1</b> What is Data Mining?</a></li>
+<li class="chapter" data-level="1.2" data-path="introduction.html"><a href="introduction.html#sec:Rinitial"><i class="fa fa-check"></i><b>1.2</b> Statistical Computing with R</a></li>
+<li class="chapter" data-level="1.3" data-path="introduction.html"><a href="introduction.html#the-tidyverse"><i class="fa fa-check"></i><b>1.3</b> The tidyverse</a></li>
+<li class="chapter" data-level="1.4" data-path="introduction.html"><a href="introduction.html#sec:notes-roadmap"><i class="fa fa-check"></i><b>1.4</b> A roadmap for these notes</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="introduction.html"><a href="introduction.html#sec:task-compare"><i class="fa fa-check"></i><b>1.4.1</b> Comparing the main task families</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html"><i class="fa fa-check"></i><b>2</b> Data Acquisition and Processing</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#obtaining-data"><i class="fa fa-check"></i><b>2.1</b> Obtaining Data</a></li>
+<li class="chapter" data-level="2.2" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#sec:dataload"><i class="fa fa-check"></i><b>2.2</b> Loading Data into R</a></li>
+<li class="chapter" data-level="2.3" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#organizing-the-data-in-r"><i class="fa fa-check"></i><b>2.3</b> Organizing the Data in R</a></li>
+<li class="chapter" data-level="2.4" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#sec:missing1"><i class="fa fa-check"></i><b>2.4</b> Missing Values</a></li>
+<li class="chapter" data-level="2.5" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#summary"><i class="fa fa-check"></i><b>2.5</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>3</b> Missing values</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="missing-values.html"><a href="missing-values.html#sec:missing"><i class="fa fa-check"></i><b>3.1</b> Patterns of Missingness</a></li>
+<li class="chapter" data-level="3.2" data-path="missing-values.html"><a href="missing-values.html#visualising-missing-values"><i class="fa fa-check"></i><b>3.2</b> Visualising missing values</a></li>
+<li class="chapter" data-level="3.3" data-path="missing-values.html"><a href="missing-values.html#working-with-complete-cases"><i class="fa fa-check"></i><b>3.3</b> Working with Complete Cases</a></li>
+<li class="chapter" data-level="3.4" data-path="missing-values.html"><a href="missing-values.html#sec:imputation"><i class="fa fa-check"></i><b>3.4</b> Missing Data Imputation</a></li>
+<li class="chapter" data-level="3.5" data-path="missing-values.html"><a href="missing-values.html#alternative-methods-of-imputation"><i class="fa fa-check"></i><b>3.5</b> Alternative Methods of Imputation</a></li>
+<li class="chapter" data-level="3.6" data-path="missing-values.html"><a href="missing-values.html#summary-1"><i class="fa fa-check"></i><b>3.6</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="prediction.html"><a href="prediction.html"><i class="fa fa-check"></i><b>4</b> Prediction</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="prediction.html"><a href="prediction.html#prediction-classification-and-clustering"><i class="fa fa-check"></i><b>4.1</b> Prediction, Classification and Clustering</a></li>
+<li class="chapter" data-level="4.2" data-path="prediction.html"><a href="prediction.html#sec:predictionbasics"><i class="fa fa-check"></i><b>4.2</b> The Basics of Prediction</a></li>
+<li class="chapter" data-level="4.3" data-path="prediction.html"><a href="prediction.html#sec:regress"><i class="fa fa-check"></i><b>4.3</b> Linear Regression for Prediction</a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="prediction.html"><a href="prediction.html#data-structures-and-notation"><i class="fa fa-check"></i><b>4.3.1</b> Data Structures and Notation</a></li>
+<li class="chapter" data-level="4.3.2" data-path="prediction.html"><a href="prediction.html#the-linear-regression-model"><i class="fa fa-check"></i><b>4.3.2</b> The Linear Regression Model</a></li>
+<li class="chapter" data-level="4.3.3" data-path="prediction.html"><a href="prediction.html#fitting-linear-regression-models"><i class="fa fa-check"></i><b>4.3.3</b> Fitting Linear Regression Models</a></li>
+<li class="chapter" data-level="4.3.4" data-path="prediction.html"><a href="prediction.html#prediction-1"><i class="fa fa-check"></i><b>4.3.4</b> Prediction</a></li>
+<li class="chapter" data-level="4.3.5" data-path="prediction.html"><a href="prediction.html#prediction-accuracy-and-the-bias-variance-trade-off"><i class="fa fa-check"></i><b>4.3.5</b> Prediction Accuracy and the Bias-Variance Trade-Off</a></li>
+<li class="chapter" data-level="4.3.6" data-path="prediction.html"><a href="prediction.html#model-selection"><i class="fa fa-check"></i><b>4.3.6</b> Model Selection</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="prediction.html"><a href="prediction.html#sec:regtree"><i class="fa fa-check"></i><b>4.4</b> Regression Trees</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="prediction.html"><a href="prediction.html#sec:introtree"><i class="fa fa-check"></i><b>4.4.1</b> Introduction to Regression Trees</a></li>
+<li class="chapter" data-level="4.4.2" data-path="prediction.html"><a href="prediction.html#how-to-grow-a-tree"><i class="fa fa-check"></i><b>4.4.2</b> How to Grow a Tree</a></li>
+<li class="chapter" data-level="4.4.3" data-path="prediction.html"><a href="prediction.html#implementing-regression-trees-in-r"><i class="fa fa-check"></i><b>4.4.3</b> Implementing Regression Trees in R</a></li>
+<li class="chapter" data-level="4.4.4" data-path="prediction.html"><a href="prediction.html#sec:treeprune"><i class="fa fa-check"></i><b>4.4.4</b> Pruning</a></li>
+<li class="chapter" data-level="4.4.5" data-path="prediction.html"><a href="prediction.html#sec:validation"><i class="fa fa-check"></i><b>4.4.5</b> Validation and Cross-Validation</a></li>
+<li class="chapter" data-level="4.4.6" data-path="prediction.html"><a href="prediction.html#sec:treeinstability"><i class="fa fa-check"></i><b>4.4.6</b> Tree instability</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="prediction.html"><a href="prediction.html#sec:randomforest"><i class="fa fa-check"></i><b>4.5</b> Random forests</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="prediction.html"><a href="prediction.html#implementation-in-r"><i class="fa fa-check"></i><b>4.5.1</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="prediction.html"><a href="prediction.html#sec:neuralnet"><i class="fa fa-check"></i><b>4.6</b> Neural Networks</a>
+<ul>
+<li class="chapter" data-level="4.6.1" data-path="prediction.html"><a href="prediction.html#an-introduction-to-neural-networks"><i class="fa fa-check"></i><b>4.6.1</b> An Introduction to Neural Networks</a></li>
+<li class="chapter" data-level="4.6.2" data-path="prediction.html"><a href="prediction.html#building-a-neural-network"><i class="fa fa-check"></i><b>4.6.2</b> Building a Neural Network</a></li>
+<li class="chapter" data-level="4.6.3" data-path="prediction.html"><a href="prediction.html#prediction-using-neural-networks-in-r"><i class="fa fa-check"></i><b>4.6.3</b> Prediction Using Neural Networks in R</a></li>
+</ul></li>
+<li class="chapter" data-level="4.7" data-path="prediction.html"><a href="prediction.html#summary-of-prediction-methods"><i class="fa fa-check"></i><b>4.7</b> Summary of Prediction Methods</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="tidy-modelling.html"><a href="tidy-modelling.html"><i class="fa fa-check"></i><b>5</b> Tidy modelling</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="tidy-modelling.html"><a href="tidy-modelling.html#splitting-and-resampling-data"><i class="fa fa-check"></i><b>5.1</b> Splitting and resampling data</a></li>
+<li class="chapter" data-level="5.2" data-path="tidy-modelling.html"><a href="tidy-modelling.html#data-processing-with-recipes"><i class="fa fa-check"></i><b>5.2</b> Data processing with recipes</a></li>
+<li class="chapter" data-level="5.3" data-path="tidy-modelling.html"><a href="tidy-modelling.html#modelling-with-parsnip"><i class="fa fa-check"></i><b>5.3</b> Modelling with parsnip</a></li>
+<li class="chapter" data-level="5.4" data-path="tidy-modelling.html"><a href="tidy-modelling.html#model-performance-with-yardstick"><i class="fa fa-check"></i><b>5.4</b> Model performance with yardstick</a></li>
+<li class="chapter" data-level="5.5" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-workflow"><i class="fa fa-check"></i><b>5.5</b> Workflows</a></li>
+<li class="chapter" data-level="5.6" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-resamples"><i class="fa fa-check"></i><b>5.6</b> Resampling with <code>fit_resamples()</code></a></li>
+<li class="chapter" data-level="5.7" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-tuning"><i class="fa fa-check"></i><b>5.7</b> Simple tuning with <code>tune_grid()</code></a></li>
+<li class="chapter" data-level="5.8" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-final"><i class="fa fa-check"></i><b>5.8</b> Final model fitting with <code>last_fit()</code></a></li>
+<li class="chapter" data-level="5.9" data-path="tidy-modelling.html"><a href="tidy-modelling.html#summary-2"><i class="fa fa-check"></i><b>5.9</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="classification.html"><a href="classification.html"><i class="fa fa-check"></i><b>6</b> Classification</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="classification.html"><a href="classification.html#introduction-to-classification"><i class="fa fa-check"></i><b>6.1</b> Introduction to Classification</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="classification.html"><a href="classification.html#statistical-theory-for-classification"><i class="fa fa-check"></i><b>6.1.1</b> Statistical Theory for Classification</a></li>
+<li class="chapter" data-level="6.1.2" data-path="classification.html"><a href="classification.html#misclassification-rates-and-confusion-matrices"><i class="fa fa-check"></i><b>6.1.2</b> Misclassification Rates and Confusion Matrices</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="classification.html"><a href="classification.html#sec:lda"><i class="fa fa-check"></i><b>6.2</b> Linear Discriminant Analysis</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="classification.html"><a href="classification.html#the-method-in-theory"><i class="fa fa-check"></i><b>6.2.1</b> The Method in Theory</a></li>
+<li class="chapter" data-level="6.2.2" data-path="classification.html"><a href="classification.html#implementation-in-r-1"><i class="fa fa-check"></i><b>6.2.2</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="classification.html"><a href="classification.html#sec:kda"><i class="fa fa-check"></i><b>6.3</b> Kernel Discriminant Analysis</a></li>
+<li class="chapter" data-level="6.4" data-path="classification.html"><a href="classification.html#sec:naive"><i class="fa fa-check"></i><b>6.4</b> Naive Bayes Classifiers</a></li>
+<li class="chapter" data-level="6.5" data-path="classification.html"><a href="classification.html#logistic-regression"><i class="fa fa-check"></i><b>6.5</b> Logistic regression</a>
+<ul>
+<li class="chapter" data-level="6.5.1" data-path="classification.html"><a href="classification.html#fitting-logistic-regression-models"><i class="fa fa-check"></i><b>6.5.1</b> Fitting Logistic Regression Models</a></li>
+<li class="chapter" data-level="6.5.2" data-path="classification.html"><a href="classification.html#logistic-regression-as-a-classifier"><i class="fa fa-check"></i><b>6.5.2</b> Logistic Regression as a classifier</a></li>
+<li class="chapter" data-level="6.5.3" data-path="classification.html"><a href="classification.html#sec:multinomial"><i class="fa fa-check"></i><b>6.5.3</b> Extending Logistic Regression to more than two classes</a></li>
+<li class="chapter" data-level="6.5.4" data-path="classification.html"><a href="classification.html#model-selection-1"><i class="fa fa-check"></i><b>6.5.4</b> Model selection</a></li>
+<li class="chapter" data-level="6.5.5" data-path="classification.html"><a href="classification.html#sec:roc"><i class="fa fa-check"></i><b>6.5.5</b> ROC curves and the classification threshold</a></li>
+</ul></li>
+<li class="chapter" data-level="6.6" data-path="classification.html"><a href="classification.html#other-methods-of-classification"><i class="fa fa-check"></i><b>6.6</b> Other Methods of Classification</a>
+<ul>
+<li class="chapter" data-level="6.6.1" data-path="classification.html"><a href="classification.html#k-nearest-neighbour-classification"><i class="fa fa-check"></i><b>6.6.1</b> k-Nearest Neighbour Classification</a></li>
+<li class="chapter" data-level="6.6.2" data-path="classification.html"><a href="classification.html#classification-trees"><i class="fa fa-check"></i><b>6.6.2</b> Classification Trees</a></li>
+<li class="chapter" data-level="6.6.3" data-path="classification.html"><a href="classification.html#random-forests-for-classification"><i class="fa fa-check"></i><b>6.6.3</b> Random Forests for Classification</a></li>
+<li class="chapter" data-level="6.6.4" data-path="classification.html"><a href="classification.html#neural-networks-for-classification"><i class="fa fa-check"></i><b>6.6.4</b> Neural Networks for Classification</a></li>
+</ul></li>
+<li class="chapter" data-level="6.7" data-path="classification.html"><a href="classification.html#sec:classimbalance"><i class="fa fa-check"></i><b>6.7</b> Dealing with Class Imbalance</a>
+<ul>
+<li class="chapter" data-level="6.7.1" data-path="classification.html"><a href="classification.html#resampling-strategies"><i class="fa fa-check"></i><b>6.7.1</b> Resampling strategies</a></li>
+<li class="chapter" data-level="6.7.2" data-path="classification.html"><a href="classification.html#sec:smote"><i class="fa fa-check"></i><b>6.7.2</b> SMOTE: synthetic minority oversampling</a></li>
+</ul></li>
+<li class="chapter" data-level="6.8" data-path="classification.html"><a href="classification.html#high-class-classifiers"><i class="fa fa-check"></i><b>6.8</b> High Class Classifiers</a></li>
+<li class="chapter" data-level="6.9" data-path="classification.html"><a href="classification.html#summary-3"><i class="fa fa-check"></i><b>6.9</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="cluster-analysis.html"><a href="cluster-analysis.html"><i class="fa fa-check"></i><b>7</b> Cluster Analysis</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#dissimilarity-matrices-for-multivariate-data"><i class="fa fa-check"></i><b>7.1</b> Dissimilarity Matrices for Multivariate Data</a></li>
+<li class="chapter" data-level="7.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering"><i class="fa fa-check"></i><b>7.2</b> Hierarchical Clustering</a></li>
+<li class="chapter" data-level="7.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means-clustering"><i class="fa fa-check"></i><b>7.3</b> K-means clustering</a></li>
+<li class="chapter" data-level="7.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-medoids-clustering"><i class="fa fa-check"></i><b>7.4</b> K-medoids clustering</a></li>
+<li class="chapter" data-level="7.5" data-path="cluster-analysis.html"><a href="cluster-analysis.html#silhouette-plots"><i class="fa fa-check"></i><b>7.5</b> Silhouette plots</a></li>
+<li class="chapter" data-level="7.6" data-path="cluster-analysis.html"><a href="cluster-analysis.html#bootstrap-stability-and-the-adjusted-rand-index"><i class="fa fa-check"></i><b>7.6</b> Bootstrap stability and the adjusted Rand index</a></li>
+<li class="chapter" data-level="7.7" data-path="cluster-analysis.html"><a href="cluster-analysis.html#density-based-clustering"><i class="fa fa-check"></i><b>7.7</b> Density-based clustering</a></li>
+<li class="chapter" data-level="7.8" data-path="cluster-analysis.html"><a href="cluster-analysis.html#choosing-varepsilon-using-a-k-distance-plot"><i class="fa fa-check"></i><b>7.8</b> Choosing <span class="math inline">\(\varepsilon\)</span> using a <span class="math inline">\(k\)</span>-distance plot</a></li>
+<li class="chapter" data-level="7.9" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hdbscan-and-umap"><i class="fa fa-check"></i><b>7.9</b> HDBSCAN and UMAP</a>
+<ul>
+<li class="chapter" data-level="7.9.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#sec:hdbscan"><i class="fa fa-check"></i><b>7.9.1</b> HDBSCAN</a></li>
+<li class="chapter" data-level="7.9.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#sec:umap"><i class="fa fa-check"></i><b>7.9.2</b> UMAP</a></li>
+<li class="chapter" data-level="7.9.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#sec:cluster-compare"><i class="fa fa-check"></i><b>7.9.3</b> Practical method comparison</a></li>
+</ul></li>
+<li class="chapter" data-level="7.10" data-path="cluster-analysis.html"><a href="cluster-analysis.html#summary-4"><i class="fa fa-check"></i><b>7.10</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="association-rule-mining.html"><a href="association-rule-mining.html"><i class="fa fa-check"></i><b>8</b> Association rule mining</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="association-rule-mining.html"><a href="association-rule-mining.html#transaction-data-as-a-binary-matrix"><i class="fa fa-check"></i><b>8.1</b> Transaction data as a binary matrix</a></li>
+<li class="chapter" data-level="8.2" data-path="association-rule-mining.html"><a href="association-rule-mining.html#the-apriori-principle"><i class="fa fa-check"></i><b>8.2</b> The Apriori principle</a></li>
+<li class="chapter" data-level="8.3" data-path="association-rule-mining.html"><a href="association-rule-mining.html#the-apriori-algorithm"><i class="fa fa-check"></i><b>8.3</b> The Apriori algorithm</a></li>
+<li class="chapter" data-level="8.4" data-path="association-rule-mining.html"><a href="association-rule-mining.html#apriori-and-eclat"><i class="fa fa-check"></i><b>8.4</b> Apriori and Eclat</a></li>
+<li class="chapter" data-level="8.5" data-path="association-rule-mining.html"><a href="association-rule-mining.html#inspecting-and-filtering-rules-in-arules"><i class="fa fa-check"></i><b>8.5</b> Inspecting and filtering rules in <code>arules</code></a></li>
+<li class="chapter" data-level="8.6" data-path="association-rule-mining.html"><a href="association-rule-mining.html#sec:association-fit"><i class="fa fa-check"></i><b>8.6</b> Where association rules fit</a></li>
+<li class="chapter" data-level="8.7" data-path="association-rule-mining.html"><a href="association-rule-mining.html#summary-5"><i class="fa fa-check"></i><b>8.7</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="sec:ensemble.html"><a href="sec:ensemble.html"><i class="fa fa-check"></i><b>9</b> Ensemble Learning</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:ensemble-motivation"><i class="fa fa-check"></i><b>9.1</b> Motivation: Why Combine Models?</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#the-variance-reduction-argument"><i class="fa fa-check"></i><b>9.1.1</b> The variance reduction argument</a></li>
+<li class="chapter" data-level="9.1.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#bias-vs-variance-in-ensembles"><i class="fa fa-check"></i><b>9.1.2</b> Bias vs variance in ensembles</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:bagging"><i class="fa fa-check"></i><b>9.2</b> Bagging</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#the-bootstrap-aggregating-algorithm"><i class="fa fa-check"></i><b>9.2.1</b> The bootstrap aggregating algorithm</a></li>
+<li class="chapter" data-level="9.2.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:oob"><i class="fa fa-check"></i><b>9.2.2</b> Out-of-bag error</a></li>
+<li class="chapter" data-level="9.2.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#implementation-in-r-2"><i class="fa fa-check"></i><b>9.2.3</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:ensemblerf"><i class="fa fa-check"></i><b>9.3</b> Random Forests</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:varimp"><i class="fa fa-check"></i><b>9.3.1</b> Variable importance</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:boosting"><i class="fa fa-check"></i><b>9.4</b> Boosting</a>
+<ul>
+<li class="chapter" data-level="9.4.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#forward-stagewise-additive-modelling"><i class="fa fa-check"></i><b>9.4.1</b> Forward stagewise additive modelling</a></li>
+<li class="chapter" data-level="9.4.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:gradboosting"><i class="fa fa-check"></i><b>9.4.2</b> Gradient boosting</a></li>
+<li class="chapter" data-level="9.4.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:xgboost"><i class="fa fa-check"></i><b>9.4.3</b> XGBoost: regularised gradient boosting</a></li>
+<li class="chapter" data-level="9.4.4" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:boost-r"><i class="fa fa-check"></i><b>9.4.4</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="9.5" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:stacking"><i class="fa fa-check"></i><b>9.5</b> Stacking</a>
+<ul>
+<li class="chapter" data-level="9.5.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#stacked-generalisation"><i class="fa fa-check"></i><b>9.5.1</b> Stacked generalisation</a></li>
+<li class="chapter" data-level="9.5.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:cv-meta"><i class="fa fa-check"></i><b>9.5.2</b> Cross-validated meta-features</a></li>
+<li class="chapter" data-level="9.5.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:stacking-r"><i class="fa fa-check"></i><b>9.5.3</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="9.6" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:automl"><i class="fa fa-check"></i><b>9.6</b> AutoML: Automated Model Selection</a></li>
+<li class="chapter" data-level="9.7" data-path="sec:ensemble.html"><a href="sec:ensemble.html#summary-6"><i class="fa fa-check"></i><b>9.7</b> Summary</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Data mining</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="cluster-analysis" class="section level1 hasAnchor" number="7">
+<h1><span class="header-section-number">Chapter 7</span> Cluster Analysis<a href="cluster-analysis.html#cluster-analysis" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>While classification assigns observations to pre-specified categories
+using predictive modelling from <em>a priori</em> training data, cluster
+analysis assigns observations to categories without any <em>a priori</em>
+labels. In this chapter we look at several approaches to finding and
+analysing clusters. We start by developing a methodology based on
+measures of dissimilarity (‘pseudo-distance’, if you like) between
+multivariate observations.</p>
+<p><strong>How this chapter connects.</strong> Prediction and classification use a
+labelled outcome, whereas clustering removes that outcome and asks
+whether natural groupings are present in the predictors alone. The
+comparison table in Section <a href="introduction.html#sec:task-compare">1.4.1</a> places clustering
+beside the supervised tasks, and the preprocessing ideas from
+Section <a href="missing-values.html#sec:missing">3.1</a> still matter here because scaling, outliers,
+and missingness can strongly affect the groups we find.</p>
+<p>In clustering, the first question is whether meaningful structure is
+present at all. That makes the dissimilarity measure part of the model,
+not just a computational detail. Different clustering methods then make
+different assumptions about the group structure: hierarchical methods
+build nested trees, centre-based methods look for compact groups, and
+density methods look for concentrated regions separated by sparse space.</p>
+<div id="dissimilarity-matrices-for-multivariate-data" class="section level2 hasAnchor" number="7.1">
+<h2><span class="header-section-number">7.1</span> Dissimilarity Matrices for Multivariate Data<a href="cluster-analysis.html#dissimilarity-matrices-for-multivariate-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Let <span class="math inline">\(x_{ij}\)</span> be the observed value of the <span class="math inline">\(j\)</span>th variable for the <span class="math inline">\(i\)</span>th
+individual (where <span class="math inline">\(i=1,\ldots,n\)</span>, <span class="math inline">\(j=1,\ldots,p\)</span>). A <em>dissimilarity</em> (or
+<em>proximity</em>) matrix <span class="math inline">\(\Delta\)</span> is an <span class="math inline">\(n\times n\)</span> matrix with element
+<span class="math inline">\(\delta_{st}\)</span> being the dissimilarity between individuals <span class="math inline">\(s\)</span> and <span class="math inline">\(t\)</span>.
+The dissimilarities satisfy:</p>
+<ul>
+<li><p><span class="math inline">\(\delta_{ss} = 0\)</span> for all individuals <span class="math inline">\(s\)</span>.</p></li>
+<li><p><span class="math inline">\(\delta_{st} \ge 0\)</span> for all <span class="math inline">\(s, t\)</span>.</p></li>
+<li><p><span class="math inline">\(\delta_{st} = \delta_{ts}\)</span> for all <span class="math inline">\(s, t\)</span>.</p></li>
+</ul>
+<p>Some examples of dissimilarities include the following.</p>
+<p><strong>Euclidean Distance</strong></p>
+<p>Defined by <span class="math display">\[\delta_{st} = \sqrt{\sum_{j=1}^p (x_{sj} - x_{tj})^2}.\]</span>
+(Often average Euclidean distance preferred, when above is divided by
+<span class="math inline">\(p\)</span>.) Suitable when all variables are numeric.</p>
+<p><strong>Manhattan Distance</strong></p>
+<p>Defined by <span class="math display">\[\delta_{st} = \sum_{j=1}^p | x_{sj} - x_{tj} |.\]</span> (Often
+average Manhattan distance preferred, when above is divided by <span class="math inline">\(p\)</span>.)
+Suitable when all variables are numeric.</p>
+<p><strong>Simple Matching Coefficient</strong></p>
+<p>The simple matching coefficient is a <em>similarity measure</em> for
+categorical variables, given by
+<span class="math display">\[\gamma_{st} = p^{-1} \sum_{j=1}^p {\bf 1}[x_{sj} = x_{tj}]\]</span> where
+<span class="math inline">\({\bf 1}[A]\)</span> is the indicator for the event: <span class="math display">\[{\bf 1}[A] = \left \{
+\begin{array}{ll}
+1 &amp; A \mbox{ occurs}\\
+0 &amp; \mbox{otherwise}.
+\end{array}
+\right .\]</span> The corresponding dissimilarity is <span class="math display">\[\begin{aligned}
+\delta_{st} &amp;= 1 - \gamma_{st}\\
+            &amp;= p^{-1} \sum_{j=1}^p {\bf 1}[x_{sj} \ne x_{tj}].\end{aligned}\]</span></p>
+<p>Note: for binary data, average Manhattan distance and simple matching
+coefficient give same dissimilarity.</p>
+<p><strong>Jaccard Coefficient</strong></p>
+<p>The Jaccard coefficient is a <em>similarity measure</em> for binary variables,
+given by
+<span class="math display">\[\gamma_{st} = \frac{\sum_{j=1}^p {\bf 1}[x_{sj} = x_{tj} = 1]}
+{\sum_{j=1}^p {\bf 1}[x_{sj} + x_{tj} &gt; 0]}.\]</span> The corresponding
+dissimilarity is <span class="math display">\[\delta_{st} = 1 - \gamma_{st}.\]</span></p>
+<p>Note that <span class="math inline">\(\gamma_{st}\)</span> is the proportion of variables on which the
+individuals are matched once the variables on which both individuals
+have a 0 response is removed. This is a very natural measure of
+similarity when 1 represents presence of a rare characteristic, so that
+the vast majority of individuals have 0 responses on most
+variables. In that situation, 0-0 matches provide almost no useful
+information about the similarity between individuals. We therefore omit
+these matches.</p>
+<p><strong>Gower’s dissimilarity</strong></p>
+<p>Gower’s dissimilarity was the metric used to identify nearest neighbours
+in the <code>kNN()</code> function from <code>VIM</code>, which we discussed in <a href="missing-values.html#sec:imputation">3.4</a>.
+To compute Gower’s dissimilarity we first divide any numeric variable by
+its range (to ensure all variables have range 1), and then use Manhattan
+dissimilarity. For categorical variables we use simple matching. Gower’s
+distance is then the combination of these:
+<span class="math display">\[\gamma_{st} = \frac{1}{p_n}\sum_{j=1}^{p_n} \frac{|x_{sj} - x_{tj}|}{r_j} + \frac{1}{p_c} \sum_{j=1}^{p_c} {\bf 1}[x_{sj} \neq x_{tj}].\]</span> where <span class="math inline">\(p_n\)</span> is the number of numeric predictors,
+<span class="math inline">\(r_j\)</span> the range of the <span class="math inline">\(j\)</span>-th numeric variable, and <span class="math inline">\(p_c\)</span> the number of categorical predictors.</p>
+<p>The R command for computing a dissimilarity matrix is</p>
+<div class="sourceCode" id="cb277"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb277-1"><a href="cluster-analysis.html#cb277-1" tabindex="-1"></a><span class="fu">dist</span>(my.data, <span class="at">method=</span>..., ...)</span></code></pre></div>
+<p>where</p>
+<ul>
+<li><p><code>my.data</code> is a data frame (or matrix, with variables as columns).</p></li>
+<li><p><code>method</code> can be</p>
+<ul>
+<li><p><code>euclidean</code> (In R, total distance, not average).</p></li>
+<li><p><code>manhattan</code> (In R, total distance, not average).</p></li>
+<li><p><code>binary</code> – the Jaccard <em>dissimilarity</em> coefficient.</p></li>
+</ul></li>
+</ul>
+<p>When Euclidean or Manhattan distance is applied directly to variables
+with very different scales, the variables with the largest units can
+dominate the dissimilarity calculation. A common remedy is to
+standardise each numeric variable before computing distances:
+<span class="math display">\[z_{ij} = \frac{x_{ij} - \bar x_j}{s_j}, \qquad j=1,\ldots,p,\]</span> where
+<span class="math inline">\(\bar x_j\)</span> and <span class="math inline">\(s_j\)</span> are the sample mean and sample standard deviation
+of the <span class="math inline">\(j\)</span>th variable. Euclidean clustering methods applied to the
+standardised observations <span class="math inline">\(z_i = (z_{i1}, \ldots, z_{ip})\)</span> then treat a
+one-standard-deviation change in any variable as being of comparable
+size. This is particularly important for methods such as <span class="math inline">\(K\)</span>-means and
+DBSCAN when they are used with Euclidean distance.</p>
+</div>
+<div id="hierarchical-clustering" class="section level2 hasAnchor" number="7.2">
+<h2><span class="header-section-number">7.2</span> Hierarchical Clustering<a href="cluster-analysis.html#hierarchical-clustering" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Cluster analysis in statistics is a procedure for detecting groupings in
+data with no pre-determined group definitions. This is in contrast to
+<em>discriminant analysis</em>, which is the process of assigning observations
+to pre-determined classes<a href="#fn62" class="footnote-ref" id="fnref62"><sup>62</sup></a>.</p>
+<p>Agglomerative hierarchical clustering uses the following algorithm.</p>
+<ol style="list-style-type: decimal">
+<li><p>Initialise by letting each observation define its own cluster.</p></li>
+<li><p>Find the two most similar clusters and combine them into a new
+cluster.</p></li>
+<li><p>Stop if only one cluster remains. Otherwise go to 2.</p></li>
+</ol>
+<p>To operate this algorithm we need to define dissimilarities between
+clusters. Options include:</p>
+<dl>
+<dt>Single linkage:</dt>
+<dd>
+<p>Let <span class="math inline">\(\delta_{AB}\)</span> denote dissimilarity between clusters <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span>
+using single linkage. Then
+<span class="math display">\[\delta_{AB} = \min \{ \delta_{st}: \, s \in A, \, t \in B \}.\]</span></p>
+</dd>
+<dt>Complete linkage:</dt>
+<dd>
+<p><span class="math display">\[\delta_{AB} = \max \{ \delta_{st}: \, s \in A, \, t \in B \}.\]</span></p>
+</dd>
+<dt>Average dissimilarity:</dt>
+<dd>
+<p><span class="math display">\[\delta_{AB} = n_A^{-1} n_B^{-1} \sum_{s \in A} \sum_{t \in B}
+\delta_{st}\]</span> where <span class="math inline">\(n_A\)</span> and <span class="math inline">\(n_B\)</span> are number of members of
+clusters <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> respectively.</p>
+</dd>
+</dl>
+<p>This linkage choice is not a minor setting. It changes the merge history
+of the tree, so cutting two dendrograms at the same height can lead to
+different final partitions.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-47" class="example"><strong>Example 7.1  </strong></span><strong>Dissimilarities Between Clusters</strong></p>
+<p>Suppose that the dissimilarity matrix for 4 individuals
+<span class="math display">\[\Delta = \begin{array}{cc}
+&amp; 1~~~~~2~~~~~3~~~~~4\\
+\begin{array}{c}
+1\\
+2\\
+3\\
+4
+\end{array}
+&amp; \hspace{-6pt} \left (
+\begin{array}{rrrr}
+  0 &amp; 2.0 &amp; 4.0 &amp; 5.0 \\
+2.0 &amp; 0   &amp; 4.5 &amp; 3.0 \\
+4.0 &amp; 4.5 &amp; 0   &amp; 1.5 \\
+5.0 &amp; 3.0 &amp; 1.5 &amp; 0   
+\end{array}
+\right )
+\end{array}\]</span>
+Consider clusters <span class="math inline">\(A= \{ 1,2\}\)</span> and <span class="math inline">\(B = \{3,4\}\)</span>. Then
+using single linkage, <span class="math display">\[\delta_{AB} = \delta_{24} = 3.0.\]</span> Using
+complete linkage, <span class="math display">\[\delta_{AB} = \delta_{14} = 5.0.\]</span> Using average
+dissimilarity,
+<span class="math display">\[\delta_{AB} = 2^{-1} \times 2^{-1} ( 4.0 + 5.0 + 4.5 + 3.0 ) = 4.125.\]</span></p>
+</div>
+<p>The R command to perform hierarchical clustering is</p>
+<div class="sourceCode" id="cb278"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb278-1"><a href="cluster-analysis.html#cb278-1" tabindex="-1"></a><span class="fu">hclust</span>(d.matrix, <span class="at">method=</span>...)</span></code></pre></div>
+<p>where</p>
+<ul>
+<li><p><code>d.matrix</code> is a dissimilarity matrix.</p></li>
+<li><p><code>method</code> can be <code>single</code>, <code>complete</code> or <code>average</code> (amongst others).</p></li>
+</ul>
+<p>The output from the analysis is the set of clusters at each iteration,
+and the dissimilarity level at which the clusters formed. This can be
+neatly displayed as a <em>dendrogram</em> – see Example <a href="cluster-analysis.html#exm:repubclust">7.2</a>.</p>
+<div class="example">
+<p><span id="exm:repubclust" class="example"><strong>Example 7.2  </strong></span><strong>Cluster Analysis for US Republican Voting Data</strong></p>
+<p>The data set <code>repub</code> contains the percentage of the vote given to the
+Republican candidate in American presidential elections from 1916 to
+1976 for a selection of states. Clusters of states with similar voting
+patterns may be of interest to political analysts. We can start with a
+star plot as an informal way to assess whether any clustering might be
+present. A star plot gives a 2-dimensional summary of a multivariate
+dataset by plotting variable values (normalized to lie between 0 and 1)
+as rays projecting from the star’s centre. This gives a quick visual
+comparison between states and helps us see which ones seem to group
+together. Figure <a href="cluster-analysis.html#fig:repubstars">7.1</a> is produced using <code>stars(repub)</code>.
+It is easy to see that several states have very similar Republican
+voting patterns. Notice also the unusual pattern in Mississippi, where
+the Republican vote is usually poor but there are some exceptional years
+relative to the other states.</p>
+<div class="figure"><span style="display:block;" id="fig:repubstars"></span>
+<img src="07-clustering_files/figure-html/repubstars-1.png" alt="Stars plot for republican voting data." width="672" />
+<p class="caption">
+Figure 7.1: Stars plot for republican voting data.
+</p>
+</div>
+<p>The following code uses <code>hclust()</code> to produce dendrograms for the
+hierarchical clustering.</p>
+<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb279-1"><a href="cluster-analysis.html#cb279-1" tabindex="-1"></a>repub <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../data/repub.csv&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb279-2"><a href="cluster-analysis.html#cb279-2" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="st">&quot;State&quot;</span>)</span>
+<span id="cb279-3"><a href="cluster-analysis.html#cb279-3" tabindex="-1"></a>repub.dist <span class="ot">&lt;-</span> repub <span class="sc">|&gt;</span> <span class="fu">dist</span>(<span class="at">method =</span> <span class="st">&quot;euclidean&quot;</span>)</span>
+<span id="cb279-4"><a href="cluster-analysis.html#cb279-4" tabindex="-1"></a>repub.clust.single <span class="ot">&lt;-</span> repub.dist <span class="sc">|&gt;</span> <span class="fu">hclust</span>(<span class="at">method =</span> <span class="st">&quot;single&quot;</span>)</span>
+<span id="cb279-5"><a href="cluster-analysis.html#cb279-5" tabindex="-1"></a>repub.clust.complete <span class="ot">&lt;-</span> repub.dist <span class="sc">|&gt;</span> <span class="fu">hclust</span>(<span class="at">method=</span><span class="st">&quot;complete&quot;</span>)</span>
+<span id="cb279-6"><a href="cluster-analysis.html#cb279-6" tabindex="-1"></a><span class="fu">library</span>(ggdendro)</span>
+<span id="cb279-7"><a href="cluster-analysis.html#cb279-7" tabindex="-1"></a><span class="fu">ggdendrogram</span>(repub.clust.single)</span>
+<span id="cb279-8"><a href="cluster-analysis.html#cb279-8" tabindex="-1"></a><span class="fu">ggdendrogram</span>(repub.clust.complete)</span></code></pre></div>
+<p>Note that we use <code>column_to_rownames()</code> here to move the <code>State</code> column
+to the rownames. This is so that when we apply <code>dist()</code> to produce the
+distance matrix, the rows and columns are labelled. These labels are
+then kept through the <code>hclust()</code> functions. The <code>ggdendrogram()</code>
+function from the <code>ggdendro</code> package gives us plotting consistent with
+<code>ggplot2</code>.</p>
+<p>The dendrograms produced are displayed in Figures <a href="cluster-analysis.html#fig:repubsingle">7.2</a> and
+<a href="cluster-analysis.html#fig:repubcomplete">7.3</a>. Note
+that the dissimilarity between two groups can be read off from the
+height at which they join. So, for example, with single linkage (in
+Figure <a href="cluster-analysis.html#fig:repubsingle">7.2</a> the group <span class="math inline">\(\{ \textsf{Alabama}, \textsf{Georgia} \}\)</span> and
+the group <span class="math inline">\(\{ \textsf{Arkansas}, \textsf{Florida},
+\textsf{Texas} \}\)</span> join at a dissimilarity of about 38. (In fact, the exact
+figure is <span class="math inline">\(37.79937\)</span> which can be obtained by inspecting
+<code>repub.clust.single$height</code>).</p>
+<pre><code>#&gt; Warning: package &#39;ggdendro&#39; was built under R version 4.5.2</code></pre>
+<div class="figure"><span style="display:block;" id="fig:repubsingle"></span>
+<img src="07-clustering_files/figure-html/repubsingle-1.png" alt="Dendrogram for Republican voting data, obtained using single linkage." width="672" />
+<p class="caption">
+Figure 7.2: Dendrogram for Republican voting data, obtained using single linkage.
+</p>
+</div>
+<div class="figure"><span style="display:block;" id="fig:repubcomplete"></span>
+<img src="07-clustering_files/figure-html/repubcomplete-1.png" alt="Dendrogram for Republican voting data, obtained using complete linkage." width="672" />
+<p class="caption">
+Figure 7.3: Dendrogram for Republican voting data, obtained using complete linkage.
+</p>
+</div>
+<p>Note that a dendrogram does not define a unique set of clusters. If the
+user wants a particular set of clusters, then these can be obtained by
+‘cutting’ the dendrogram at a particular height, and defining the
+clusters according to the groups which formed below that height. For
+instance, if we use a cut-off height of 75 with complete linkage then
+three clusters emerge:</p>
+<ul>
+<li><p><em>Cluster 1</em>: New York, New Mexico, Washington, California, Oregon,
+Michigan, Kansas, Wyoming.</p></li>
+<li><p><em>Cluster 2</em>: Mississippi.</p></li>
+<li><p><em>Cluster 3</em>: Alabama, Georgia, Arkansas, Florida, Texas.</p></li>
+</ul>
+<p>These groupings were obtained by inspection of the dendrogram. Such a
+process would clearly have been laborious had all 50 states been present
+in the data. Fortunately the R command <code>cutree</code> generates group
+membership automatically.</p>
+<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb281-1"><a href="cluster-analysis.html#cb281-1" tabindex="-1"></a>repub.groups.complete <span class="ot">&lt;-</span> repub.clust.complete <span class="sc">|&gt;</span> <span class="fu">cutree</span>(<span class="at">h=</span><span class="dv">75</span>)</span>
+<span id="cb281-2"><a href="cluster-analysis.html#cb281-2" tabindex="-1"></a>repub.groups.complete</span></code></pre></div>
+<pre><code>#&gt;     Alabama    Arkansas  California     Florida     Georgia      Kansas 
+#&gt;           1           1           2           1           1           2 
+#&gt;    Michigan Mississippi  New Mexico    New York      Oregon       Texas 
+#&gt;           2           3           2           2           2           1 
+#&gt;  Washington     Wyoming 
+#&gt;           2           2</code></pre>
+<p>Lower cuts would produce more clusters, while higher cuts would merge
+these groups into fewer clusters.</p>
+</div>
+<p><strong>Single and Complete Linkage Compared</strong></p>
+<ul>
+<li><p>Single linkage is prone to ‘chaining’. In the figure below the three
+groups on the right will merge together (in a kind of chain) before
+combining with the group on the left. Note that everything would
+change if a single datum were added midway between the two groups on
+the left – these groups would then combine earlier than those on
+the right. This can be viewed as an unwanted lack of robustness with
+single linkage.</p>
+<p><img src="graphics/linkage_single.png" alt="" width="536" /></p>
+<p>The central cluster in Figure <a href="cluster-analysis.html#fig:repubsingle">7.2</a> in
+Example <a href="cluster-analysis.html#exm:repubclust">7.2</a> shows an instance of chaining with real data.</p></li>
+<li><p>The growth of large clusters at small heights is very unlikely under
+complete linkage. In the figure below the middle cluster will
+combine with the right hand cluster because the extreme left hand
+edge of the large left cluster is distant. Nonetheless, our
+intuition is that the middle cluster should first combine with the
+left hand cluster.</p>
+<p><img src="graphics/linkage_complete.png" alt="" width="563" /></p></li>
+</ul>
+</div>
+<div id="k-means-clustering" class="section level2 hasAnchor" number="7.3">
+<h2><span class="header-section-number">7.3</span> K-means clustering<a href="cluster-analysis.html#k-means-clustering" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>If we have some knowledge <em>a priori</em> of the number of clusters <span class="math inline">\(K\)</span>, then
+the problem of clustering changes to assigning each datum to a cluster
+such that within-cluster variation is minimized (and between-cluster
+variation maximised).</p>
+<p>A naive way to address this problem is to compute the within-cluster
+variation for all possible assignments the <span class="math inline">\(n\)</span> data points to <span class="math inline">\(K\)</span>
+clusters. We then pick the assignment with minimal variation. The
+problem is that the number of possible assignments is given by:
+<span class="math display">\[S(n,K) = \frac{1}{K!}\sum_{k=1}^K (-1)^{K-k}\dbinom{K}{k}k^n.\]</span> The
+leading term here is <span class="math inline">\(\frac{K^n}{K!}\)</span> which gets large very quickly as
+<span class="math inline">\(n\)</span> increases! We thus settle for an approximate solution via the
+iterative <span class="math inline">\(K\)</span>-means algorithm.</p>
+<p>For a set of <span class="math inline">\(n\)</span> numerical datapoints <span class="math inline">\(x_i\)</span>, the average total variation
+in the data may be measured using
+<span class="math display">\[T=\frac{1}{2N}\sum_{i=1}^n\sum_{j=1}^n d(x_i,x_j)\]</span> where <span class="math inline">\(d\)</span> is the
+dissimilarity metric. If we denote <span class="math inline">\(C(i)\)</span> as the cluster that point
+<span class="math inline">\(x_i\)</span> is assigned to, we may re-write this as <span class="math display">\[\begin{aligned}
+T &amp;= \frac{1}{2N}\sum_{k=1}^K\sum_{C(i)=k}\left(\sum_{C(j)=k}d(x_i,x_j) + \sum_{C(j)\neq k}d(x_i,x_j)\right)\\
+  &amp;= W(C) + B(C).\end{aligned}\]</span> where <span class="math inline">\(W(C)\)</span> is the within-cluster
+variation
+<span class="math display">\[W(C) = \frac{1}{2N}\sum_{k=1}^K\sum_{C(i)=k}\sum_{C(j)=k}d(x_i,x_j),\]</span>
+and <span class="math inline">\(B(C)\)</span> is the between-cluster variation
+<span class="math display">\[B(C) = \frac{1}{2N}\sum_{k=1}^K\sum_{C(i)=k}\sum_{C(j)\neq k}d(x_i,x_j).\]</span>
+Noting that <span class="math inline">\(T\)</span> is a constant, minimizing <span class="math inline">\(W(C)\)</span> is equivalent to
+maximising <span class="math inline">\(B(C)\)</span>.</p>
+<p>If <span class="math inline">\(d(x_i,x_j)\)</span> is the Euclidean distance, then these simplify to
+<span class="math display">\[\begin{aligned}
+W(C) &amp;= \sum_{k=1}^K \sum_{C(i)=k} (x_i - \mu_k)^2,\\
+B(C) &amp;= \sum_{k=1}^K N_k (\mu_k - \mu)^2,\\\end{aligned}\]</span> where <span class="math inline">\(N_k\)</span>
+is the number of data points in cluster <span class="math inline">\(k\)</span>, <span class="math inline">\(\mu_k\)</span> is the mean of the
+data points in cluster <span class="math inline">\(k\)</span>, and <span class="math inline">\(\mu\)</span> is the mean of all datapoints
+(grand mean).</p>
+<p>This gives us the basis of the <span class="math inline">\(K\)</span>-means algorithm:</p>
+<ol start="0" style="list-style-type: decimal">
+<li><p>Start by placing the cluster means <span class="math inline">\(\mu_k\)</span> arbitrarily.</p></li>
+<li><p>Compute the cluster assignment by assigning each datapoint <span class="math inline">\(x_i\)</span> to
+the closest cluster mean:
+<span class="math display">\[C(i) = \mathop{\mathrm{arg\,min}}_{1 \leq k \leq K} (x_i - \mu_k)^2.\]</span></p></li>
+<li><p>Recompute the cluster means <span class="math inline">\(\mu_k\)</span>.</p></li>
+<li><p>Repeat from 1 until <span class="math inline">\(\mu_k\)</span> reach convergence.</p></li>
+</ol>
+<p>Note the similarity with linear discriminant analysis: Rather than have
+a training data set define the cluster means and then assigning
+observations to the closest cluster, we use an iterative procedure where
+data from the previous iteration may be considered the training data.</p>
+<p>There are a number of pros and cons to this method.</p>
+<ul>
+<li><p>The algorithm is simple to implement, requiring only means and
+distances to be calculated.</p></li>
+<li><p>The algorithm will always converge, but may only converge to a local
+minimum rather than the global minimum<a href="#fn63" class="footnote-ref" id="fnref63"><sup>63</sup></a>.</p></li>
+<li><p>It is restricted to numerical data.</p></li>
+<li><p>As means are used (Euclidean distance), outliers may be problematic.</p></li>
+<li><p>Requires <em>a priori</em> knowledge of the number of clusters <span class="math inline">\(K\)</span>.</p></li>
+</ul>
+<div class="example">
+<p><span id="exm:kmeans" class="example"><strong>Example 7.3  </strong></span><strong><span class="math inline">\(K\)</span>-means example on synthetic data</strong></p>
+<p>Given randomly generated data from 3 distributions in two-dimensions in
+Figure <a href="cluster-analysis.html#fig:kmeans1">7.4</a>.</p>
+<div class="figure"><span style="display:block;" id="fig:kmeans1"></span>
+<img src="07-clustering_files/figure-html/kmeans1-1.png" alt="Data generated from 3 distributions for Example \@ref(exm:kmeans)." width="672" />
+<p class="caption">
+Figure 7.4: Data generated from 3 distributions for Example <a href="cluster-analysis.html#exm:kmeans">7.3</a>.
+</p>
+</div>
+<p>We’d expect that <span class="math inline">\(K=3\)</span> is reasonable, so let’s explore how the <span class="math inline">\(K\)</span>-means
+algorithm operates: Figure <a href="cluster-analysis.html#fig:kmeans2">7.5</a> shows the initial (random)
+cluster means, and
+several further iterations of the algorithm. We seed the algorithm by
+sampling 3 points randomly from the data. Notice how with even
+relatively poor choices for the initial cluster means, the algorithm
+still correctly identifies the clusters in this case, and converges
+quite quickly: There’s very little difference in the cluster means after
+the 8th iteration. The similarity with linear discriminant analysis is
+seen here as well, in that you can imagine lines bisecting the midpoints
+of the pair-wise cluster means dividing the region into partitions that
+contain each cluster.</p>
+<div class="figure"><span style="display:block;" id="fig:kmeans2"></span>
+<img src="07-clustering_files/figure-html/kmeans2-1.png" alt="The $K$-means algorithm in practice after several iterations for Example \@ref(exm:kmeans)." width="672" />
+<p class="caption">
+Figure 7.5: The <span class="math inline">\(K\)</span>-means algorithm in practice after several iterations for Example <a href="cluster-analysis.html#exm:kmeans">7.3</a>.
+</p>
+</div>
+<p>In order to find an appropriate value for <span class="math inline">\(K\)</span>, one method is to apply
+the <span class="math inline">\(K\)</span>-means algorithm for a number of different values for <span class="math inline">\(K\)</span>, and
+compare the within cluster variance produced under each value. It’s
+clear that the within-cluster variance will decrease monotonically, so
+rather than looking for the smallest value we instead look to see which
+value of <span class="math inline">\(K\)</span> results in the largest decrease compared to <span class="math inline">\(K-1\)</span> -
+typically we’re looking for the ‘kink’ in the graph of the within
+cluster variance versus <span class="math inline">\(K\)</span>. Figure <a href="cluster-analysis.html#fig:kmeans3">7.6</a> shows
+this for the above example. The majority of the reduction in cluster
+variance occurs by <span class="math inline">\(K=3\)</span>, and while things continue to improve, the
+relative improvement is minor.</p>
+<pre><code>#&gt; Warning: package &#39;broom&#39; was built under R version 4.5.2</code></pre>
+<div class="figure"><span style="display:block;" id="fig:kmeans3"></span>
+<img src="07-clustering_files/figure-html/kmeans3-1.png" alt="The within cluster variance for one to six clusters for Example \@ref(exm:kmeans)" width="672" />
+<p class="caption">
+Figure 7.6: The within cluster variance for one to six clusters for Example <a href="cluster-analysis.html#exm:kmeans">7.3</a>
+</p>
+</div>
+</div>
+<p>The <span class="math inline">\(K\)</span>-means algorithm is implemented using the <code>kmeans</code> function in R
+which has syntax</p>
+<div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb284-1"><a href="cluster-analysis.html#cb284-1" tabindex="-1"></a><span class="fu">kmeans</span>(x, centers, <span class="at">nstart =</span> <span class="dv">1</span>)</span></code></pre></div>
+<p>where <code>x</code> is the data, <code>centers</code> the number of clusters, and <code>nstart</code>
+may be optionally specified to run the algorithm several times from
+different starting points, helping to minimise the chance of us being
+left with a local minimum rather than the global minimum. The output
+class contains components</p>
+<ul>
+<li><p><code>clusters</code>: the cluster assignment for each observation.</p></li>
+<li><p><code>centers</code>: the center of each cluster.</p></li>
+<li><p><code>withinss</code>: the within cluster variation (sum of squares).</p></li>
+<li><p><code>size</code>: the size of each cluster.</p></li>
+</ul>
+<p>The information can be extracted into tidy data frames using <code>tidy()</code>,
+<code>augment()</code> and <code>glance()</code> from the <code>broom</code> package in a similar way
+as we can extract information for linear models.</p>
+<div class="example">
+<p><span id="exm:penguins" class="example"><strong>Example 7.4  </strong></span><strong><span class="math inline">\(K\)</span>-means of Penguins from the Palmer Archipelago</strong></p>
+<p>These data consist of size measurements, clutch observations, and blood
+isotope ratios for adult foraging Adélie, Chinstrap, and Gentoo penguins
+observed on islands in the Palmer Archipelago near Palmer Station,
+Antarctica. The data were collected and made available by Dr Kristen
+Gorman and the Palmer Station Long Term Ecological Research (LTER)
+Program.</p>
+<p>We will use the measurements <code>flipper_length_mm</code>, <code>bill_length_mm</code>, and
+<code>body_mass_g</code> to cluster the penguins. Suppose we do not know the
+species labels and want to see whether the <span class="math inline">\(K\)</span>-means algorithm can
+recover them from the numeric features alone.</p>
+<pre><code>#&gt; Warning: package &#39;palmerpenguins&#39; was built under R version 4.5.2</code></pre>
+<pre><code>#&gt; Warning: package &#39;patchwork&#39; was built under R version 4.5.2</code></pre>
+<div class="figure"><span style="display:block;" id="fig:peng1"></span>
+<img src="07-clustering_files/figure-html/peng1-1.png" alt="The actual species (left) and clusters found using $K$-means with 3 clusters (right) for Example \@ref(exm:penguins)." width="672" />
+<p class="caption">
+Figure 7.7: The actual species (left) and clusters found using <span class="math inline">\(K\)</span>-means with 3 clusters (right) for Example <a href="cluster-analysis.html#exm:penguins">7.4</a>.
+</p>
+</div>
+<p>Figure <a href="cluster-analysis.html#fig:peng1">7.7</a> compares the actual species (on the left) with
+the clusters found by the <span class="math inline">\(K\)</span>-means algorithm (on the right). The
+algorithm does reasonably well, although there is some incorrect
+allocation for penguins with moderate flipper lengths and body masses.
+The code used is below:</p>
+<div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb287-1"><a href="cluster-analysis.html#cb287-1" tabindex="-1"></a><span class="fu">ggplot</span>(penguins) <span class="sc">+</span></span>
+<span id="cb287-2"><a href="cluster-analysis.html#cb287-2" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>flipper_length_mm,</span>
+<span id="cb287-3"><a href="cluster-analysis.html#cb287-3" tabindex="-1"></a>                         <span class="at">y=</span>body_mass_g,</span>
+<span id="cb287-4"><a href="cluster-analysis.html#cb287-4" tabindex="-1"></a>                         <span class="at">col=</span>species))</span>
+<span id="cb287-5"><a href="cluster-analysis.html#cb287-5" tabindex="-1"></a></span>
+<span id="cb287-6"><a href="cluster-analysis.html#cb287-6" tabindex="-1"></a>km <span class="ot">&lt;-</span> penguins <span class="sc">|&gt;</span></span>
+<span id="cb287-7"><a href="cluster-analysis.html#cb287-7" tabindex="-1"></a>  <span class="fu">select</span>(flipper_length_mm, bill_length_mm, body_mass_g) <span class="sc">|&gt;</span></span>
+<span id="cb287-8"><a href="cluster-analysis.html#cb287-8" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), scale)) <span class="sc">|&gt;</span></span>
+<span id="cb287-9"><a href="cluster-analysis.html#cb287-9" tabindex="-1"></a>  <span class="fu">kmeans</span>(<span class="at">centers=</span><span class="dv">3</span>, <span class="at">nstart=</span><span class="dv">20</span>)</span>
+<span id="cb287-10"><a href="cluster-analysis.html#cb287-10" tabindex="-1"></a></span>
+<span id="cb287-11"><a href="cluster-analysis.html#cb287-11" tabindex="-1"></a>km <span class="sc">|&gt;</span> <span class="fu">augment</span>(penguins) <span class="sc">|&gt;</span></span>
+<span id="cb287-12"><a href="cluster-analysis.html#cb287-12" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb287-13"><a href="cluster-analysis.html#cb287-13" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>flipper_length_mm,</span>
+<span id="cb287-14"><a href="cluster-analysis.html#cb287-14" tabindex="-1"></a>                       <span class="at">y=</span>body_mass_g,</span>
+<span id="cb287-15"><a href="cluster-analysis.html#cb287-15" tabindex="-1"></a>                       <span class="at">col=</span>.cluster))</span></code></pre></div>
+<p>Notice that we’re specifying <code>nstart=20</code> when using <code>kmeans</code>. This
+requests that the <span class="math inline">\(K\)</span>-means algorithm is run from 20 separate starting
+cluster positions, which helps reduce the chance of being left at a
+local minimum rather than the global minimum. We are also scaling each
+predictor (via the <code>mutate</code> function) to a common scale. If we do not do
+that, <code>body_mass_g</code> dominates the distance calculation, as shown in
+Figure <a href="cluster-analysis.html#fig:peng2">7.8</a>.</p>
+<div class="figure"><span style="display:block;" id="fig:peng2"></span>
+<img src="07-clustering_files/figure-html/peng2-1.png" alt="The actual species (left) and clusters found using $K$-means with 3 clusters (right) for Example \@ref(exm:penguins) without scaling." width="672" />
+<p class="caption">
+Figure 7.8: The actual species (left) and clusters found using <span class="math inline">\(K\)</span>-means with 3 clusters (right) for Example <a href="cluster-analysis.html#exm:penguins">7.4</a> without scaling.
+</p>
+</div>
+<p>Figure <a href="cluster-analysis.html#fig:peng2">7.8</a> shows that without scaling, the division into clusters happens
+almost exclusively along the <code>body_mass_g</code> axis, as this contributes the most to the
+distance between observations. This clearly gives a clustering that does not align
+well with the actual species.</p>
+<p>Figure <a href="cluster-analysis.html#fig:peng3">7.9</a> compares the total within cluster sum of squares for a
+range of <span class="math inline">\(k\)</span> for scaled (left) and unscaled (right) data. We see in either case
+that the data suggest that two clusters may be best, though the scaled data does
+show a very slightly larger kink at 3 clusters.</p>
+<div class="figure"><span style="display:block;" id="fig:peng3"></span>
+<img src="07-clustering_files/figure-html/peng3-1.png" alt="Cluster size versus within cluster variation for Example \@ref(exm:penguins). Scaled data left, unscaled data right" width="672" />
+<p class="caption">
+Figure 7.9: Cluster size versus within cluster variation for Example <a href="cluster-analysis.html#exm:penguins">7.4</a>. Scaled data left, unscaled data right
+</p>
+</div>
+<p>The code used to produce the datasets for these charts is below:</p>
+<div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb288-1"><a href="cluster-analysis.html#cb288-1" tabindex="-1"></a>peng.scale <span class="ot">&lt;-</span> penguins <span class="sc">|&gt;</span></span>
+<span id="cb288-2"><a href="cluster-analysis.html#cb288-2" tabindex="-1"></a>  <span class="fu">select</span>(flipper_length_mm, bill_length_mm, body_mass_g) <span class="sc">|&gt;</span></span>
+<span id="cb288-3"><a href="cluster-analysis.html#cb288-3" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), scale))</span>
+<span id="cb288-4"><a href="cluster-analysis.html#cb288-4" tabindex="-1"></a></span>
+<span id="cb288-5"><a href="cluster-analysis.html#cb288-5" tabindex="-1"></a>peng_ss <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">k=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>) <span class="sc">|&gt;</span></span>
+<span id="cb288-6"><a href="cluster-analysis.html#cb288-6" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb288-7"><a href="cluster-analysis.html#cb288-7" tabindex="-1"></a>    <span class="at">km =</span> <span class="fu">map</span>(k, <span class="sc">~</span> <span class="fu">kmeans</span>(peng.scale, <span class="at">centers=</span>., <span class="at">nstart=</span><span class="dv">20</span>)),</span>
+<span id="cb288-8"><a href="cluster-analysis.html#cb288-8" tabindex="-1"></a>    <span class="at">tidied =</span> <span class="fu">map</span>(km, glance)</span>
+<span id="cb288-9"><a href="cluster-analysis.html#cb288-9" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb288-10"><a href="cluster-analysis.html#cb288-10" tabindex="-1"></a>  <span class="fu">unnest</span>(tidied)</span>
+<span id="cb288-11"><a href="cluster-analysis.html#cb288-11" tabindex="-1"></a>peng_ss</span></code></pre></div>
+<ul>
+<li><p>We scale the penguin data before applying <code>kmeans</code>.</p></li>
+<li><p>To run <code>kmeans</code> across a range of k, we utilise the <code>purrr</code> package’s <code>map</code>
+function for applying a function across the list of k. This takes in a list
+(or vector) and operates a function on each entry in turn, returning a list.</p></li>
+<li><p>The <code>tibble(k=1:6)</code> sets up a <code>data.frame</code> with a single column <code>k</code> ranging from
+one to six.</p></li>
+<li><p>The <code>mutate()</code> command first uses <code>map()</code> to run the function <code>kmeans()</code> for
+each <code>k</code> on the scaled penguin data. Note that the varying parameter (<code>k</code>)
+in the <code>map()</code> is being passed in using the <code>.</code> argument - i.e. it is being
+mapped to the <code>centers</code> argument. The result of this
+will be a list column <code>km</code>, where each entry is an R object (in this case one of
+class <code>kmeans</code>).</p></li>
+<li><p>The second line in <code>mutate()</code> then operates on the <code>km</code> list column,
+running the <code>glance()</code> command from <code>broom</code> which will return a tidy <code>data.frame</code>
+containing summary model fit information such as the sum of squares. this is
+then stored in the list column <code>tidied</code>.</p></li>
+<li><p>Finally, we use <code>unnest()</code> from <code>tidyr</code> to expand the <code>data.frame</code>s stored
+in the list column <code>tidied</code>, flattening them out so that each of the columns
+within <code>tidied</code> becomes a column in the main data frame.</p></li>
+<li><p>In the end, we have columns for <code>k</code>, a list column <code>km</code> (storing the <code>kmeans</code>
+output), then the columns that result from the <code>glance()</code> function (<code>totss</code>
+the total sum of squares; <code>tot.withinss</code>, the total within-cluster sum of
+squares; <code>betweenss</code>, the between-cluster sum of squares; and <code>iter</code>, the number
+of iterations to convergence). As this is a tidy data.frame, it can be
+fed into <code>ggplot()</code> for plotting.</p></li>
+</ul>
+</div>
+<div class="example">
+<p><span id="exm:unlabeled-div-48" class="example"><strong>Example 7.5  </strong></span><strong><span class="math inline">\(K\)</span>-means for image compression</strong></p>
+<p>One use of <span class="math inline">\(K\)</span>-means (or any clustering method) is in image compression.
+Given an image, a simple way to compress the image is to replace each
+pixel (which is normally represented using 4 bytes) with an index into a
+smaller colour palette. If we can replace all the pixels in the image
+with just 16 colours for example, each pixel would then take up just 0.5
+bytes, a compression ratio of 1:8. Replacing arbitrary colours by a
+small set is exactly the problem that clustering is attempting to solve.
+It works best on images that have few colour gradients, rather than on
+images with lots of subtle colour differences. Figure <a href="cluster-analysis.html#fig:cartoon">7.10</a>
+shows the same image clustered using a range of colours.</p>
+<div class="figure"><span style="display:block;" id="fig:cartoon"></span>
+<img src="graphics/test01_02.png" alt="The same image clustered using top, from left: 2, 4, 8 colours and bottom from left: 16, 32, 256 colours." width="33%" /><img src="graphics/test01_04.png" alt="The same image clustered using top, from left: 2, 4, 8 colours and bottom from left: 16, 32, 256 colours." width="33%" /><img src="graphics/test01_08.png" alt="The same image clustered using top, from left: 2, 4, 8 colours and bottom from left: 16, 32, 256 colours." width="33%" /><img src="graphics/test01_16.png" alt="The same image clustered using top, from left: 2, 4, 8 colours and bottom from left: 16, 32, 256 colours." width="33%" /><img src="graphics/test01_32.png" alt="The same image clustered using top, from left: 2, 4, 8 colours and bottom from left: 16, 32, 256 colours." width="33%" /><img src="graphics/test01_256.png" alt="The same image clustered using top, from left: 2, 4, 8 colours and bottom from left: 16, 32, 256 colours." width="33%" />
+<p class="caption">
+Figure 7.10: The same image clustered using top, from left: 2, 4, 8 colours and bottom from left: 16, 32, 256 colours.
+</p>
+</div>
+</div>
+</div>
+<div id="k-medoids-clustering" class="section level2 hasAnchor" number="7.4">
+<h2><span class="header-section-number">7.4</span> K-medoids clustering<a href="cluster-analysis.html#k-medoids-clustering" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>So far we have used only the Euclidean distance as our dissimilarity
+measure. The Euclidean distance is not appropriate, however, if we have
+categorical data, or the data are on very different scales. Instead, the
+<span class="math inline">\(K\)</span>-medoids algorithm may be used. It uses only the distances between
+data points, allowing any dissimilarity matrix to be used. The algorithm
+is as follows:</p>
+<ol start="0" style="list-style-type: decimal">
+<li><p>Pick initial data points to be cluster centers <span class="math inline">\(m_k\)</span>.</p></li>
+<li><p>Compute the cluster assignment by assigning each datapoint <span class="math inline">\(x_i\)</span> to
+the closest cluster center.
+<span class="math display">\[C(i) = \mathop{\mathrm{arg\,min}}_{1 \leq k \leq K} d(x_i, m_k).\]</span></p></li>
+<li><p>Find the observation in each cluster that minimises the total
+distance to other points in that cluster.
+<span class="math display">\[i_k = \mathop{\mathrm{arg\,min}}_{C(i)=k} \sum_{C(j)=k} d(x_i, x_j).\]</span></p></li>
+<li><p>Assign <span class="math inline">\(m_k = x_{i_k}\)</span>.</p></li>
+<li><p>Repeat from 1 until the <span class="math inline">\(m_k\)</span> reach convergence.</p></li>
+</ol>
+<p>This is significantly more costly than <span class="math inline">\(K\)</span>-means because we have lost the
+simplification of using the means of each cluster as the center. The
+<code>pam</code> function (Partitioning Around Medoids) in the <code>cluster</code> package
+may be used to compute the <span class="math inline">\(K\)</span>-medoids of a dataset. Like <code>hclust</code>, it
+can take a dissimilarity object directly, thus overcoming the
+restriction of using only the Euclidean distance function. The
+syntax is</p>
+<div class="sourceCode" id="cb289"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb289-1"><a href="cluster-analysis.html#cb289-1" tabindex="-1"></a><span class="fu">pam</span>(x, k, <span class="at">metric =</span> <span class="st">&quot;euclidean&quot;</span>)</span></code></pre></div>
+<p>where <code>x</code> is either a data frame or a dissimilarity matrix, <code>k</code> is the
+number of clusters. <code>metric</code> specifies the dissimilarity measure to use
+in the case <code>x</code> is a data frame.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-49" class="example"><strong>Example 7.6  </strong></span><strong><span class="math inline">\(K\)</span>-medoids to Republican voting data</strong></p>
+<p>We show how to use the <code>pam</code> function on the US Republican voting data
+from example <a href="cluster-analysis.html#exm:repubclust">7.2</a>.</p>
+<div class="sourceCode" id="cb290"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb290-1"><a href="cluster-analysis.html#cb290-1" tabindex="-1"></a><span class="fu">library</span>(cluster)</span></code></pre></div>
+<pre><code>#&gt; Warning: package &#39;cluster&#39; was built under R version 4.5.2</code></pre>
+<div class="sourceCode" id="cb292"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb292-1"><a href="cluster-analysis.html#cb292-1" tabindex="-1"></a><span class="fu">pam</span>(repub, <span class="at">k=</span><span class="dv">3</span>, <span class="at">metric=</span><span class="st">&quot;manhattan&quot;</span>)</span></code></pre></div>
+<pre><code>#&gt; Medoids:
+#&gt;             ID  1916  1920  1924  1928  1932  1936  1940  1944  1948  1952
+#&gt; Arkansas     2 28.01 38.73 29.28 39.33 12.91 17.86 20.87 29.84 21.02 43.76
+#&gt; California   3 46.26 66.24 57.21 64.70 37.40 31.70 41.35 42.99 47.14 56.39
+#&gt; Mississippi  8  4.91 14.03  7.60 17.90  3.55  2.74  4.19  6.44  2.62 39.56
+#&gt;              1956  1960 1964 1968 1972  1976
+#&gt; Arkansas    45.82 43.06 43.9 30.8 68.9 34.97
+#&gt; California  55.40 50.10 40.9 47.8 55.0 50.89
+#&gt; Mississippi 24.46 24.67 87.1 13.5 78.2 49.21
+#&gt; Clustering vector:
+#&gt;     Alabama    Arkansas  California     Florida     Georgia      Kansas 
+#&gt;           1           1           2           1           1           2 
+#&gt;    Michigan Mississippi  New Mexico    New York      Oregon       Texas 
+#&gt;           2           3           2           2           2           1 
+#&gt;  Washington     Wyoming 
+#&gt;           2           2 
+#&gt; Objective function:
+#&gt;    build     swap 
+#&gt; 82.00643 74.48071 
+#&gt; 
+#&gt; Available components:
+#&gt;  [1] &quot;medoids&quot;    &quot;id.med&quot;     &quot;clustering&quot; &quot;objective&quot;  &quot;isolation&quot; 
+#&gt;  [6] &quot;clusinfo&quot;   &quot;silinfo&quot;    &quot;diss&quot;       &quot;call&quot;       &quot;data&quot;</code></pre>
+<p>As with <code>kmeans</code>, we can clean up this output using <code>tidy()</code> to extract the medoids,
+<code>glance()</code> to extract the model fit information, and <code>augment()</code> to add the
+clustering information to the original data.</p>
+<p>Here we’ve used the Manhattan distance rather than the Euclidean
+distance, yet we’ve retrieved the same grouping as we did in example
+<a href="cluster-analysis.html#exm:repubclust">7.2</a>, with Mississippi being in a cluster on its own, and the other
+states grouping into two clusters. We could also do this using some
+other distance measures, by passing the dissimilarity object into <code>pam</code>
+instead of the data frame.</p>
+<div class="sourceCode" id="cb294"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb294-1"><a href="cluster-analysis.html#cb294-1" tabindex="-1"></a>repub.dist <span class="ot">&lt;-</span> <span class="fu">dist</span>(repub, <span class="at">method=</span><span class="st">&quot;manhattan&quot;</span>)</span>
+<span id="cb294-2"><a href="cluster-analysis.html#cb294-2" tabindex="-1"></a><span class="fu">pam</span>(repub.dist, <span class="at">k=</span><span class="dv">3</span>)</span></code></pre></div>
+<pre><code>#&gt; Medoids:
+#&gt;      ID               
+#&gt; [1,] &quot;2&quot; &quot;Arkansas&quot;   
+#&gt; [2,] &quot;3&quot; &quot;California&quot; 
+#&gt; [3,] &quot;8&quot; &quot;Mississippi&quot;
+#&gt; Clustering vector:
+#&gt;     Alabama    Arkansas  California     Florida     Georgia      Kansas 
+#&gt;           1           1           2           1           1           2 
+#&gt;    Michigan Mississippi  New Mexico    New York      Oregon       Texas 
+#&gt;           2           3           2           2           2           1 
+#&gt;  Washington     Wyoming 
+#&gt;           2           2 
+#&gt; Objective function:
+#&gt;    build     swap 
+#&gt; 82.00643 74.48071 
+#&gt; 
+#&gt; Available components:
+#&gt; [1] &quot;medoids&quot;    &quot;id.med&quot;     &quot;clustering&quot; &quot;objective&quot;  &quot;isolation&quot; 
+#&gt; [6] &quot;clusinfo&quot;   &quot;silinfo&quot;    &quot;diss&quot;       &quot;call&quot;</code></pre>
+<p>When <span class="math inline">\(K\)</span>-means and PAM disagree, the difference often shows up around
+boundary points or outliers. <span class="math inline">\(K\)</span>-means averages within a cluster, so the
+centroid can be pulled by extreme observations, while PAM keeps the
+centre anchored to an actual data point.</p>
+</div>
+</div>
+<div id="silhouette-plots" class="section level2 hasAnchor" number="7.5">
+<h2><span class="header-section-number">7.5</span> Silhouette plots<a href="cluster-analysis.html#silhouette-plots" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We’ve already mentioned one heuristic that can be used to determine the
+most appropriate number of clusters for the data. Another technique is
+to use a silhouette plot which is produced using the <code>cluster</code> package.</p>
+<p>Given a clustering, the silhouette <span class="math inline">\(s(i)\)</span> of an observation <span class="math inline">\(x_i\)</span> is a
+measure of how well <span class="math inline">\(x_i\)</span> fits into the cluster to which it has been
+assigned, compared with the other clusters. It is computed using
+<span class="math display">\[s(i) = \frac{b(i) - a(i)}{\max\{a(i),b(i)\} },\]</span> where <span class="math inline">\(a(i)\)</span> is the
+average dissimilarity between <span class="math inline">\(x_i\)</span> and the rest of the points in the
+cluster to which <span class="math inline">\(x_i\)</span> belongs, and <span class="math inline">\(b(i)\)</span> is the smallest average
+dissimilarity between <span class="math inline">\(x_i\)</span> and the points in the other clusters<a href="#fn64" class="footnote-ref" id="fnref64"><sup>64</sup></a>.
+Figure <a href="cluster-analysis.html#fig:silhouette">7.11</a> shows this diagrammatically.</p>
+<div class="figure"><span style="display:block;" id="fig:silhouette"></span>
+<img src="07-clustering_files/figure-html/silhouette-1.png" alt="$x$ lies in cluster $A$, so $a(i)$ will be the average of the dissimilarities to other points in $A$. $b(i)$ will be the average dissimilarity to points in cluster $B$ as this is smaller than the average dissimilarity to cluster $C$." width="672" />
+<p class="caption">
+Figure 7.11: <span class="math inline">\(x\)</span> lies in cluster <span class="math inline">\(A\)</span>, so <span class="math inline">\(a(i)\)</span> will be the average of the dissimilarities to other points in <span class="math inline">\(A\)</span>. <span class="math inline">\(b(i)\)</span> will be the average dissimilarity to points in cluster <span class="math inline">\(B\)</span> as this is smaller than the average dissimilarity to cluster <span class="math inline">\(C\)</span>.
+</p>
+</div>
+<p>Notice that <span class="math inline">\(s(i)\)</span> can be at most <span class="math inline">\(1\)</span> when <span class="math inline">\(a(i)\)</span> is small compared to
+<span class="math inline">\(b(i)\)</span>, suggesting that <span class="math inline">\(x_i\)</span> has been assigned to the correct cluster,
+as all other clusters are much further away. <span class="math inline">\(s(i)\)</span> can be as low as -1,
+however, when <span class="math inline">\(b(i)\)</span> is small compared to <span class="math inline">\(a(i)\)</span>, which occurs if <span class="math inline">\(x_i\)</span>
+would be better suited in a different cluster. An <span class="math inline">\(s(i)\)</span> value of <span class="math inline">\(0\)</span>
+indicates that <span class="math inline">\(x_i\)</span> is equally close to two or more clusters.</p>
+<p>A <em>silhouette plot</em> is a plot of the silhouettes of each observation,
+grouped by cluster, and sorted by decreasing silhouette. These plots
+give a visual indication of how the well clustered the data are: High
+silhouette values indicate well grouped clusters, with low silhouette
+values indicating clusters that are close to each other (which may
+suggest that they should be grouped together).</p>
+<p>The average silhouette across all data may be used as a measure of how
+well clustered the data are. As the number of clusters increases, we
+would expect clustering to improve until a point is reached where a
+cluster is split into two or more clusters that remain close to one
+another (and thus not well grouped). Finding the number of clusters for
+which the average silhouette is maximised is often a reasonable
+heuristic for determining the appropriate number of clusters in a
+dataset.</p>
+<p>A silhouette plot may be generated by using <code>plot</code> on a <code>silhouette</code>
+class, which can be generated from the output to <code>pam</code>, or by a
+dissimilarity matrix and a cluster vector. For the Republican voting
+data we have the following.</p>
+<div class="sourceCode" id="cb296"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb296-1"><a href="cluster-analysis.html#cb296-1" tabindex="-1"></a><span class="fu">library</span>(cluster)</span>
+<span id="cb296-2"><a href="cluster-analysis.html#cb296-2" tabindex="-1"></a>repub.dist <span class="ot">&lt;-</span> <span class="fu">dist</span>(repub, <span class="at">method=</span><span class="st">&quot;manhattan&quot;</span>)</span>
+<span id="cb296-3"><a href="cluster-analysis.html#cb296-3" tabindex="-1"></a>repub.pam<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">pam</span>(repub.dist, <span class="at">k=</span><span class="dv">3</span>)</span>
+<span id="cb296-4"><a href="cluster-analysis.html#cb296-4" tabindex="-1"></a>repub.pam<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">pam</span>(repub.dist, <span class="at">k=</span><span class="dv">4</span>)</span>
+<span id="cb296-5"><a href="cluster-analysis.html#cb296-5" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">silhouette</span>(repub.pam<span class="fl">.1</span>), <span class="at">border=</span><span class="cn">NA</span>, <span class="at">do.clus.stat=</span><span class="cn">FALSE</span>, <span class="at">do.n.k=</span><span class="cn">FALSE</span>,</span>
+<span id="cb296-6"><a href="cluster-analysis.html#cb296-6" tabindex="-1"></a>     <span class="at">main=</span><span class="st">&quot;3 clusters&quot;</span>)</span>
+<span id="cb296-7"><a href="cluster-analysis.html#cb296-7" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">silhouette</span>(repub.pam<span class="fl">.2</span>), <span class="at">border=</span><span class="cn">NA</span>, <span class="at">do.clus.stat=</span><span class="cn">FALSE</span>, <span class="at">do.n.k=</span><span class="cn">FALSE</span>,</span>
+<span id="cb296-8"><a href="cluster-analysis.html#cb296-8" tabindex="-1"></a>     <span class="at">main=</span><span class="st">&quot;4 clusters&quot;</span>)</span></code></pre></div>
+<div class="figure"><span style="display:block;" id="fig:silhouetterepub"></span>
+<img src="07-clustering_files/figure-html/silhouetterepub-1.png" alt="Silhouette plots of the republican voting data" width="50%" /><img src="07-clustering_files/figure-html/silhouetterepub-2.png" alt="Silhouette plots of the republican voting data" width="50%" />
+<p class="caption">
+Figure 7.12: Silhouette plots of the republican voting data
+</p>
+</div>
+<p>Figure <a href="cluster-analysis.html#fig:silhouetterepub">7.12</a> shows the resulting plots. Points to note:</p>
+<ul>
+<li><p>We have used <code>border=NA</code> to make sure the barplot that is produced
+has no border. This is important as the default plotting mode on
+Windows has no anti-aliasing enabled, which means transparent
+borders don’t correctly let the colour from the bars through so you
+end up with no bars. Setting the border to <code>NA</code> fixes this as it
+turns the border off.</p></li>
+<li><p>We have used <code>do.clus.stat=FALSE</code> and <code>do.n.k=FALSE</code> to turn off some of the
+statistics that might otherwise crowd the plot. Experiment with
+these yourself.</p></li>
+<li><p>The Mississippi silhouette is defined to be 1, as it is the only
+point in its cluster (and thus the average dissimilarity to other
+points in the cluster is not well-defined). To highlight this
+special-case, the silhouette bar has not been plotted.</p></li>
+<li><p>There is a higher average silhouette for 3 clusters rather than 4,
+and some evidence in the 4 cluster silhouette plot that at least one
+of the clusters is not well grouped, with Arkansas having a low
+silhouette. Further information about this may be found by printing
+the silhouette output from the <code>pam</code> object:</p>
+<div class="sourceCode" id="cb297"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb297-1"><a href="cluster-analysis.html#cb297-1" tabindex="-1"></a>repub.pam<span class="fl">.2</span> <span class="sc">|&gt;</span> <span class="fu">pluck</span>(<span class="st">&#39;silinfo&#39;</span>, <span class="st">&#39;widths&#39;</span>)</span></code></pre></div>
+<pre><code>#&gt;             cluster neighbor  sil_width
+#&gt; Georgia           1        3 0.34562691
+#&gt; Alabama           1        3 0.30613459
+#&gt; Arkansas          1        3 0.04979458
+#&gt; California        2        3 0.68012986
+#&gt; Oregon            2        3 0.67300077
+#&gt; Michigan          2        3 0.64554014
+#&gt; Wyoming           2        3 0.64475783
+#&gt; New York          2        3 0.63315168
+#&gt; New Mexico        2        3 0.60961094
+#&gt; Kansas            2        3 0.59358889
+#&gt; Washington        2        3 0.57341819
+#&gt; Florida           3        1 0.39220717
+#&gt; Texas             3        1 0.28198501
+#&gt; Mississippi       4        1 0.00000000</code></pre>
+<p>We can see that Arkansas lies between cluster 1 and cluster 3,
+perhaps suggesting that these two clusters may be artificially
+split.</p></li>
+</ul>
+<p>If you wish to extract the silhouette information and plot yourself using <code>ggplot2</code>,
+you can do so via the <code>pluck</code> function above:</p>
+<div class="sourceCode" id="cb299"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb299-1"><a href="cluster-analysis.html#cb299-1" tabindex="-1"></a>repub.pam<span class="fl">.2</span> <span class="sc">|&gt;</span> <span class="fu">pluck</span>(<span class="st">&#39;silinfo&#39;</span>, <span class="st">&#39;widths&#39;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb299-2"><a href="cluster-analysis.html#cb299-2" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
+<span id="cb299-3"><a href="cluster-analysis.html#cb299-3" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="st">&quot;State&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb299-4"><a href="cluster-analysis.html#cb299-4" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb299-5"><a href="cluster-analysis.html#cb299-5" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">y=</span><span class="fu">as_factor</span>(State), <span class="at">x=</span>sil_width)) <span class="sc">+</span></span>
+<span id="cb299-6"><a href="cluster-analysis.html#cb299-6" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">&quot;Silhouette width&quot;</span>, <span class="at">y=</span><span class="cn">NULL</span>)</span></code></pre></div>
+<p><img src="07-clustering_files/figure-html/unnamed-chunk-15-1.png" alt="" width="672" /></p>
+<p>This can be useful for larger datasets, where you might like to just do a boxplot of the silhouette
+widths for each cluster.</p>
+<p>If you wish to generate a plot of silhouettes for output from <code>kmeans</code> or
+<code>hclust</code> you can use the second form of the <code>silhouette</code> command</p>
+<div class="sourceCode" id="cb300"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb300-1"><a href="cluster-analysis.html#cb300-1" tabindex="-1"></a><span class="fu">silhouette</span>(x, dist)</span></code></pre></div>
+<p>where <code>x</code> is a vector with the cluster numbers of each observation, such
+as <code>clusters</code> returned from <code>kmeans</code> or the output of <code>cutree</code>, and
+<code>dist</code> is a dissimilarity matrix, normally computed using <code>dist</code>. Note
+that you need not use the same dissimilarity measure as was used to
+generate the clustering. (e.g. the squared Euclidean measure used in
+<code>kmeans</code>). For the <code>penguins</code> data this may be done as follows.</p>
+<div class="sourceCode" id="cb301"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb301-1"><a href="cluster-analysis.html#cb301-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">27</span>)</span>
+<span id="cb301-2"><a href="cluster-analysis.html#cb301-2" tabindex="-1"></a>peng.scaled <span class="ot">&lt;-</span> penguins <span class="sc">|&gt;</span></span>
+<span id="cb301-3"><a href="cluster-analysis.html#cb301-3" tabindex="-1"></a>  <span class="fu">select</span>(flipper_length_mm, bill_length_mm, bill_depth_mm, body_mass_g) <span class="sc">|&gt;</span></span>
+<span id="cb301-4"><a href="cluster-analysis.html#cb301-4" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), scale))</span>
+<span id="cb301-5"><a href="cluster-analysis.html#cb301-5" tabindex="-1"></a>peng.km<span class="fl">.1</span> <span class="ot">&lt;-</span> peng.scaled <span class="sc">|&gt;</span> <span class="fu">kmeans</span>(<span class="at">centers=</span><span class="dv">3</span>, <span class="at">nstart=</span><span class="dv">20</span>)</span>
+<span id="cb301-6"><a href="cluster-analysis.html#cb301-6" tabindex="-1"></a>peng.km<span class="fl">.2</span> <span class="ot">&lt;-</span> peng.scaled <span class="sc">|&gt;</span> <span class="fu">kmeans</span>(<span class="at">centers=</span><span class="dv">4</span>, <span class="at">nstart=</span><span class="dv">20</span>)</span>
+<span id="cb301-7"><a href="cluster-analysis.html#cb301-7" tabindex="-1"></a>peng.dist <span class="ot">&lt;-</span> peng.scaled <span class="sc">|&gt;</span> <span class="fu">dist</span>(<span class="at">method=</span><span class="st">&#39;euclidean&#39;</span>)</span>
+<span id="cb301-8"><a href="cluster-analysis.html#cb301-8" tabindex="-1"></a>peng.sil<span class="fl">.1</span> <span class="ot">&lt;-</span> peng.km<span class="fl">.1</span> <span class="sc">|&gt;</span> <span class="fu">pluck</span>(<span class="st">&#39;cluster&#39;</span>) <span class="sc">|&gt;</span> <span class="fu">silhouette</span>(<span class="at">dist=</span>peng.dist)</span>
+<span id="cb301-9"><a href="cluster-analysis.html#cb301-9" tabindex="-1"></a>peng.sil<span class="fl">.2</span> <span class="ot">&lt;-</span> peng.km<span class="fl">.2</span> <span class="sc">|&gt;</span> <span class="fu">pluck</span>(<span class="st">&#39;cluster&#39;</span>) <span class="sc">|&gt;</span> <span class="fu">silhouette</span>(<span class="at">dist=</span>peng.dist)</span>
+<span id="cb301-10"><a href="cluster-analysis.html#cb301-10" tabindex="-1"></a>peng.sil <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb301-11"><a href="cluster-analysis.html#cb301-11" tabindex="-1"></a>    peng.sil<span class="fl">.1</span> <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">k=</span><span class="st">&#39;k=3&#39;</span>),</span>
+<span id="cb301-12"><a href="cluster-analysis.html#cb301-12" tabindex="-1"></a>    peng.sil<span class="fl">.2</span> <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">k=</span><span class="st">&#39;k=4&#39;</span>)</span>
+<span id="cb301-13"><a href="cluster-analysis.html#cb301-13" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb301-14"><a href="cluster-analysis.html#cb301-14" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cluster =</span> <span class="fu">as.factor</span>(cluster))</span>
+<span id="cb301-15"><a href="cluster-analysis.html#cb301-15" tabindex="-1"></a></span>
+<span id="cb301-16"><a href="cluster-analysis.html#cb301-16" tabindex="-1"></a><span class="fu">ggplot</span>(peng.sil) <span class="sc">+</span></span>
+<span id="cb301-17"><a href="cluster-analysis.html#cb301-17" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x=</span>cluster, <span class="at">y=</span>sil_width)) <span class="sc">+</span></span>
+<span id="cb301-18"><a href="cluster-analysis.html#cb301-18" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(k), <span class="at">scales=</span><span class="st">&#39;free_x&#39;</span>)</span></code></pre></div>
+<div class="figure"><span style="display:block;" id="fig:silhouettepeng"></span>
+<img src="07-clustering_files/figure-html/silhouettepeng-1.png" alt="Silhouette plots of the Palmer Penguins data set" width="672" />
+<p class="caption">
+Figure 7.13: Silhouette plots of the Palmer Penguins data set
+</p>
+</div>
+<p>Plots are given in Figure <a href="cluster-analysis.html#fig:silhouettepeng">7.13</a>. Points to note:</p>
+<ul>
+<li><p>We’ve scaled the penguins data prior to fitting k-means or computing distances.</p></li>
+<li><p>The <code>silhouette()</code> command utilises the <code>cluster</code> vector from the <code>peng.km.1</code> object,
+so we’ve used <code>pluck()</code> to pull it out.</p></li>
+<li><p>The <code>silhouette()</code> function returns a matrix with class <code>silhouette</code>. We coerce
+this into a <code>data.frame</code> for plotting.</p></li>
+<li><p>We bind the two datasets together so we can plot them side by side with facetting.</p></li>
+<li><p>We’ve used boxplots here rather than a standard silhouette plot, just
+by way of demonstration.</p></li>
+<li><p>It is clear that the third cluster in the 3-cluster case has been
+split in two (clusters 3 and 4) in the 4-cluster case, each of which has
+lower average silhouette, suggesting this split is artificial.</p></li>
+<li><p>Notice in both plots there are points with negative silhouettes.
+This suggests that these penguins may be better suited to one of the
+other clusters. While the <span class="math inline">\(k\)</span>-means algorithm has assigned these
+observations to the closest cluster based on the cluster centroid,
+that doesn’t necessarily mean that each point is close to all the
+other points in that cluster. The different ways of measuring how
+close a point is to each cluster (e.g. cluster centroid versus
+average dissimilarity to other points in the cluster) may give
+different results, in the same way that single and complete linkage
+give different results in hierarchical clustering.</p></li>
+</ul>
+</div>
+<div id="bootstrap-stability-and-the-adjusted-rand-index" class="section level2 hasAnchor" number="7.6">
+<h2><span class="header-section-number">7.6</span> Bootstrap stability and the adjusted Rand index<a href="cluster-analysis.html#bootstrap-stability-and-the-adjusted-rand-index" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The output of a clustering algorithm is only one partition of the data.
+It is natural to ask whether that partition is <em>stable</em>: if the data
+were perturbed slightly, would essentially the same clusters be found
+again? One common approach is to use bootstrap resampling.</p>
+<p>A useful clustering should survive small perturbations to the data, not
+just look convincing on a single fitted partition.</p>
+<p>Suppose that a baseline clustering gives a partition
+<span class="math inline">\(C = \{C_1, \ldots, C_K\}\)</span>, and a bootstrap resample gives another
+partition <span class="math inline">\(D = \{D_1, \ldots, D_L\}\)</span>. Let
+<span class="math display">\[n_{ij} = |C_i \cap D_j|, \qquad
+  a_i = \sum_{j=1}^L n_{ij}, \qquad
+  b_j = \sum_{i=1}^K n_{ij},\]</span> and let
+<span class="math inline">\(n = \sum_{i=1}^K \sum_{j=1}^L n_{ij}\)</span> be the number of observations
+common to the two partitions. The <em>adjusted Rand index</em> is
+<span class="math display">\[\mathop{\mathrm{ARI}}(C,D) =
+\frac{\sum_{i=1}^K \sum_{j=1}^L \dbinom{n_{ij}}{2}
+- \frac{1}{\dbinom{n}{2}}
+   \left(\sum_{i=1}^K \dbinom{a_i}{2}\right)
+   \left(\sum_{j=1}^L \dbinom{b_j}{2}\right)}
+{\frac{1}{2}
+\left[\sum_{i=1}^K \dbinom{a_i}{2} + \sum_{j=1}^L \dbinom{b_j}{2}\right]
+- \frac{1}{\dbinom{n}{2}}
+   \left(\sum_{i=1}^K \dbinom{a_i}{2}\right)
+   \left(\sum_{j=1}^L \dbinom{b_j}{2}\right)}.\]</span></p>
+<p>This index compares all pairs of observations and asks whether they are
+placed together, or kept apart, in both clusterings. The adjustment
+removes the agreement that would be expected purely by chance. An ARI of
+1 indicates perfect agreement, an ARI near 0 indicates agreement no
+better than random assignment, and a negative ARI indicates worse than
+random agreement.</p>
+<p>A simple bootstrap stability study proceeds as follows.</p>
+<ol style="list-style-type: decimal">
+<li><p>Fit the clustering to the original data to obtain a baseline
+partition.</p></li>
+<li><p>Resample the observations with replacement.</p></li>
+<li><p>Refit the clustering method to the resampled data.</p></li>
+<li><p>Compare the new clustering with the baseline clustering using ARI.</p></li>
+<li><p>Repeat steps 2–4 many times.</p></li>
+</ol>
+<p>If the resulting ARI values are consistently high, then the clustering
+is relatively stable under sampling variation. If they are often small
+or highly variable, then the clustering should be treated with caution.</p>
+</div>
+<div id="density-based-clustering" class="section level2 hasAnchor" number="7.7">
+<h2><span class="header-section-number">7.7</span> Density-based clustering<a href="cluster-analysis.html#density-based-clustering" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Hierarchical clustering, <span class="math inline">\(K\)</span>-means and PAM all attempt to partition the
+observations into groups, but they are not designed specifically for
+clusters with irregular shape or for data sets containing genuine noise
+points. Density-based methods address this by looking for regions where
+the observations are concentrated.</p>
+<p>For a point <span class="math inline">\(x_i\)</span>, define its <span class="math inline">\(\varepsilon\)</span>-neighbourhood by
+<span class="math display">\[N_\varepsilon(x_i) = \{x_j : d(x_i, x_j) \leq \varepsilon\}.\]</span>
+Given a minimum neighbourhood size <code>MinPts</code>, we classify points as
+follows.</p>
+<ul>
+<li><p><span class="math inline">\(x_i\)</span> is a <em>core point</em> if <span class="math inline">\(|N_\varepsilon(x_i)| \geq \text{MinPts}\)</span>.</p></li>
+<li><p><span class="math inline">\(x_i\)</span> is a <em>border point</em> if it is not core, but lies in the
+<span class="math inline">\(\varepsilon\)</span>-neighbourhood of a core point.</p></li>
+<li><p><span class="math inline">\(x_i\)</span> is a <em>noise point</em> if it is neither core nor border.</p></li>
+</ul>
+<p>To formalise the DBSCAN algorithm, suppose <span class="math inline">\(x_j \in N_\varepsilon(x_i)\)</span>.
+Then:</p>
+<ul>
+<li><p><span class="math inline">\(x_j\)</span> is <em>directly density reachable</em> from <span class="math inline">\(x_i\)</span> if <span class="math inline">\(x_i\)</span> is a core
+point.</p></li>
+<li><p><span class="math inline">\(x_j\)</span> is <em>density reachable</em> from <span class="math inline">\(x_i\)</span> if there exists a sequence
+of points
+<span class="math inline">\(x_i = z_0, z_1, \ldots, z_m = x_j\)</span> such that each <span class="math inline">\(z_{r+1}\)</span> is
+directly density reachable from <span class="math inline">\(z_r\)</span>.</p></li>
+<li><p>Two points are <em>density connected</em> if they are both density
+reachable from the same point.</p></li>
+</ul>
+<p>A DBSCAN cluster is then a maximal set of density connected points. A
+point that is not assigned to any such set is labelled as noise.</p>
+<p>The DBSCAN algorithm is:</p>
+<ol style="list-style-type: decimal">
+<li><p>Pick an unvisited point <span class="math inline">\(x_i\)</span>.</p></li>
+<li><p>Compute <span class="math inline">\(N_\varepsilon(x_i)\)</span>.</p></li>
+<li><p>If <span class="math inline">\(x_i\)</span> is not core, temporarily label it as noise and move on.</p></li>
+<li><p>If <span class="math inline">\(x_i\)</span> is core, start a new cluster and recursively add all points
+density reachable from <span class="math inline">\(x_i\)</span>.</p></li>
+<li><p>Repeat until every point has been visited.</p></li>
+</ol>
+<p>A point that is labelled as noise early in the scan can still be
+absorbed into a cluster later if a nearby core point reaches it.</p>
+<p>Unlike <span class="math inline">\(K\)</span>-means or PAM, DBSCAN does not require the number of clusters
+to be fixed in advance. It can also identify non-convex cluster shapes,
+and it may leave some observations unclustered.</p>
+</div>
+<div id="choosing-varepsilon-using-a-k-distance-plot" class="section level2 hasAnchor" number="7.8">
+<h2><span class="header-section-number">7.8</span> Choosing <span class="math inline">\(\varepsilon\)</span> using a <span class="math inline">\(k\)</span>-distance plot<a href="cluster-analysis.html#choosing-varepsilon-using-a-k-distance-plot" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>DBSCAN requires the user to choose both <span class="math inline">\(\varepsilon\)</span> and <code>MinPts</code>. One
+practical heuristic is the <em><span class="math inline">\(k\)</span>-distance plot</em>. If <code>MinPts = m</code>, then a
+point becomes core once it has at least <span class="math inline">\(m-1\)</span> other points inside its
+<span class="math inline">\(\varepsilon\)</span>-neighbourhood (the point itself is counted in <code>MinPts</code>).
+Hence we compute, for each observation, the distance to its <span class="math inline">\((m-1)\)</span>st
+nearest <em>other</em> point. If we denote this by <span class="math inline">\(d_{m-1}(x_i)\)</span>, then we
+sort the values
+<span class="math display">\[d_{m-1}(x_{(1)}) \leq d_{m-1}(x_{(2)}) \leq \cdots \leq d_{m-1}(x_{(n)}).\]</span></p>
+<p>For points deep inside dense clusters these distances are small. For
+border and noise points they increase much more quickly. A visible
+“kink” or elbow in the ordered plot therefore provides a rough guide to
+a sensible choice of <span class="math inline">\(\varepsilon\)</span>.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-50" class="example"><strong>Example 7.7  </strong></span><strong>DBSCAN on a non-convex synthetic data set</strong></p>
+<p>DBSCAN is particularly useful when the clusters are curved or ring-like,
+since methods such as <span class="math inline">\(K\)</span>-means would tend to split such shapes into
+artificial convex pieces. A typical workflow is:</p>
+<div class="sourceCode" id="cb302"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb302-1"><a href="cluster-analysis.html#cb302-1" tabindex="-1"></a><span class="fu">library</span>(dbscan)</span>
+<span id="cb302-2"><a href="cluster-analysis.html#cb302-2" tabindex="-1"></a></span>
+<span id="cb302-3"><a href="cluster-analysis.html#cb302-3" tabindex="-1"></a>nonconvex <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb302-4"><a href="cluster-analysis.html#cb302-4" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">c</span>(...),</span>
+<span id="cb302-5"><a href="cluster-analysis.html#cb302-5" tabindex="-1"></a>  <span class="at">y =</span> <span class="fu">c</span>(...)</span>
+<span id="cb302-6"><a href="cluster-analysis.html#cb302-6" tabindex="-1"></a>)</span>
+<span id="cb302-7"><a href="cluster-analysis.html#cb302-7" tabindex="-1"></a></span>
+<span id="cb302-8"><a href="cluster-analysis.html#cb302-8" tabindex="-1"></a>dbscan<span class="sc">::</span><span class="fu">kNNdistplot</span>(<span class="fu">as.matrix</span>(nonconvex), <span class="at">k =</span> <span class="dv">4</span>)</span>
+<span id="cb302-9"><a href="cluster-analysis.html#cb302-9" tabindex="-1"></a>db <span class="ot">&lt;-</span> <span class="fu">dbscan</span>(nonconvex, <span class="at">eps =</span> <span class="fl">0.25</span>, <span class="at">minPts =</span> <span class="dv">5</span>)</span>
+<span id="cb302-10"><a href="cluster-analysis.html#cb302-10" tabindex="-1"></a></span>
+<span id="cb302-11"><a href="cluster-analysis.html#cb302-11" tabindex="-1"></a><span class="fu">bind_cols</span>(nonconvex, <span class="at">cluster =</span> <span class="fu">factor</span>(db<span class="sc">$</span>cluster)) <span class="sc">|&gt;</span></span>
+<span id="cb302-12"><a href="cluster-analysis.html#cb302-12" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb302-13"><a href="cluster-analysis.html#cb302-13" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">colour =</span> cluster))</span></code></pre></div>
+<p>The <code>kNNdistplot()</code> call is used to choose a plausible value of
+<span class="math inline">\(\varepsilon\)</span>. The fitted DBSCAN model then labels dense groups of
+points and leaves isolated observations as noise.</p>
+</div>
+<div class="example">
+<p><span id="exm:unlabeled-div-51" class="example"><strong>Example 7.8  </strong></span><strong>High-dimensional clustering in practice</strong></p>
+<p>A high-dimensional clustering workflow on the Qatar Cars data might use
+the variables
+<code>length</code>, <code>width</code>, <code>height</code>, <code>mass</code>, <code>horsepower</code>, <code>price</code>,
+<code>performance</code>, <code>economy</code>, <code>trunk</code>, and <code>seating</code>, with <code>type</code> and
+<code>enginetype</code> used only after fitting for interpretation. A simple
+workflow is:</p>
+<div class="sourceCode" id="cb303"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb303-1"><a href="cluster-analysis.html#cb303-1" tabindex="-1"></a>qatarcars <span class="sc">|&gt;</span></span>
+<span id="cb303-2"><a href="cluster-analysis.html#cb303-2" tabindex="-1"></a>  <span class="fu">select</span>(type, enginetype, length, width, height, mass,</span>
+<span id="cb303-3"><a href="cluster-analysis.html#cb303-3" tabindex="-1"></a>         horsepower, price, performance, economy, trunk, seating) <span class="sc">|&gt;</span></span>
+<span id="cb303-4"><a href="cluster-analysis.html#cb303-4" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">|&gt;</span></span>
+<span id="cb303-5"><a href="cluster-analysis.html#cb303-5" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(length<span class="sc">:</span>seating, <span class="sc">~</span> <span class="fu">as.numeric</span>(<span class="fu">scale</span>(.x))))</span></code></pre></div>
+<p>The key point is that the clustering is fit only on the numeric
+variables that define similarity; the categorical labels are retained
+for interpretation, not for training the clustering itself.</p>
+</div>
+</div>
+<div id="hdbscan-and-umap" class="section level2 hasAnchor" number="7.9">
+<h2><span class="header-section-number">7.9</span> HDBSCAN and UMAP<a href="cluster-analysis.html#hdbscan-and-umap" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="sec:hdbscan" class="section level3 hasAnchor" number="7.9.1">
+<h3><span class="header-section-number">7.9.1</span> HDBSCAN<a href="cluster-analysis.html#sec:hdbscan" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>DBSCAN uses a single value of <span class="math inline">\(\varepsilon\)</span>, so it can struggle when a
+dataset contains both sparse and dense clusters. HDBSCAN (Hierarchical
+DBSCAN, Campello et al. 2013) addresses this limitation by building a
+hierarchy over a range of density thresholds rather than committing to
+a single <span class="math inline">\(\varepsilon\)</span>.</p>
+<p>The key idea is the <em>mutual reachability distance</em> between two points
+<span class="math inline">\(x_i\)</span> and <span class="math inline">\(x_j\)</span>:
+<span class="math display" id="eq:mreach">\[\begin{equation}
+d_{\text{mreach}}(x_i, x_j) = \max\!\bigl( d_{\text{core}}(x_i),\,
+  d_{\text{core}}(x_j),\, d(x_i, x_j) \bigr),
+\tag{7.1}
+\end{equation}\]</span>
+where <span class="math inline">\(d_{\text{core}}(x_i)\)</span> is the <em>core distance</em> of <span class="math inline">\(x_i\)</span>: the
+distance to its <span class="math inline">\(k\)</span>-th nearest neighbour (for a fixed <span class="math inline">\(k\)</span>,
+<code>minPts</code> in the implementation). The mutual reachability distance equals
+the ordinary distance between the points unless one or both is in a
+sparse region, in which case it is inflated to their core distances.
+This has the effect of smoothing out noise without distorting dense
+clusters.</p>
+<p>HDBSCAN constructs a minimum spanning tree of the mutual reachability
+distances, converts it to a dendrogram (<em>condensed cluster tree</em>), and
+then extracts clusters as the subtrees that are most stable across the
+range of density thresholds. Stability is measured by how long a cluster
+persists as <span class="math inline">\(\varepsilon\)</span> decreases; clusters that appear briefly are
+absorbed into their parent. This self-tuning avoids the need to choose
+<span class="math inline">\(\varepsilon\)</span> manually, making HDBSCAN particularly useful when cluster
+densities vary across the dataset.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-52" class="example"><strong>Example 7.9  </strong></span><strong>HDBSCAN on the Qatar Cars data</strong></p>
+<div class="sourceCode" id="cb304"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb304-1"><a href="cluster-analysis.html#cb304-1" tabindex="-1"></a><span class="fu">library</span>(dbscan)</span>
+<span id="cb304-2"><a href="cluster-analysis.html#cb304-2" tabindex="-1"></a></span>
+<span id="cb304-3"><a href="cluster-analysis.html#cb304-3" tabindex="-1"></a>cars_scaled <span class="ot">&lt;-</span> qatarcars <span class="sc">|&gt;</span></span>
+<span id="cb304-4"><a href="cluster-analysis.html#cb304-4" tabindex="-1"></a>  <span class="fu">select</span>(length, width, height, mass, horsepower,</span>
+<span id="cb304-5"><a href="cluster-analysis.html#cb304-5" tabindex="-1"></a>         price, performance, economy, trunk, seating) <span class="sc">|&gt;</span></span>
+<span id="cb304-6"><a href="cluster-analysis.html#cb304-6" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">|&gt;</span></span>
+<span id="cb304-7"><a href="cluster-analysis.html#cb304-7" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), <span class="sc">~</span> <span class="fu">as.numeric</span>(<span class="fu">scale</span>(.x))))</span>
+<span id="cb304-8"><a href="cluster-analysis.html#cb304-8" tabindex="-1"></a></span>
+<span id="cb304-9"><a href="cluster-analysis.html#cb304-9" tabindex="-1"></a>hdb <span class="ot">&lt;-</span> <span class="fu">hdbscan</span>(cars_scaled, <span class="at">minPts =</span> <span class="dv">5</span>)</span>
+<span id="cb304-10"><a href="cluster-analysis.html#cb304-10" tabindex="-1"></a>hdb</span>
+<span id="cb304-11"><a href="cluster-analysis.html#cb304-11" tabindex="-1"></a><span class="fu">plot</span>(hdb)   <span class="co"># condensed cluster tree</span></span></code></pre></div>
+<p>Points to note:</p>
+<ul>
+<li><p>Only the <code>minPts</code> parameter need be chosen. A value of 5 is a
+common default; larger values produce fewer, more conservative
+clusters.</p></li>
+<li><p><code>plot()</code> on an <code>hdbscan</code> object draws the condensed cluster tree.
+Wide bands indicate large, stable clusters; thin bands that
+correspond to briefly-present density groups are collapsed to noise.</p></li>
+<li><p>Observations with cluster label 0 are noise points that did not
+belong to any stable cluster.</p></li>
+</ul>
+</div>
+<p>Before turning to UMAP, it helps to separate clustering from
+visualisation. PCA is the simplest linear display map for scaled numeric
+data, while UMAP is a nonlinear display map that emphasises local
+neighbourhood structure. In either case, the clustering itself should be
+fit in the original feature space; the lower-dimensional map is there to
+help us interpret the result.</p>
+</div>
+<div id="sec:umap" class="section level3 hasAnchor" number="7.9.2">
+<h3><span class="header-section-number">7.9.2</span> UMAP<a href="cluster-analysis.html#sec:umap" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>UMAP (Uniform Manifold Approximation and Projection, McInnes et al.
+2018) is a dimensionality reduction technique used to produce
+low-dimensional displays of high-dimensional data. It is not a
+clustering method, but is widely used to visualise the structure found
+by clustering algorithms and to inspect how well different clusters
+separate in a 2D or 3D projection.</p>
+<p><strong>Neighbourhood graph construction.</strong> UMAP begins by building a weighted
+graph of the <span class="math inline">\(k\)</span> nearest neighbours of each point <span class="math inline">\(x_i\)</span> in the
+original feature space, where <span class="math inline">\(k\)</span> is controlled by the <code>n_neighbors</code>
+parameter. The edge weight <span class="math inline">\(w_{ij}\)</span> between neighbouring points <span class="math inline">\(x_i\)</span>
+and <span class="math inline">\(x_j\)</span> is a <em>fuzzy set membership strength</em> that reflects how close
+<span class="math inline">\(x_j\)</span> is to <span class="math inline">\(x_i\)</span> relative to the local neighbourhood scale around
+<span class="math inline">\(x_i\)</span>:
+<span class="math display">\[w_{ij} = \exp\!\left(\frac{-(d(x_i, x_j) - \rho_i)}{\sigma_i}\right),\]</span>
+where <span class="math inline">\(\rho_i\)</span> is the distance from <span class="math inline">\(x_i\)</span> to its nearest neighbour
+(so that the weight of the closest neighbour is always 1), and
+<span class="math inline">\(\sigma_i\)</span> is a per-point bandwidth calibrated so that the effective
+number of neighbours (the fuzzy set cardinality) matches <span class="math inline">\(k\)</span>. The
+final symmetric weights are <span class="math inline">\(\bar{w}_{ij} = w_{ij} + w_{ji} -
+w_{ij}w_{ji}\)</span>.</p>
+<p><strong>Low-dimensional optimisation.</strong> UMAP then seeks coordinates
+<span class="math inline">\(y_1, \ldots, y_n \in \mathbb{R}^d\)</span> (usually <span class="math inline">\(d = 2\)</span>) such that the
+low-dimensional pairwise affinities
+<span class="math display" id="eq:umap-aff">\[\begin{equation}
+v_{ij} = \left(1 + a\,\lVert y_i - y_j \rVert^{2b}\right)^{-1}
+\tag{7.2}
+\end{equation}\]</span>
+match the high-dimensional weights <span class="math inline">\(\bar{w}_{ij}\)</span> as closely as
+possible. The parameters <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> are determined from the
+<code>min_dist</code> hyperparameter, which controls how tightly UMAP packs
+nearby points in the embedding. The coordinates are chosen to minimise
+the cross-entropy between the two fuzzy sets:
+<span class="math display" id="eq:umap-loss">\[\begin{equation}
+\mathcal{L} = \sum_{i \neq j}
+\left[
+  \bar{w}_{ij}\log\frac{\bar{w}_{ij}}{v_{ij}}
+  + (1 - \bar{w}_{ij})\log\frac{1 - \bar{w}_{ij}}{1 - v_{ij}}
+\right].
+\tag{7.3}
+\end{equation}\]</span>
+This ensures that pairs that are neighbours in the original space
+(large <span class="math inline">\(\bar{w}_{ij}\)</span>) are placed close together in the embedding
+(large <span class="math inline">\(v_{ij}\)</span>), while non-neighbouring pairs are pushed apart.</p>
+<p><strong>Key hyperparameters:</strong></p>
+<ul>
+<li><code>n_neighbors</code> (<span class="math inline">\(k\)</span>): controls the local neighbourhood size.
+Smaller values emphasise fine-grained local structure; larger
+values produce a more global view.</li>
+<li><code>min_dist</code>: controls how tightly points are packed in the
+embedding. Smaller values produce clumped clusters; larger values
+spread points out for a more continuous layout.</li>
+<li><code>n_components</code>: the dimensionality of the embedding (typically 2
+for visualisation).</li>
+</ul>
+<p><strong>Interpreting a UMAP plot.</strong> The <code>UMAP 1</code> and <code>UMAP 2</code> axes are
+computed display coordinates. Unlike principal components, they have no
+linear interpretation in terms of the original variables. Distances
+between widely separated clusters in a UMAP plot should not be
+interpreted as meaningful: UMAP preserves local structure well but
+global structure (the distances between clusters) is not reliable.
+Within a cluster, relative distances are approximately meaningful.</p>
+<p>As a direct consequence: <em>clustering should be fit in the original
+feature space unless dimension reduction is itself part of the model.</em>
+UMAP is used to display clustering results, not to determine them.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-53" class="example"><strong>Example 7.10  </strong></span><strong>UMAP visualisation of a clustering solution</strong></p>
+<div class="sourceCode" id="cb305"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb305-1"><a href="cluster-analysis.html#cb305-1" tabindex="-1"></a><span class="fu">library</span>(uwot)</span>
+<span id="cb305-2"><a href="cluster-analysis.html#cb305-2" tabindex="-1"></a></span>
+<span id="cb305-3"><a href="cluster-analysis.html#cb305-3" tabindex="-1"></a><span class="co"># Fit UMAP on the scaled data (same matrix used for clustering)</span></span>
+<span id="cb305-4"><a href="cluster-analysis.html#cb305-4" tabindex="-1"></a>umap_coords <span class="ot">&lt;-</span> <span class="fu">umap</span>(cars_scaled, <span class="at">n_neighbors =</span> <span class="dv">15</span>, <span class="at">min_dist =</span> <span class="fl">0.1</span>,</span>
+<span id="cb305-5"><a href="cluster-analysis.html#cb305-5" tabindex="-1"></a>                    <span class="at">n_components =</span> <span class="dv">2</span>, <span class="at">n_threads =</span> <span class="dv">1</span>)</span>
+<span id="cb305-6"><a href="cluster-analysis.html#cb305-6" tabindex="-1"></a></span>
+<span id="cb305-7"><a href="cluster-analysis.html#cb305-7" tabindex="-1"></a>car_umap <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(umap_coords, <span class="at">.name_repair =</span> <span class="sc">~</span> <span class="fu">c</span>(<span class="st">&quot;UMAP1&quot;</span>, <span class="st">&quot;UMAP2&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb305-8"><a href="cluster-analysis.html#cb305-8" tabindex="-1"></a>  <span class="fu">bind_cols</span>(<span class="at">cluster =</span> <span class="fu">factor</span>(hdb<span class="sc">$</span>cluster),</span>
+<span id="cb305-9"><a href="cluster-analysis.html#cb305-9" tabindex="-1"></a>            <span class="at">type    =</span> qatarcars_complete<span class="sc">$</span>type)</span>
+<span id="cb305-10"><a href="cluster-analysis.html#cb305-10" tabindex="-1"></a></span>
+<span id="cb305-11"><a href="cluster-analysis.html#cb305-11" tabindex="-1"></a><span class="fu">ggplot</span>(car_umap, <span class="fu">aes</span>(<span class="at">x =</span> UMAP1, <span class="at">y =</span> UMAP2, <span class="at">colour =</span> cluster,</span>
+<span id="cb305-12"><a href="cluster-analysis.html#cb305-12" tabindex="-1"></a>                     <span class="at">shape =</span> type)) <span class="sc">+</span></span>
+<span id="cb305-13"><a href="cluster-analysis.html#cb305-13" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb305-14"><a href="cluster-analysis.html#cb305-14" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;UMAP view of Qatar Cars -- HDBSCAN clusters&quot;</span>)</span></code></pre></div>
+<p>Points to note:</p>
+<ul>
+<li><p><code>umap()</code> from the <code>uwot</code> package is the recommended R
+implementation. Setting <code>n_threads = 1</code> makes the result
+reproducible when combined with a fixed seed.</p></li>
+<li><p>The UMAP is fit using the same scaled numeric matrix as HDBSCAN,
+so the display is consistent with what the algorithm actually saw.</p></li>
+<li><p>Setting <code>shape = type</code> uses the car body type as an independent
+label (not used in fitting) to check whether the clusters align
+with domain categories. This is a useful validity check.</p></li>
+</ul>
+</div>
+</div>
+<div id="sec:cluster-compare" class="section level3 hasAnchor" number="7.9.3">
+<h3><span class="header-section-number">7.9.3</span> Practical method comparison<a href="cluster-analysis.html#sec:cluster-compare" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The table below summarises the practical trade-offs between the
+clustering methods covered in this chapter.</p>
+<table style="width:100%;">
+<colgroup>
+<col width="14%" />
+<col width="28%" />
+<col width="18%" />
+<col width="13%" />
+<col width="10%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Method</th>
+<th align="left">Key idea</th>
+<th align="center">Handles non-convex?</th>
+<th align="center">Scales to <span class="math inline">\(n\)</span>?</th>
+<th align="center">Needs <span class="math inline">\(K\)</span>?</th>
+<th align="center">Handles noise?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Hierarchical</td>
+<td align="left">Merge/split by dissimilarity</td>
+<td align="center">Depends on linkage</td>
+<td align="center">Poor (<span class="math inline">\(O(n^2)\)</span>)</td>
+<td align="center">No (cut tree)</td>
+<td align="center">No</td>
+</tr>
+<tr class="even">
+<td align="left">K-means</td>
+<td align="left">Minimise within-SS</td>
+<td align="center">No (convex only)</td>
+<td align="center">Good</td>
+<td align="center">Yes</td>
+<td align="center">No</td>
+</tr>
+<tr class="odd">
+<td align="left">K-medoids (PAM)</td>
+<td align="left">Minimise to actual centre</td>
+<td align="center">No (convex only)</td>
+<td align="center">Moderate</td>
+<td align="center">Yes</td>
+<td align="center">Partial</td>
+</tr>
+<tr class="even">
+<td align="left">DBSCAN</td>
+<td align="left">Density connected regions</td>
+<td align="center">Yes</td>
+<td align="center">Good</td>
+<td align="center">No</td>
+<td align="center">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">HDBSCAN</td>
+<td align="left">Hierarchical density extraction</td>
+<td align="center">Yes</td>
+<td align="center">Good</td>
+<td align="center">No</td>
+<td align="center">Yes</td>
+</tr>
+</tbody>
+</table>
+<p>A few practical guidelines:</p>
+<ul>
+<li><p>Use <strong>hierarchical clustering</strong> when the data are small enough to
+inspect the full dendrogram, or when the number of clusters is
+genuinely unknown and you want an overview at multiple scales.</p></li>
+<li><p>Use <strong>K-means or K-medoids</strong> when the clusters are roughly
+spherical and the number of clusters can be chosen via the silhouette
+width or elbow plot. K-medoids is more robust to outliers because
+the cluster centre is a real observation.</p></li>
+<li><p>Use <strong>DBSCAN</strong> when the clusters are non-convex or irregularly
+shaped, and when identifying noise points is important. Choose
+<span class="math inline">\(\varepsilon\)</span> via a <span class="math inline">\(k\)</span>-distance plot.</p></li>
+<li><p>Use <strong>HDBSCAN</strong> as the default when cluster densities vary across
+the dataset, or when you do not want to commit to a single
+<span class="math inline">\(\varepsilon\)</span>. It is the most general-purpose density method.</p></li>
+<li><p>Use <strong>UMAP</strong> for visualisation after fitting any of the above
+methods, particularly when the data are high-dimensional. Always
+fit the clustering in the original feature space.</p></li>
+</ul>
+<p>The same dataset can look quite different under different clustering
+assumptions, so the method choice is part of the analysis rather than a
+software default.</p>
+</div>
+</div>
+<div id="summary-4" class="section level2 hasAnchor" number="7.10">
+<h2><span class="header-section-number">7.10</span> Summary<a href="cluster-analysis.html#summary-4" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Clustering is the main unsupervised grouping tool in these notes.</p>
+<ul>
+<li><p>The choice of dissimilarity measure matters as much as the choice of
+clustering algorithm.</p></li>
+<li><p>Methods such as <span class="math inline">\(K\)</span>-means and PAM work best for compact,
+centre-based clusters, while DBSCAN and HDBSCAN are better suited to
+irregular shapes and noisy data.</p></li>
+<li><p>Preprocessing is especially important in clustering because the
+algorithm sees only the features we give it; scaling, missing-value
+handling, and outlier review therefore directly affect the clusters.</p></li>
+</ul>
+<p>Looking ahead, Section <a href="association-rule-mining.html#sec:association-fit">8.6</a> studies another
+unsupervised task, association rule mining, which focuses on
+co-occurrence patterns rather than grouping observations.</p>
+
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol start="62">
+<li id="fn62"><p>In fields such as computer science and image analysis, cluster
+analysis is referred to as <em>unsupervised learning</em> and discriminant
+analysis is referred to as <em>supervised learning</em>.<a href="cluster-analysis.html#fnref62" class="footnote-back">↩︎</a></p></li>
+<li id="fn63"><p>One potential way to avoid local minima is to start with a number
+of different initial cluster mean positions and pick the result that
+gives smallest within-cluster variation.<a href="cluster-analysis.html#fnref63" class="footnote-back">↩︎</a></p></li>
+<li id="fn64"><p>If a cluster contains only one point, the average dissimilarity to
+other points in the cluster is not well defined. We use the natural
+definition that <span class="math inline">\(a(i)\equiv 0\)</span> which gives <span class="math inline">\(s(i)=1\)</span> in this case.<a href="cluster-analysis.html#fnref64" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="classification.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="association-rule-mining.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": "https://github.com/jmarshallnz/161324/edit/main/notes/07-clustering.Rmd",
+    "text": "Edit"
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": ["_main.pdf", "_main.epub"],
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

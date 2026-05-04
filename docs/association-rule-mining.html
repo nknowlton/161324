@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 8 Association rule mining | Data mining</title>
+  <meta name="description" content="Chapter 8 Association rule mining | Data mining notes" />
+  <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 8 Association rule mining | Data mining" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="Chapter 8 Association rule mining | Data mining notes" />
+  <meta name="github-repo" content="jmarshallnz/161324" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 8 Association rule mining | Data mining" />
+  
+  <meta name="twitter:description" content="Chapter 8 Association rule mining | Data mining notes" />
+  
+
+<meta name="author" content="Jonathan Marshall, Martin Hazelton, Nick Knowlton" />
+
+
+<meta name="date" content="2026-05-03" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="cluster-analysis.html"/>
+<link rel="next" href="sec:ensemble.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet" />
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="libs/datatables-binding-0.34.0/datatables.js"></script>
+<link href="libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+<link href="libs/nouislider-7.0.10/jquery.nouislider.min.css" rel="stylesheet" />
+<script src="libs/nouislider-7.0.10/jquery.nouislider.min.js"></script>
+<link href="libs/selectize-0.12.0/selectize.bootstrap3.css" rel="stylesheet" />
+<script src="libs/selectize-0.12.0/selectize.min.js"></script>
+<link href="libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+
+
+<style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">161.324 Data Mining</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="introduction.html"><a href="introduction.html#sec:intro1"><i class="fa fa-check"></i><b>1.1</b> What is Data Mining?</a></li>
+<li class="chapter" data-level="1.2" data-path="introduction.html"><a href="introduction.html#sec:Rinitial"><i class="fa fa-check"></i><b>1.2</b> Statistical Computing with R</a></li>
+<li class="chapter" data-level="1.3" data-path="introduction.html"><a href="introduction.html#the-tidyverse"><i class="fa fa-check"></i><b>1.3</b> The tidyverse</a></li>
+<li class="chapter" data-level="1.4" data-path="introduction.html"><a href="introduction.html#sec:notes-roadmap"><i class="fa fa-check"></i><b>1.4</b> A roadmap for these notes</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="introduction.html"><a href="introduction.html#sec:task-compare"><i class="fa fa-check"></i><b>1.4.1</b> Comparing the main task families</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html"><i class="fa fa-check"></i><b>2</b> Data Acquisition and Processing</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#obtaining-data"><i class="fa fa-check"></i><b>2.1</b> Obtaining Data</a></li>
+<li class="chapter" data-level="2.2" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#sec:dataload"><i class="fa fa-check"></i><b>2.2</b> Loading Data into R</a></li>
+<li class="chapter" data-level="2.3" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#organizing-the-data-in-r"><i class="fa fa-check"></i><b>2.3</b> Organizing the Data in R</a></li>
+<li class="chapter" data-level="2.4" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#sec:missing1"><i class="fa fa-check"></i><b>2.4</b> Missing Values</a></li>
+<li class="chapter" data-level="2.5" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#summary"><i class="fa fa-check"></i><b>2.5</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>3</b> Missing values</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="missing-values.html"><a href="missing-values.html#sec:missing"><i class="fa fa-check"></i><b>3.1</b> Patterns of Missingness</a></li>
+<li class="chapter" data-level="3.2" data-path="missing-values.html"><a href="missing-values.html#visualising-missing-values"><i class="fa fa-check"></i><b>3.2</b> Visualising missing values</a></li>
+<li class="chapter" data-level="3.3" data-path="missing-values.html"><a href="missing-values.html#working-with-complete-cases"><i class="fa fa-check"></i><b>3.3</b> Working with Complete Cases</a></li>
+<li class="chapter" data-level="3.4" data-path="missing-values.html"><a href="missing-values.html#sec:imputation"><i class="fa fa-check"></i><b>3.4</b> Missing Data Imputation</a></li>
+<li class="chapter" data-level="3.5" data-path="missing-values.html"><a href="missing-values.html#alternative-methods-of-imputation"><i class="fa fa-check"></i><b>3.5</b> Alternative Methods of Imputation</a></li>
+<li class="chapter" data-level="3.6" data-path="missing-values.html"><a href="missing-values.html#summary-1"><i class="fa fa-check"></i><b>3.6</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="prediction.html"><a href="prediction.html"><i class="fa fa-check"></i><b>4</b> Prediction</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="prediction.html"><a href="prediction.html#prediction-classification-and-clustering"><i class="fa fa-check"></i><b>4.1</b> Prediction, Classification and Clustering</a></li>
+<li class="chapter" data-level="4.2" data-path="prediction.html"><a href="prediction.html#sec:predictionbasics"><i class="fa fa-check"></i><b>4.2</b> The Basics of Prediction</a></li>
+<li class="chapter" data-level="4.3" data-path="prediction.html"><a href="prediction.html#sec:regress"><i class="fa fa-check"></i><b>4.3</b> Linear Regression for Prediction</a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="prediction.html"><a href="prediction.html#data-structures-and-notation"><i class="fa fa-check"></i><b>4.3.1</b> Data Structures and Notation</a></li>
+<li class="chapter" data-level="4.3.2" data-path="prediction.html"><a href="prediction.html#the-linear-regression-model"><i class="fa fa-check"></i><b>4.3.2</b> The Linear Regression Model</a></li>
+<li class="chapter" data-level="4.3.3" data-path="prediction.html"><a href="prediction.html#fitting-linear-regression-models"><i class="fa fa-check"></i><b>4.3.3</b> Fitting Linear Regression Models</a></li>
+<li class="chapter" data-level="4.3.4" data-path="prediction.html"><a href="prediction.html#prediction-1"><i class="fa fa-check"></i><b>4.3.4</b> Prediction</a></li>
+<li class="chapter" data-level="4.3.5" data-path="prediction.html"><a href="prediction.html#prediction-accuracy-and-the-bias-variance-trade-off"><i class="fa fa-check"></i><b>4.3.5</b> Prediction Accuracy and the Bias-Variance Trade-Off</a></li>
+<li class="chapter" data-level="4.3.6" data-path="prediction.html"><a href="prediction.html#model-selection"><i class="fa fa-check"></i><b>4.3.6</b> Model Selection</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="prediction.html"><a href="prediction.html#sec:regtree"><i class="fa fa-check"></i><b>4.4</b> Regression Trees</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="prediction.html"><a href="prediction.html#sec:introtree"><i class="fa fa-check"></i><b>4.4.1</b> Introduction to Regression Trees</a></li>
+<li class="chapter" data-level="4.4.2" data-path="prediction.html"><a href="prediction.html#how-to-grow-a-tree"><i class="fa fa-check"></i><b>4.4.2</b> How to Grow a Tree</a></li>
+<li class="chapter" data-level="4.4.3" data-path="prediction.html"><a href="prediction.html#implementing-regression-trees-in-r"><i class="fa fa-check"></i><b>4.4.3</b> Implementing Regression Trees in R</a></li>
+<li class="chapter" data-level="4.4.4" data-path="prediction.html"><a href="prediction.html#sec:treeprune"><i class="fa fa-check"></i><b>4.4.4</b> Pruning</a></li>
+<li class="chapter" data-level="4.4.5" data-path="prediction.html"><a href="prediction.html#sec:validation"><i class="fa fa-check"></i><b>4.4.5</b> Validation and Cross-Validation</a></li>
+<li class="chapter" data-level="4.4.6" data-path="prediction.html"><a href="prediction.html#sec:treeinstability"><i class="fa fa-check"></i><b>4.4.6</b> Tree instability</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="prediction.html"><a href="prediction.html#sec:randomforest"><i class="fa fa-check"></i><b>4.5</b> Random forests</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="prediction.html"><a href="prediction.html#implementation-in-r"><i class="fa fa-check"></i><b>4.5.1</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="prediction.html"><a href="prediction.html#sec:neuralnet"><i class="fa fa-check"></i><b>4.6</b> Neural Networks</a>
+<ul>
+<li class="chapter" data-level="4.6.1" data-path="prediction.html"><a href="prediction.html#an-introduction-to-neural-networks"><i class="fa fa-check"></i><b>4.6.1</b> An Introduction to Neural Networks</a></li>
+<li class="chapter" data-level="4.6.2" data-path="prediction.html"><a href="prediction.html#building-a-neural-network"><i class="fa fa-check"></i><b>4.6.2</b> Building a Neural Network</a></li>
+<li class="chapter" data-level="4.6.3" data-path="prediction.html"><a href="prediction.html#prediction-using-neural-networks-in-r"><i class="fa fa-check"></i><b>4.6.3</b> Prediction Using Neural Networks in R</a></li>
+</ul></li>
+<li class="chapter" data-level="4.7" data-path="prediction.html"><a href="prediction.html#summary-of-prediction-methods"><i class="fa fa-check"></i><b>4.7</b> Summary of Prediction Methods</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="tidy-modelling.html"><a href="tidy-modelling.html"><i class="fa fa-check"></i><b>5</b> Tidy modelling</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="tidy-modelling.html"><a href="tidy-modelling.html#splitting-and-resampling-data"><i class="fa fa-check"></i><b>5.1</b> Splitting and resampling data</a></li>
+<li class="chapter" data-level="5.2" data-path="tidy-modelling.html"><a href="tidy-modelling.html#data-processing-with-recipes"><i class="fa fa-check"></i><b>5.2</b> Data processing with recipes</a></li>
+<li class="chapter" data-level="5.3" data-path="tidy-modelling.html"><a href="tidy-modelling.html#modelling-with-parsnip"><i class="fa fa-check"></i><b>5.3</b> Modelling with parsnip</a></li>
+<li class="chapter" data-level="5.4" data-path="tidy-modelling.html"><a href="tidy-modelling.html#model-performance-with-yardstick"><i class="fa fa-check"></i><b>5.4</b> Model performance with yardstick</a></li>
+<li class="chapter" data-level="5.5" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-workflow"><i class="fa fa-check"></i><b>5.5</b> Workflows</a></li>
+<li class="chapter" data-level="5.6" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-resamples"><i class="fa fa-check"></i><b>5.6</b> Resampling with <code>fit_resamples()</code></a></li>
+<li class="chapter" data-level="5.7" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-tuning"><i class="fa fa-check"></i><b>5.7</b> Simple tuning with <code>tune_grid()</code></a></li>
+<li class="chapter" data-level="5.8" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-final"><i class="fa fa-check"></i><b>5.8</b> Final model fitting with <code>last_fit()</code></a></li>
+<li class="chapter" data-level="5.9" data-path="tidy-modelling.html"><a href="tidy-modelling.html#summary-2"><i class="fa fa-check"></i><b>5.9</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="classification.html"><a href="classification.html"><i class="fa fa-check"></i><b>6</b> Classification</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="classification.html"><a href="classification.html#introduction-to-classification"><i class="fa fa-check"></i><b>6.1</b> Introduction to Classification</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="classification.html"><a href="classification.html#statistical-theory-for-classification"><i class="fa fa-check"></i><b>6.1.1</b> Statistical Theory for Classification</a></li>
+<li class="chapter" data-level="6.1.2" data-path="classification.html"><a href="classification.html#misclassification-rates-and-confusion-matrices"><i class="fa fa-check"></i><b>6.1.2</b> Misclassification Rates and Confusion Matrices</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="classification.html"><a href="classification.html#sec:lda"><i class="fa fa-check"></i><b>6.2</b> Linear Discriminant Analysis</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="classification.html"><a href="classification.html#the-method-in-theory"><i class="fa fa-check"></i><b>6.2.1</b> The Method in Theory</a></li>
+<li class="chapter" data-level="6.2.2" data-path="classification.html"><a href="classification.html#implementation-in-r-1"><i class="fa fa-check"></i><b>6.2.2</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="classification.html"><a href="classification.html#sec:kda"><i class="fa fa-check"></i><b>6.3</b> Kernel Discriminant Analysis</a></li>
+<li class="chapter" data-level="6.4" data-path="classification.html"><a href="classification.html#sec:naive"><i class="fa fa-check"></i><b>6.4</b> Naive Bayes Classifiers</a></li>
+<li class="chapter" data-level="6.5" data-path="classification.html"><a href="classification.html#logistic-regression"><i class="fa fa-check"></i><b>6.5</b> Logistic regression</a>
+<ul>
+<li class="chapter" data-level="6.5.1" data-path="classification.html"><a href="classification.html#fitting-logistic-regression-models"><i class="fa fa-check"></i><b>6.5.1</b> Fitting Logistic Regression Models</a></li>
+<li class="chapter" data-level="6.5.2" data-path="classification.html"><a href="classification.html#logistic-regression-as-a-classifier"><i class="fa fa-check"></i><b>6.5.2</b> Logistic Regression as a classifier</a></li>
+<li class="chapter" data-level="6.5.3" data-path="classification.html"><a href="classification.html#sec:multinomial"><i class="fa fa-check"></i><b>6.5.3</b> Extending Logistic Regression to more than two classes</a></li>
+<li class="chapter" data-level="6.5.4" data-path="classification.html"><a href="classification.html#model-selection-1"><i class="fa fa-check"></i><b>6.5.4</b> Model selection</a></li>
+<li class="chapter" data-level="6.5.5" data-path="classification.html"><a href="classification.html#sec:roc"><i class="fa fa-check"></i><b>6.5.5</b> ROC curves and the classification threshold</a></li>
+</ul></li>
+<li class="chapter" data-level="6.6" data-path="classification.html"><a href="classification.html#other-methods-of-classification"><i class="fa fa-check"></i><b>6.6</b> Other Methods of Classification</a>
+<ul>
+<li class="chapter" data-level="6.6.1" data-path="classification.html"><a href="classification.html#k-nearest-neighbour-classification"><i class="fa fa-check"></i><b>6.6.1</b> k-Nearest Neighbour Classification</a></li>
+<li class="chapter" data-level="6.6.2" data-path="classification.html"><a href="classification.html#classification-trees"><i class="fa fa-check"></i><b>6.6.2</b> Classification Trees</a></li>
+<li class="chapter" data-level="6.6.3" data-path="classification.html"><a href="classification.html#random-forests-for-classification"><i class="fa fa-check"></i><b>6.6.3</b> Random Forests for Classification</a></li>
+<li class="chapter" data-level="6.6.4" data-path="classification.html"><a href="classification.html#neural-networks-for-classification"><i class="fa fa-check"></i><b>6.6.4</b> Neural Networks for Classification</a></li>
+</ul></li>
+<li class="chapter" data-level="6.7" data-path="classification.html"><a href="classification.html#sec:classimbalance"><i class="fa fa-check"></i><b>6.7</b> Dealing with Class Imbalance</a>
+<ul>
+<li class="chapter" data-level="6.7.1" data-path="classification.html"><a href="classification.html#resampling-strategies"><i class="fa fa-check"></i><b>6.7.1</b> Resampling strategies</a></li>
+<li class="chapter" data-level="6.7.2" data-path="classification.html"><a href="classification.html#sec:smote"><i class="fa fa-check"></i><b>6.7.2</b> SMOTE: synthetic minority oversampling</a></li>
+</ul></li>
+<li class="chapter" data-level="6.8" data-path="classification.html"><a href="classification.html#high-class-classifiers"><i class="fa fa-check"></i><b>6.8</b> High Class Classifiers</a></li>
+<li class="chapter" data-level="6.9" data-path="classification.html"><a href="classification.html#summary-3"><i class="fa fa-check"></i><b>6.9</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="cluster-analysis.html"><a href="cluster-analysis.html"><i class="fa fa-check"></i><b>7</b> Cluster Analysis</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#dissimilarity-matrices-for-multivariate-data"><i class="fa fa-check"></i><b>7.1</b> Dissimilarity Matrices for Multivariate Data</a></li>
+<li class="chapter" data-level="7.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering"><i class="fa fa-check"></i><b>7.2</b> Hierarchical Clustering</a></li>
+<li class="chapter" data-level="7.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means-clustering"><i class="fa fa-check"></i><b>7.3</b> K-means clustering</a></li>
+<li class="chapter" data-level="7.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-medoids-clustering"><i class="fa fa-check"></i><b>7.4</b> K-medoids clustering</a></li>
+<li class="chapter" data-level="7.5" data-path="cluster-analysis.html"><a href="cluster-analysis.html#silhouette-plots"><i class="fa fa-check"></i><b>7.5</b> Silhouette plots</a></li>
+<li class="chapter" data-level="7.6" data-path="cluster-analysis.html"><a href="cluster-analysis.html#bootstrap-stability-and-the-adjusted-rand-index"><i class="fa fa-check"></i><b>7.6</b> Bootstrap stability and the adjusted Rand index</a></li>
+<li class="chapter" data-level="7.7" data-path="cluster-analysis.html"><a href="cluster-analysis.html#density-based-clustering"><i class="fa fa-check"></i><b>7.7</b> Density-based clustering</a></li>
+<li class="chapter" data-level="7.8" data-path="cluster-analysis.html"><a href="cluster-analysis.html#choosing-varepsilon-using-a-k-distance-plot"><i class="fa fa-check"></i><b>7.8</b> Choosing <span class="math inline">\(\varepsilon\)</span> using a <span class="math inline">\(k\)</span>-distance plot</a></li>
+<li class="chapter" data-level="7.9" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hdbscan-and-umap"><i class="fa fa-check"></i><b>7.9</b> HDBSCAN and UMAP</a>
+<ul>
+<li class="chapter" data-level="7.9.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#sec:hdbscan"><i class="fa fa-check"></i><b>7.9.1</b> HDBSCAN</a></li>
+<li class="chapter" data-level="7.9.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#sec:umap"><i class="fa fa-check"></i><b>7.9.2</b> UMAP</a></li>
+<li class="chapter" data-level="7.9.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#sec:cluster-compare"><i class="fa fa-check"></i><b>7.9.3</b> Practical method comparison</a></li>
+</ul></li>
+<li class="chapter" data-level="7.10" data-path="cluster-analysis.html"><a href="cluster-analysis.html#summary-4"><i class="fa fa-check"></i><b>7.10</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="association-rule-mining.html"><a href="association-rule-mining.html"><i class="fa fa-check"></i><b>8</b> Association rule mining</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="association-rule-mining.html"><a href="association-rule-mining.html#transaction-data-as-a-binary-matrix"><i class="fa fa-check"></i><b>8.1</b> Transaction data as a binary matrix</a></li>
+<li class="chapter" data-level="8.2" data-path="association-rule-mining.html"><a href="association-rule-mining.html#the-apriori-principle"><i class="fa fa-check"></i><b>8.2</b> The Apriori principle</a></li>
+<li class="chapter" data-level="8.3" data-path="association-rule-mining.html"><a href="association-rule-mining.html#the-apriori-algorithm"><i class="fa fa-check"></i><b>8.3</b> The Apriori algorithm</a></li>
+<li class="chapter" data-level="8.4" data-path="association-rule-mining.html"><a href="association-rule-mining.html#apriori-and-eclat"><i class="fa fa-check"></i><b>8.4</b> Apriori and Eclat</a></li>
+<li class="chapter" data-level="8.5" data-path="association-rule-mining.html"><a href="association-rule-mining.html#inspecting-and-filtering-rules-in-arules"><i class="fa fa-check"></i><b>8.5</b> Inspecting and filtering rules in <code>arules</code></a></li>
+<li class="chapter" data-level="8.6" data-path="association-rule-mining.html"><a href="association-rule-mining.html#sec:association-fit"><i class="fa fa-check"></i><b>8.6</b> Where association rules fit</a></li>
+<li class="chapter" data-level="8.7" data-path="association-rule-mining.html"><a href="association-rule-mining.html#summary-5"><i class="fa fa-check"></i><b>8.7</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="sec:ensemble.html"><a href="sec:ensemble.html"><i class="fa fa-check"></i><b>9</b> Ensemble Learning</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:ensemble-motivation"><i class="fa fa-check"></i><b>9.1</b> Motivation: Why Combine Models?</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#the-variance-reduction-argument"><i class="fa fa-check"></i><b>9.1.1</b> The variance reduction argument</a></li>
+<li class="chapter" data-level="9.1.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#bias-vs-variance-in-ensembles"><i class="fa fa-check"></i><b>9.1.2</b> Bias vs variance in ensembles</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:bagging"><i class="fa fa-check"></i><b>9.2</b> Bagging</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#the-bootstrap-aggregating-algorithm"><i class="fa fa-check"></i><b>9.2.1</b> The bootstrap aggregating algorithm</a></li>
+<li class="chapter" data-level="9.2.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:oob"><i class="fa fa-check"></i><b>9.2.2</b> Out-of-bag error</a></li>
+<li class="chapter" data-level="9.2.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#implementation-in-r-2"><i class="fa fa-check"></i><b>9.2.3</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:ensemblerf"><i class="fa fa-check"></i><b>9.3</b> Random Forests</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:varimp"><i class="fa fa-check"></i><b>9.3.1</b> Variable importance</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:boosting"><i class="fa fa-check"></i><b>9.4</b> Boosting</a>
+<ul>
+<li class="chapter" data-level="9.4.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#forward-stagewise-additive-modelling"><i class="fa fa-check"></i><b>9.4.1</b> Forward stagewise additive modelling</a></li>
+<li class="chapter" data-level="9.4.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:gradboosting"><i class="fa fa-check"></i><b>9.4.2</b> Gradient boosting</a></li>
+<li class="chapter" data-level="9.4.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:xgboost"><i class="fa fa-check"></i><b>9.4.3</b> XGBoost: regularised gradient boosting</a></li>
+<li class="chapter" data-level="9.4.4" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:boost-r"><i class="fa fa-check"></i><b>9.4.4</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="9.5" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:stacking"><i class="fa fa-check"></i><b>9.5</b> Stacking</a>
+<ul>
+<li class="chapter" data-level="9.5.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#stacked-generalisation"><i class="fa fa-check"></i><b>9.5.1</b> Stacked generalisation</a></li>
+<li class="chapter" data-level="9.5.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:cv-meta"><i class="fa fa-check"></i><b>9.5.2</b> Cross-validated meta-features</a></li>
+<li class="chapter" data-level="9.5.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:stacking-r"><i class="fa fa-check"></i><b>9.5.3</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="9.6" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:automl"><i class="fa fa-check"></i><b>9.6</b> AutoML: Automated Model Selection</a></li>
+<li class="chapter" data-level="9.7" data-path="sec:ensemble.html"><a href="sec:ensemble.html#summary-6"><i class="fa fa-check"></i><b>9.7</b> Summary</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Data mining</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="association-rule-mining" class="section level1 hasAnchor" number="8">
+<h1><span class="header-section-number">Chapter 8</span> Association rule mining<a href="association-rule-mining.html#association-rule-mining" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>While <span class="math inline">\(K\)</span>-means clustering is used primarily for numerical measures, we
+often have data where the variables are categorical. A common database
+type that we haven’t yet met comes in the form of a list of sets of
+items. A classical example is that of market basket analysis. A retail
+store has a large number of transactions during a particular time
+period, and is interested whether certain groups of items are
+consistently purchased together. With knowledge of such associations the
+store layout could be designed to place items optimally with respect to
+each other, or the data might be used for cross-selling (discounting an
+item if you purchase the second), catalogue design, or to identify
+customer segments based on purchasing patterns.</p>
+<p>A number of other examples are similar to this, however. Results from
+questionnaires (particularly when the questions permit categorical
+answers) yield similar data, and the analyst may be interested in
+associations between the answers to different questions. Data from web
+searches may also be analysed in the same manner. People that search for
+certain terms may be more likely to also search for other terms.
+Further, there’s the possibility that improved search results<a href="#fn65" class="footnote-ref" id="fnref65"><sup>65</sup></a> might
+be gleaned: If a person has previously searched for ‘Apple’ and later
+searches for ‘Leopard’ then it may be that they are interested in Mac
+OS 10.5 (codenamed ‘Leopard’) rather than whether leopards eat apples.</p>
+<p>Typically, such datasets consist of a large number of possible items and
+a large number of collections of those items, where each collection may
+contain only a small fraction of the total items available. A
+supermarket for example may have many thousands of products, yet each
+transaction may consist of at most a few hundred items, and in many
+cases fewer than ten items. Table <a href="association-rule-mining.html#tab:market1">8.1</a>
+shows a few entries from a typical transaction
+database.</p>
+<p><strong>How this chapter connects.</strong> Association rules are another
+unsupervised task from the comparison table in
+Section <a href="introduction.html#sec:task-compare">1.4.1</a>, but the focus is different from
+clustering. Here we study which items or conditions co-occur, rather
+than how to group the observations themselves. This makes the chapter a
+natural companion to Section <a href="cluster-analysis.html#sec:cluster-compare">7.9.3</a> for categorical
+or transactional data.</p>
+<table>
+<caption><span id="tab:market1">Table 8.1: </span>An example supermarket database with six transactions.</caption>
+<thead>
+<tr class="header">
+<th align="right">transaction</th>
+<th align="left">items</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">bread, milk</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="left">beer</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="left">butter</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="left">bread, butter, milk</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="left">bread, butter</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="left">bread, beer</td>
+</tr>
+</tbody>
+</table>
+<p>The retailer is primarily interested in whether a product is purchased
+(presence/absence) rather than how many instances of the same item were
+purchased in the same transaction, so the data may typically be
+represented by a binary matrix as in Table <a href="association-rule-mining.html#tab:market2">8.2</a>.</p>
+<table>
+<caption><span id="tab:market2">Table 8.2: </span>The binary matrix of transactions from Table <a href="association-rule-mining.html#tab:market1">8.1</a></caption>
+<thead>
+<tr class="header">
+<th align="right">transaction</th>
+<th align="right">bread</th>
+<th align="right">milk</th>
+<th align="right">beer</th>
+<th align="right">butter</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p><em>Association rules</em> provide information about implications between item
+sets: if a transaction has items from set <span class="math inline">\(A\)</span>, do they also tend to have
+items from set <span class="math inline">\(B\)</span>? This is an example of a <em>rule</em> which is an
+implication of the form <span class="math inline">\(A \Rightarrow B\)</span>, where <span class="math inline">\(A, B\)</span> are <em>itemsets</em>
+with the requirement that they are disjoint (<span class="math inline">\(A \cap B = \emptyset\)</span>).
+<span class="math inline">\(A\)</span> is known as the <em>antecedent</em> (or lhs) and <span class="math inline">\(B\)</span> is the <em>consequent</em>
+(or rhs) of the rule.</p>
+<p>From Table <a href="association-rule-mining.html#tab:market1">8.1</a>,
+an example rule for the supermarket might be
+<span class="math inline">\(\{\textrm{milk},\textrm{bread}\} \Rightarrow \{\textrm{butter}\}\)</span>, meaning that if the customer
+purchases milk and bread, they also purchase butter. Even with this
+small dataset (just 4 items), there are 50 association rules. In
+general, for <span class="math inline">\(d\)</span> items, the number of association rules is given by
+<span class="math display">\[3^d - 2^{d+1} + 1,\]</span> and thus is exponential in the number of items.
+The majority of these rules are of no use: It will be unlikely that
+there are transactions in the data set that contains the rules, thus we
+need to be able to select the interesting rules from all possible rules,
+without having to generate all possible rules to begin with.</p>
+<p>The <em>support</em> <span class="math inline">\(\mathop{\mathrm{supp}}(A)\)</span> of an itemset <span class="math inline">\(A\)</span> is defined
+as the proportion of transactions in the database which contain the
+itemset. For the example database in Table <a href="association-rule-mining.html#tab:market1">8.1</a>, the itemset
+<span class="math inline">\(\{\textrm{milk},\textrm{bread}\}\)</span> has a support of <span class="math inline">\(2/6\)</span> since it
+occurs in 2 out of the 6 transactions, whereas the itemset
+<span class="math inline">\(\{\textrm{bread}\}\)</span> has support <span class="math inline">\(5/6\)</span>. The support of a rule
+<span class="math inline">\(A \Rightarrow B\)</span> is then just the support of <span class="math inline">\(A \cup B\)</span>, i.e. the
+proportion of transactions in the database containing all the items in
+the rule.</p>
+<p>The <em>confidence</em> of a rule is defined as
+<span class="math display">\[\mathop{\mathrm{conf}}(A \Rightarrow B) = \frac{\mathop{\mathrm{supp}}(A \cup B)}{\mathop{\mathrm{supp}}(A)},\]</span>
+and can be interpreted as an estimate of the probability <span class="math inline">\(P(B|A)\)</span>, the
+probability of finding the consequent of the rule given the antecedent.
+From Table <a href="association-rule-mining.html#tab:market1">8.1</a> we see that the rule
+<span class="math inline">\(\{\textrm{milk}, \textrm{bread}\} \Rightarrow \{\textrm{butter}\}\)</span> has
+confidence <span class="math inline">\(\frac{1/6}{2/6} = 0.5\)</span>, so that 50% of the transactions
+containing milk and bread also contain butter.</p>
+<p>Interesting association rules are those that satisfy both a minimum
+support clause and a minimum confidence constraint simultaneously. The
+minimal support constraint allows rules to be mined efficiently, as if
+an itemset <span class="math inline">\(B\)</span> has high support, then we know that all subsets of <span class="math inline">\(B\)</span>
+must also have high support. This allows algorithms to be designed that
+mine all <em>maximal frequent itemsets</em> efficiently.</p>
+<p>Even with such constraints, however, there may still be a large number
+of association rules found. Further, one must be careful to consider
+association rules with high support and high confidence as being
+interesting, as example <a href="association-rule-mining.html#exm:coffeetea">8.1</a> shows.</p>
+<div class="example">
+<p><span id="exm:coffeetea" class="example"><strong>Example 8.1  </strong></span><strong>Coffee and tea drinking</strong></p>
+<p>Suppose that 1000 people were asked whether
+they drank tea or coffee, or both. The results of this are given in the
+contigency table <a href="association-rule-mining.html#tab:coffeetea">8.3</a>.</p>
+<table>
+<caption><span id="tab:coffeetea">Table 8.3: </span>Contigency table of drinking preferences for 1000 people.</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">coffee</th>
+<th align="right">no coffee</th>
+<th align="right">total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">tea</td>
+<td align="right">150</td>
+<td align="right">650</td>
+<td align="right">800</td>
+</tr>
+<tr class="even">
+<td align="left">no tea</td>
+<td align="right">50</td>
+<td align="right">150</td>
+<td align="right">200</td>
+</tr>
+<tr class="odd">
+<td align="left">total</td>
+<td align="right">200</td>
+<td align="right">800</td>
+<td align="right">1000</td>
+</tr>
+</tbody>
+</table>
+<p>The association rule <span class="math inline">\(\{\textrm{coffee}\}\Rightarrow\{\textrm{tea}\}\)</span>
+may be considered, and we find it has relatively high support (15%) and
+confidence (75%). At first glance it might appear that those that drink
+coffee also tend to drink tea. However, the probability of a person
+drinking tea is 80% regardless of whether they drink coffee, and this
+reduces to 75% if they drink coffee. Thus, knowing that a particular
+person drinks coffee actually reduces the chance that they’re a tea
+drinker! The high confidence of the rule
+<span class="math inline">\(\{\textrm{coffee}\}\Rightarrow\{\textrm{tea}\}\)</span> is therefore
+misleading. The pitfall of high confidence is due to the fact that the
+confidence measure does not take into account the support of the rule
+consequent. Once we take into account the support of tea drinkers, it is
+no surprise that many coffee drinkers also drink tea.</p>
+</div>
+<p>A popular measure useful for ranking association rules in terms of
+“interestingness" is <em>lift</em>, which is defined as
+<span class="math display">\[\mathop{\mathrm{lift}}(A \Rightarrow B) = \frac{\mathop{\mathrm{supp}}(A \cup B)}{\mathop{\mathrm{supp}}(A)\mathop{\mathrm{supp}}(B)}.\]</span>
+This may be interpreted as the deviation of the support of the rule from
+what might be expected if the antecedent and consequent were
+independent. A large lift value indicates a strong positive association.
+A lift of 1 indicates no association, and a lift smaller than one
+indicates a negative association. The lift of the rule
+<span class="math inline">\(\{\textrm{milk},\textrm{bread}\}\Rightarrow\{\textrm{butter}\}\)</span> is <span class="math inline">\(1\)</span>.
+The lift of the rule <span class="math inline">\(\{\textrm{coffee}\}\Rightarrow\{\textrm{tea}\}\)</span> is
+<span class="math inline">\(\frac{0.15}{(0.2)(0.8)} = 0.9375\)</span>, indicating a slight negative
+correlation.</p>
+<p>Using the definition of confidence, lift may also be written as
+<span class="math display">\[\mathop{\mathrm{lift}}(A \Rightarrow B)
+  = \frac{\mathop{\mathrm{conf}}(A \Rightarrow B)}{\mathop{\mathrm{supp}}(B)}
+  = \frac{P(B|A)}{P(B)}.\]</span>
+Thus lift measures how much the knowledge that <span class="math inline">\(A\)</span> has occurred changes
+the probability of observing <span class="math inline">\(B\)</span>, relative to the baseline probability
+of <span class="math inline">\(B\)</span>. In that sense it behaves like a likelihood ratio: lift above 1
+indicates positive association, lift equal to 1 corresponds to
+independence, and lift below 1 indicates negative association.</p>
+<p>While the former statistical criteria for interesting-ness of
+association rules is important, often subjective measures may be of more
+interest to the data-miner. An association might be considered
+uninteresting if it provides only information that was already known (or
+suspected). The associations that provide connections that were not
+previously known are those that are subjectively of interest. For
+example, the association
+<span class="math inline">\(\{\textrm{bread}\}\Rightarrow\{\textrm{butter}\}\)</span> is not subjectively
+interesting, whereas <span class="math inline">\(\{\textrm{nappies}\}\Rightarrow\{\textrm{beer}\}\)</span>
+is interesting!</p>
+<p>There have been several algorithms developed for mining association
+rules, with the <em>Apriori</em> and <em>Eclat</em> algorithms being two of the more
+popular techniques. The R package <code>arules</code> implements both algorithms.</p>
+<div id="transaction-data-as-a-binary-matrix" class="section level2 hasAnchor" number="8.1">
+<h2><span class="header-section-number">8.1</span> Transaction data as a binary matrix<a href="association-rule-mining.html#transaction-data-as-a-binary-matrix" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Suppose that the database contains <span class="math inline">\(N\)</span> transactions and that there are
+<span class="math inline">\(d\)</span> distinct possible items. Let
+<span class="math display">\[z_{ir} = {\bf 1}[\mbox{transaction $i$ contains item $r$}],
+\qquad i = 1,\ldots,N,\; r = 1,\ldots,d.\]</span>
+Then the transaction database may be represented as an <span class="math inline">\(N \times d\)</span>
+binary matrix <span class="math inline">\(Z = (z_{ir})\)</span>. If <span class="math inline">\(A\)</span> is an itemset, then transaction
+<span class="math inline">\(i\)</span> contains <span class="math inline">\(A\)</span> precisely when <span class="math inline">\(z_{ir}=1\)</span> for every item <span class="math inline">\(r \in A\)</span>.
+Thus the support of <span class="math inline">\(A\)</span> may be written as
+<span class="math display">\[\mathop{\mathrm{supp}}(A)
+  = \frac{1}{N}\sum_{i=1}^N {\bf 1}[A \subseteq T_i]
+  = \frac{1}{N}\sum_{i=1}^N \prod_{r \in A} z_{ir},\]</span>
+where <span class="math inline">\(T_i\)</span> denotes the set of items in transaction <span class="math inline">\(i\)</span>.</p>
+<p>This binary representation is conceptually useful even when the data are
+stored in a sparse format, since it makes clear that association rule
+mining is fundamentally about the co-occurrence structure of the items.</p>
+</div>
+<div id="the-apriori-principle" class="section level2 hasAnchor" number="8.2">
+<h2><span class="header-section-number">8.2</span> The Apriori principle<a href="association-rule-mining.html#the-apriori-principle" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The support measure satisfies an antimonotonicity property: if
+<span class="math inline">\(A \subseteq B\)</span>, then every transaction containing <span class="math inline">\(B\)</span> must also contain
+<span class="math inline">\(A\)</span>, and hence
+<span class="math display">\[\mathop{\mathrm{supp}}(B) \leq \mathop{\mathrm{supp}}(A).\]</span>
+This is known as the <em>Apriori principle</em>. It is the key fact that makes
+large-scale rule mining possible. If an itemset fails the minimum
+support threshold, then all supersets of that itemset must also fail,
+and they may be discarded without ever having their support counted.</p>
+<p>This principle applies only to support, not to confidence or lift. In
+practice one therefore first mines the frequent itemsets using a support
+threshold, and only afterwards generates the rules and filters them by
+confidence, lift or other measures of interest.</p>
+</div>
+<div id="the-apriori-algorithm" class="section level2 hasAnchor" number="8.3">
+<h2><span class="header-section-number">8.3</span> The Apriori algorithm<a href="association-rule-mining.html#the-apriori-algorithm" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The Apriori algorithm works level-by-level through the itemset lattice.</p>
+<ol style="list-style-type: decimal">
+<li><p>Count the support of all 1-itemsets and retain those exceeding the
+minimum support threshold.</p></li>
+<li><p>Generate candidate 2-itemsets from the surviving 1-itemsets, count
+their support, and discard those that are infrequent.</p></li>
+<li><p>Generate candidate 3-itemsets from the surviving 2-itemsets, again
+pruning any candidate whose subsets are not all frequent.</p></li>
+<li><p>Continue until no new frequent itemsets remain.</p></li>
+<li><p>For each frequent itemset <span class="math inline">\(F\)</span>, generate rules
+<span class="math inline">\(A \Rightarrow F \setminus A\)</span> for non-empty proper subsets <span class="math inline">\(A\)</span> of
+<span class="math inline">\(F\)</span>, and retain those meeting the confidence requirement.</p></li>
+</ol>
+<p>Although this is still a combinatorial problem, the support-based
+pruning means that the overwhelming majority of impossible or
+uninteresting candidates are never counted.</p>
+</div>
+<div id="apriori-and-eclat" class="section level2 hasAnchor" number="8.4">
+<h2><span class="header-section-number">8.4</span> Apriori and Eclat<a href="association-rule-mining.html#apriori-and-eclat" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Apriori uses a <em>horizontal</em> representation of the data: the algorithm
+repeatedly scans through the transactions and counts how many contain
+each candidate itemset. Eclat instead uses a <em>vertical</em> representation.
+For each item <span class="math inline">\(r\)</span>, we store the transaction identifiers
+<span class="math display">\[I_r = \{i : z_{ir} = 1\}.\]</span>
+The support of an itemset may then be obtained by set intersection. For
+example,
+<span class="math display">\[\mathop{\mathrm{supp}}(\{r,s,t\}) = \frac{|I_r \cap I_s \cap I_t|}{N}.\]</span>
+Eclat is often faster in practice because intersections of transaction
+identifier sets can be cheaper than repeated scans through the full
+database.</p>
+</div>
+<div id="inspecting-and-filtering-rules-in-arules" class="section level2 hasAnchor" number="8.5">
+<h2><span class="header-section-number">8.5</span> Inspecting and filtering rules in <code>arules</code><a href="association-rule-mining.html#inspecting-and-filtering-rules-in-arules" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Once rules have been mined, the main task is usually to sort and filter
+them. The <code>arules</code> package returns an object of class <code>rules</code>, which may
+be inspected using</p>
+<div class="sourceCode" id="cb306"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb306-1"><a href="association-rule-mining.html#cb306-1" tabindex="-1"></a>rules <span class="sc">|&gt;</span> <span class="fu">inspect</span>()</span>
+<span id="cb306-2"><a href="association-rule-mining.html#cb306-2" tabindex="-1"></a>rules <span class="sc">|&gt;</span> <span class="fu">sort</span>(<span class="at">by =</span> <span class="st">&quot;lift&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">head</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">|&gt;</span> <span class="fu">inspect</span>()</span>
+<span id="cb306-3"><a href="association-rule-mining.html#cb306-3" tabindex="-1"></a>rules <span class="sc">|&gt;</span> <span class="fu">subset</span>(lhs <span class="sc">%in%</span> <span class="st">&quot;garlic&quot;</span>)</span>
+<span id="cb306-4"><a href="association-rule-mining.html#cb306-4" tabindex="-1"></a>rules <span class="sc">|&gt;</span> <span class="fu">subset</span>(lhs <span class="sc">%ain%</span> <span class="fu">c</span>(<span class="st">&quot;garlic&quot;</span>, <span class="st">&quot;onion&quot;</span>))</span>
+<span id="cb306-5"><a href="association-rule-mining.html#cb306-5" tabindex="-1"></a>rules <span class="sc">|&gt;</span> <span class="fu">subset</span>(lhs <span class="sc">%pin%</span> <span class="st">&quot;wine&quot;</span>)</span></code></pre></div>
+<p>The <code>%in%</code> operator matches complete item names, <code>%ain%</code> requires all
+specified items to be present, and <code>%pin%</code> performs a partial match. In
+practice these tools are often more useful than the original mining
+step, because even moderate support thresholds can still produce a large
+number of candidate rules.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-54" class="example"><strong>Example 8.2  </strong></span><strong>Household incomes and demographic information</strong></p>
+<p>A total of <span class="math inline">\(N=9409\)</span> questionnaires containg 502 questions were filled
+out by shopping mall customers in the San Francisco Bay area. The
+dataset consists of 14 demographic attributes, one of which is annual
+household income.</p>
+<p>We start by loading the data in and checking the frequency of items in
+the dataset with support greater than 5%, given in Figure <a href="association-rule-mining.html#fig:income1">8.1</a>.</p>
+<div class="sourceCode" id="cb307"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb307-1"><a href="association-rule-mining.html#cb307-1" tabindex="-1"></a><span class="fu">library</span>(arules)</span>
+<span id="cb307-2"><a href="association-rule-mining.html#cb307-2" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;Income&quot;</span>)</span>
+<span id="cb307-3"><a href="association-rule-mining.html#cb307-3" tabindex="-1"></a><span class="fu">itemFrequencyPlot</span>(Income, <span class="at">support=</span><span class="fl">0.05</span>, <span class="at">cex.names=</span><span class="fl">0.8</span>)</span></code></pre></div>
+<div class="figure"><span style="display:block;" id="fig:income1"></span>
+<img src="08-associationrules_files/figure-html/income1-1.png" alt="The freqency of items in the Income data set with support greater than 5%" width="672" />
+<p class="caption">
+Figure 8.1: The freqency of items in the Income data set with support greater than 5%
+</p>
+</div>
+<p>We can re-do this plot using <code>ggplot</code> instead which will make it a little nicer. We first use <code>enframe()</code> to convert the named vector returned by <code>itemFrequency()</code> to a <code>tibble</code>:</p>
+<div class="sourceCode" id="cb308"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb308-1"><a href="association-rule-mining.html#cb308-1" tabindex="-1"></a>Income <span class="sc">|&gt;</span></span>
+<span id="cb308-2"><a href="association-rule-mining.html#cb308-2" tabindex="-1"></a>  <span class="fu">itemFrequency</span>() <span class="sc">|&gt;</span></span>
+<span id="cb308-3"><a href="association-rule-mining.html#cb308-3" tabindex="-1"></a>  <span class="fu">enframe</span>(<span class="at">name=</span><span class="st">&quot;item&quot;</span>, <span class="at">value=</span><span class="st">&quot;support&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb308-4"><a href="association-rule-mining.html#cb308-4" tabindex="-1"></a>  <span class="fu">filter</span>(support <span class="sc">&gt;=</span> <span class="fl">0.05</span>) <span class="sc">|&gt;</span></span>
+<span id="cb308-5"><a href="association-rule-mining.html#cb308-5" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb308-6"><a href="association-rule-mining.html#cb308-6" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x=</span>support, <span class="at">y=</span>item))</span></code></pre></div>
+<p><img src="08-associationrules_files/figure-html/unnamed-chunk-3-1.png" alt="" width="672" /></p>
+<p>There are several other variables with support less than 5% - all
+variables can be seen using <code>labels(Income)$items</code>. The next step is to
+generate association rules using the <code>apriori</code> function. We specify a
+support of 0.01 and confidence of 0.6, yielding just over a million
+rules.</p>
+<div class="sourceCode" id="cb309"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb309-1"><a href="association-rule-mining.html#cb309-1" tabindex="-1"></a>rules <span class="ot">&lt;-</span> Income <span class="sc">|&gt;</span> <span class="fu">apriori</span>(<span class="at">parameter=</span><span class="fu">list</span>(<span class="at">support=</span><span class="fl">0.01</span>, <span class="at">confidence=</span><span class="fl">0.6</span>))</span></code></pre></div>
+<pre><code>#&gt; Apriori
+#&gt; 
+#&gt; Parameter specification:
+#&gt;  confidence minval smax arem  aval originalSupport maxtime support minlen
+#&gt;         0.6    0.1    1 none FALSE            TRUE       5    0.01      1
+#&gt;  maxlen target  ext
+#&gt;      10  rules TRUE
+#&gt; 
+#&gt; Algorithmic control:
+#&gt;  filter tree heap memopt load sort verbose
+#&gt;     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+#&gt; 
+#&gt; Absolute minimum support count: 68 
+#&gt; 
+#&gt; set item appearances ...[0 item(s)] done [0.00s].
+#&gt; set transactions ...[50 item(s), 6876 transaction(s)] done [0.00s].
+#&gt; sorting and recoding items ... [49 item(s)] done [0.00s].
+#&gt; creating transaction tree ... done [0.00s].
+#&gt; checking subsets of size 1 2 3 4 5 6 7 8 9 10</code></pre>
+<pre><code>#&gt; Warning in apriori(Income, parameter = list(support = 0.01, confidence = 0.6)):
+#&gt; Mining stopped (maxlen reached). Only patterns up to a length of 10 returned!</code></pre>
+<pre><code>#&gt;  done [0.48s].
+#&gt; writing ... [1200801 rule(s)] done [0.21s].
+#&gt; creating S4 object  ... done [0.89s].</code></pre>
+<div class="sourceCode" id="cb313"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb313-1"><a href="association-rule-mining.html#cb313-1" tabindex="-1"></a>rules</span></code></pre></div>
+<pre><code>#&gt; set of 1200801 rules</code></pre>
+<div class="sourceCode" id="cb315"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb315-1"><a href="association-rule-mining.html#cb315-1" tabindex="-1"></a><span class="fu">summary</span>(rules)</span></code></pre></div>
+<pre><code>#&gt; set of 1200801 rules
+#&gt; 
+#&gt; rule length distribution (lhs + rhs):sizes
+#&gt;      1      2      3      4      5      6      7      8      9     10 
+#&gt;      7    382   5447  34793 119273 245153 315139 265573 153451  61583 
+#&gt; 
+#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#&gt;   1.000   6.000   7.000   7.121   8.000  10.000 
+#&gt; 
+#&gt; summary of quality measures:
+#&gt;     support          confidence        coverage            lift        
+#&gt;  Min.   :0.01003   Min.   :0.6000   Min.   :0.01003   Min.   : 0.6573  
+#&gt;  1st Qu.:0.01265   1st Qu.:0.7238   1st Qu.:0.01556   1st Qu.: 1.1386  
+#&gt;  Median :0.01745   Median :0.8333   Median :0.02152   Median : 1.3910  
+#&gt;  Mean   :0.02476   Mean   :0.8272   Mean   :0.03076   Mean   : 1.6330  
+#&gt;  3rd Qu.:0.02792   3rd Qu.:0.9423   3rd Qu.:0.03476   3rd Qu.: 1.9247  
+#&gt;  Max.   :0.91289   Max.   :1.0000   Max.   :1.00000   Max.   :24.3140  
+#&gt;      count       
+#&gt;  Min.   :  69.0  
+#&gt;  1st Qu.:  87.0  
+#&gt;  Median : 120.0  
+#&gt;  Mean   : 170.2  
+#&gt;  3rd Qu.: 192.0  
+#&gt;  Max.   :6277.0  
+#&gt; 
+#&gt; mining info:
+#&gt;    data ntransactions support confidence
+#&gt;  Income          6876    0.01        0.6
+#&gt;                                                                        call
+#&gt;  apriori(data = Income, parameter = list(support = 0.01, confidence = 0.6))</code></pre>
+<p>The rules may be inspected via the <code>inspect</code> command. Sorting the rules
+first based on confidence or lift is useful to obtain the most
+interesting (objectively!) relationships first:</p>
+<div class="sourceCode" id="cb317"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb317-1"><a href="association-rule-mining.html#cb317-1" tabindex="-1"></a>rules <span class="sc">|&gt;</span></span>
+<span id="cb317-2"><a href="association-rule-mining.html#cb317-2" tabindex="-1"></a>  <span class="fu">sort</span>(<span class="at">by=</span><span class="st">&quot;confidence&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb317-3"><a href="association-rule-mining.html#cb317-3" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span></span>
+<span id="cb317-4"><a href="association-rule-mining.html#cb317-4" tabindex="-1"></a>  <span class="fu">inspect</span>()</span></code></pre></div>
+<pre><code>#&gt;     lhs                              rhs                           support confidence   coverage     lift count
+#&gt; [1] {marital status=widowed}      =&gt; {dual incomes=not married} 0.02937755          1 0.02937755 1.671366   202
+#&gt; [2] {marital status=divorced}     =&gt; {dual incomes=not married} 0.09787667          1 0.09787667 1.671366   673
+#&gt; [3] {marital status=single}       =&gt; {dual incomes=not married} 0.40910413          1 0.40910413 1.671366  2813
+#&gt; [4] {occupation=military,                                                                                      
+#&gt;      ethnic classification=white} =&gt; {language in home=english} 0.01207097          1 0.01207097 1.095428    83
+#&gt; [5] {marital status=single,                                                                                    
+#&gt;      ethnic classification=other} =&gt; {dual incomes=not married} 0.01163467          1 0.01163467 1.671366    80</code></pre>
+<p>As you can see, there are rules with confidence=1, indicating that all
+transactions in the datasets containing the lhs also contain the rhs.
+The items <code>dual income=not married</code> and <code>marital status=single</code> are
+clearly giving the same information. We can filter out all such rules
+using the <code>subset</code> command<a href="#fn66" class="footnote-ref" id="fnref66"><sup>66</sup></a>:</p>
+<div class="sourceCode" id="cb319"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb319-1"><a href="association-rule-mining.html#cb319-1" tabindex="-1"></a>rules <span class="ot">&lt;-</span> rules <span class="sc">|&gt;</span></span>
+<span id="cb319-2"><a href="association-rule-mining.html#cb319-2" tabindex="-1"></a>  <span class="fu">subset</span>(confidence <span class="sc">&lt;</span> <span class="dv">1</span>)</span>
+<span id="cb319-3"><a href="association-rule-mining.html#cb319-3" tabindex="-1"></a></span>
+<span id="cb319-4"><a href="association-rule-mining.html#cb319-4" tabindex="-1"></a>rules <span class="sc">|&gt;</span> <span class="fu">sort</span>(<span class="at">by=</span><span class="st">&quot;confidence&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb319-5"><a href="association-rule-mining.html#cb319-5" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n=</span><span class="dv">2</span>) <span class="sc">|&gt;</span></span>
+<span id="cb319-6"><a href="association-rule-mining.html#cb319-6" tabindex="-1"></a>  <span class="fu">inspect</span>()</span></code></pre></div>
+<pre><code>#&gt;     lhs                                              rhs           support confidence  coverage     lift count
+#&gt; [1] {marital status=single,                                                                                   
+#&gt;      occupation=student,                                                                                      
+#&gt;      householder status=live with parents/family} =&gt; {age=14-34} 0.1137289  0.9987229 0.1138743 1.706141   782
+#&gt; [2] {marital status=single,                                                                                   
+#&gt;      occupation=student,                                                                                      
+#&gt;      dual incomes=not married,                                                                                
+#&gt;      householder status=live with parents/family} =&gt; {age=14-34} 0.1137289  0.9987229 0.1138743 1.706141   782</code></pre>
+<p>These are a little more interesting, but hardly surprising - if you’re a
+student living with your parents/family, then you’re very likely to be
+less than 35 years of age.</p>
+<p>We can also inspect things interactively via the <code>inspectDT</code> function in <code>arulesViz</code>, though you’ll want to make sure you don’t have too many rules first:</p>
+<div class="sourceCode" id="cb321"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb321-1"><a href="association-rule-mining.html#cb321-1" tabindex="-1"></a><span class="fu">library</span>(arulesViz)</span></code></pre></div>
+<pre><code>#&gt; Warning: package &#39;arulesViz&#39; was built under R version 4.5.2</code></pre>
+<div class="sourceCode" id="cb323"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb323-1"><a href="association-rule-mining.html#cb323-1" tabindex="-1"></a>rules <span class="sc">|&gt;</span></span>
+<span id="cb323-2"><a href="association-rule-mining.html#cb323-2" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n=</span><span class="dv">100</span>) <span class="sc">|&gt;</span></span>
+<span id="cb323-3"><a href="association-rule-mining.html#cb323-3" tabindex="-1"></a>  <span class="fu">inspectDT</span>()</span></code></pre></div>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-cae7767b4c1328522b55" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-cae7767b4c1328522b55">{"x":{"filter":"top","vertical":false,"filterHTML":"<tr>\n  <td><\/td>\n  <td data-type=\"factor\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"width: 100%; display: none;\">\n      <select multiple=\"multiple\" style=\"width: 100%;\" data-options=\"[&quot;{}&quot;,&quot;{ethnic classification=pacific islander}&quot;,&quot;{type of home=mobile Home}&quot;,&quot;{ethnic classification=american indian}&quot;,&quot;{occupation=military}&quot;,&quot;{ethnic classification=other}&quot;,&quot;{language in home=other}&quot;,&quot;{marital status=widowed}&quot;,&quot;{occupation=unemployed}&quot;,&quot;{type of home=other}&quot;,&quot;{ethnic classification=asian}&quot;,&quot;{language in home=spanish}&quot;,&quot;{occupation=retired}&quot;,&quot;{occupation=homemaker}&quot;]\"><\/select>\n    <\/div>\n  <\/td>\n  <td data-type=\"factor\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"width: 100%; display: none;\">\n      <select multiple=\"multiple\" style=\"width: 100%;\" data-options=\"[&quot;{number of children=0}&quot;,&quot;{income=$0-$40,000}&quot;,&quot;{years in bay area=10+}&quot;,&quot;{ethnic classification=white}&quot;,&quot;{number in household=1}&quot;,&quot;{education=no college graduate}&quot;,&quot;{language in home=english}&quot;,&quot;{householder status=own}&quot;,&quot;{age=35+}&quot;,&quot;{sex=female}&quot;,&quot;{age=14-34}&quot;,&quot;{dual incomes=not married}&quot;,&quot;{years in bay area=1-9}&quot;,&quot;{householder status=rent}&quot;,&quot;{sex=male}&quot;,&quot;{marital status=single}&quot;,&quot;{type of home=house}&quot;,&quot;{ethnic classification=hispanic}&quot;,&quot;{marital status=married}&quot;,&quot;{dual incomes=no}&quot;]\"><\/select>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"0.010180337405468\" data-max=\"0.912885398487493\" data-scale=\"15\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"0.602272727272727\" data-max=\"0.985655737704918\" data-scale=\"15\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"0.012798138452588\" data-max=\"1\" data-scale=\"15\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"0.79194512949441\" data-max=\"6.82479420395232\" data-scale=\"15\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"integer\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"70\" data-max=\"6277\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n<\/tr>","data":[["[1]","[2]","[3]","[4]","[5]","[6]","[7]","[8]","[9]","[10]","[11]","[12]","[13]","[14]","[15]","[16]","[17]","[18]","[19]","[20]","[21]","[22]","[23]","[24]","[25]","[26]","[27]","[28]","[29]","[30]","[31]","[32]","[33]","[34]","[35]","[36]","[37]","[38]","[39]","[40]","[41]","[42]","[43]","[44]","[45]","[46]","[47]","[48]","[49]","[51]","[52]","[53]","[54]","[55]","[56]","[57]","[58]","[59]","[60]","[61]","[62]","[63]","[64]","[65]","[66]","[67]","[68]","[69]","[70]","[71]","[72]","[73]","[74]","[75]","[76]","[77]","[78]","[79]","[80]","[81]","[82]","[83]","[84]","[85]","[86]","[87]","[88]","[89]","[90]","[91]","[92]","[93]","[94]","[95]","[96]","[97]","[98]","[99]","[100]","[101]"],["{}","{}","{}","{}","{}","{}","{}","{ethnic classification=pacific islander}","{type of home=mobile Home}","{type of home=mobile Home}","{type of home=mobile Home}","{type of home=mobile Home}","{type of home=mobile Home}","{type of home=mobile Home}","{type of home=mobile Home}","{type of home=mobile Home}","{type of home=mobile Home}","{type of home=mobile Home}","{ethnic classification=american indian}","{ethnic classification=american indian}","{ethnic classification=american indian}","{ethnic classification=american indian}","{ethnic classification=american indian}","{ethnic classification=american indian}","{ethnic classification=american indian}","{occupation=military}","{occupation=military}","{occupation=military}","{occupation=military}","{occupation=military}","{occupation=military}","{occupation=military}","{occupation=military}","{occupation=military}","{ethnic classification=other}","{ethnic classification=other}","{ethnic classification=other}","{ethnic classification=other}","{ethnic classification=other}","{ethnic classification=other}","{ethnic classification=other}","{language in home=other}","{language in home=other}","{language in home=other}","{language in home=other}","{language in home=other}","{marital status=widowed}","{marital status=widowed}","{marital status=widowed}","{marital status=widowed}","{marital status=widowed}","{marital status=widowed}","{marital status=widowed}","{marital status=widowed}","{marital status=widowed}","{marital status=widowed}","{occupation=unemployed}","{occupation=unemployed}","{occupation=unemployed}","{occupation=unemployed}","{occupation=unemployed}","{occupation=unemployed}","{occupation=unemployed}","{occupation=unemployed}","{type of home=other}","{type of home=other}","{type of home=other}","{type of home=other}","{type of home=other}","{type of home=other}","{type of home=other}","{type of home=other}","{type of home=other}","{ethnic classification=asian}","{ethnic classification=asian}","{ethnic classification=asian}","{ethnic classification=asian}","{ethnic classification=asian}","{ethnic classification=asian}","{language in home=spanish}","{language in home=spanish}","{language in home=spanish}","{language in home=spanish}","{language in home=spanish}","{language in home=spanish}","{occupation=retired}","{occupation=retired}","{occupation=retired}","{occupation=retired}","{occupation=retired}","{occupation=retired}","{occupation=retired}","{occupation=retired}","{occupation=retired}","{occupation=retired}","{occupation=retired}","{occupation=homemaker}","{occupation=homemaker}","{occupation=homemaker}","{occupation=homemaker}"],["{number of children=0}","{income=$0-$40,000}","{years in bay area=10+}","{ethnic classification=white}","{number in household=1}","{education=no college graduate}","{language in home=english}","{language in home=english}","{householder status=own}","{age=35+}","{sex=female}","{number of children=0}","{income=$0-$40,000}","{years in bay area=10+}","{ethnic classification=white}","{number in household=1}","{education=no college graduate}","{language in home=english}","{age=14-34}","{dual incomes=not married}","{income=$0-$40,000}","{years in bay area=10+}","{number in household=1}","{education=no college graduate}","{language in home=english}","{years in bay area=1-9}","{householder status=rent}","{sex=male}","{age=14-34}","{number of children=0}","{income=$0-$40,000}","{number in household=1}","{education=no college graduate}","{language in home=english}","{age=14-34}","{dual incomes=not married}","{income=$0-$40,000}","{years in bay area=10+}","{number in household=1}","{education=no college graduate}","{language in home=english}","{marital status=single}","{age=14-34}","{dual incomes=not married}","{income=$0-$40,000}","{education=no college graduate}","{householder status=own}","{age=35+}","{sex=female}","{number of children=0}","{income=$0-$40,000}","{years in bay area=10+}","{ethnic classification=white}","{number in household=1}","{education=no college graduate}","{language in home=english}","{marital status=single}","{age=14-34}","{dual incomes=not married}","{income=$0-$40,000}","{years in bay area=10+}","{number in household=1}","{education=no college graduate}","{language in home=english}","{householder status=rent}","{age=14-34}","{dual incomes=not married}","{number of children=0}","{income=$0-$40,000}","{ethnic classification=white}","{number in household=1}","{education=no college graduate}","{language in home=english}","{age=14-34}","{type of home=house}","{dual incomes=not married}","{income=$0-$40,000}","{education=no college graduate}","{language in home=english}","{ethnic classification=hispanic}","{age=14-34}","{type of home=house}","{dual incomes=not married}","{income=$0-$40,000}","{education=no college graduate}","{householder status=own}","{marital status=married}","{age=35+}","{type of home=house}","{number of children=0}","{income=$0-$40,000}","{years in bay area=10+}","{ethnic classification=white}","{number in household=1}","{education=no college graduate}","{language in home=english}","{dual incomes=no}","{householder status=own}","{marital status=married}","{age=35+}"],[0.6218731820826061,0.622454915648633,0.6465968586387435,0.6697207678883071,0.691826643397324,0.7052065154159395,0.9128853984874927,0.01119837114601513,0.01105293775450844,0.0101803374054683,0.01047120418848168,0.01207097149505526,0.01221640488656195,0.01090750436300175,0.01134380453752181,0.01308900523560209,0.01192553810354858,0.01381617219313554,0.01076207097149505,0.01076207097149505,0.01119837114601513,0.01076207097149505,0.01076207097149505,0.01308900523560209,0.01454333915066899,0.01468877254217568,0.01381617219313554,0.01701570680628272,0.01483420593368237,0.01425247236765561,0.01512507271669575,0.0158522396742292,0.01570680628272251,0.01847004072134962,0.01745200698080279,0.01672484002326934,0.01672484002326934,0.0158522396742292,0.01541593949970913,0.01890634089586969,0.02181500872600349,0.01788830715532286,0.02152414194299011,0.02065154159394997,0.01977894124490983,0.02050610820244328,0.018760907504363,0.02821407795229785,0.02254217568353694,0.0274869109947644,0.02283304246655032,0.02385107620709715,0.02283304246655032,0.02763234438627109,0.02123327515997673,0.02777777777777778,0.02297847585805701,0.02661431064572426,0.03010471204188482,0.02908667830133799,0.02356020942408377,0.02152414194299011,0.02981384525887144,0.03083187899941827,0.02486910994764398,0.02632344386271088,0.02705061082024433,0.02675974403723095,0.02632344386271088,0.02850494473531123,0.02821407795229785,0.02719604421175102,0.03519488074461896,0.03941244909831297,0.03737638161721931,0.03694008144269924,0.03446771378708551,0.03548574752763235,0.03984874927283304,0.05002908667830134,0.03897614892379291,0.03504944735311227,0.03504944735311227,0.0447934845840605,0.05031995346131472,0.056282722513089,0.04348458406050029,0.06995346131471786,0.04828388598022106,0.06762652705061083,0.04610238510762071,0.06093659104130308,0.06253635834787667,0.06762652705061083,0.04741128563118092,0.06849912739965096,0.0504653868528214,0.04464805119255381,0.05890052356020942,0.0462478184991274],[0.6218731820826061,0.622454915648633,0.6465968586387435,0.6697207678883071,0.691826643397324,0.7052065154159395,0.9128853984874927,0.875,0.7450980392156863,0.6862745098039216,0.7058823529411765,0.8137254901960784,0.8235294117647058,0.7352941176470589,0.7647058823529411,0.8823529411764706,0.803921568627451,0.9313725490196079,0.6607142857142857,0.6607142857142857,0.6875,0.6607142857142857,0.6607142857142857,0.8035714285714286,0.8928571428571429,0.7214285714285714,0.6785714285714286,0.8357142857142857,0.7285714285714285,0.7,0.7428571428571429,0.7785714285714286,0.7714285714285715,0.9071428571428571,0.6818181818181818,0.6534090909090909,0.6534090909090909,0.6193181818181818,0.6022727272727273,0.7386363636363636,0.8522727272727273,0.6089108910891089,0.7326732673267327,0.7029702970297029,0.6732673267326733,0.698019801980198,0.6386138613861386,0.9603960396039604,0.7673267326732673,0.9356435643564357,0.7772277227722773,0.8118811881188119,0.7772277227722773,0.9405940594059405,0.7227722772277227,0.9455445544554455,0.6528925619834711,0.7561983471074381,0.8553719008264463,0.8264462809917356,0.6694214876033058,0.6115702479338843,0.8471074380165289,0.8760330578512396,0.66796875,0.70703125,0.7265625,0.71875,0.70703125,0.765625,0.7578125,0.73046875,0.9453125,0.7150395778364116,0.6781002638522428,0.6701846965699209,0.6253298153034301,0.6437994722955145,0.7229551451187335,0.8664987405541562,0.6750629722921915,0.6070528967254408,0.6070528967254408,0.7758186397984886,0.871536523929471,0.7930327868852459,0.6127049180327869,0.985655737704918,0.680327868852459,0.9528688524590164,0.6495901639344263,0.8586065573770492,0.8811475409836066,0.9528688524590164,0.6680327868852459,0.9651639344262295,0.6884920634920635,0.6091269841269841,0.8035714285714286,0.6309523809523809],[1,1,1,1,1,1,1,0.01279813845258872,0.01483420593368237,0.01483420593368237,0.01483420593368237,0.01483420593368237,0.01483420593368237,0.01483420593368237,0.01483420593368237,0.01483420593368237,0.01483420593368237,0.01483420593368237,0.01628853984874927,0.01628853984874927,0.01628853984874927,0.01628853984874927,0.01628853984874927,0.01628853984874927,0.01628853984874927,0.02036067481093659,0.02036067481093659,0.02036067481093659,0.02036067481093659,0.02036067481093659,0.02036067481093659,0.02036067481093659,0.02036067481093659,0.02036067481093659,0.02559627690517743,0.02559627690517743,0.02559627690517743,0.02559627690517743,0.02559627690517743,0.02559627690517743,0.02559627690517743,0.02937754508435137,0.02937754508435137,0.02937754508435137,0.02937754508435136,0.02937754508435137,0.02937754508435137,0.02937754508435137,0.02937754508435137,0.02937754508435137,0.02937754508435137,0.02937754508435137,0.02937754508435137,0.02937754508435137,0.02937754508435137,0.02937754508435137,0.03519488074461896,0.03519488074461896,0.03519488074461896,0.03519488074461896,0.03519488074461897,0.03519488074461897,0.03519488074461897,0.03519488074461897,0.03723094822571262,0.03723094822571262,0.03723094822571262,0.03723094822571262,0.03723094822571262,0.03723094822571262,0.03723094822571262,0.03723094822571262,0.03723094822571262,0.05511925538103549,0.05511925538103548,0.05511925538103549,0.05511925538103548,0.05511925538103549,0.05511925538103549,0.0577370564281559,0.0577370564281559,0.0577370564281559,0.0577370564281559,0.05773705642815591,0.0577370564281559,0.07097149505526468,0.07097149505526469,0.07097149505526469,0.07097149505526469,0.07097149505526469,0.07097149505526468,0.07097149505526469,0.07097149505526469,0.07097149505526469,0.07097149505526468,0.07097149505526469,0.07329842931937172,0.07329842931937174,0.07329842931937172,0.07329842931937174],[1,1,1,1,1,1,1,0.9584992830970208,1.982698961937716,1.655146800916087,1.274257563356138,1.308507125956089,1.323034634414513,1.137175517980472,1.141827936386281,1.275396010832334,1.139980347676295,1.02025133775033,1.128713398402839,1.104295437183138,1.104497663551402,1.021833429728167,0.9550286795399261,1.139483840556227,0.9780604929561438,2.041375661375661,1.618965004461188,1.873613116586706,1.244635314995563,1.125631431244153,1.193431241655541,1.125385146701102,1.093904486933978,0.993709460843442,1.164765669113495,1.092085782472268,1.049729184367035,0.957811924917188,0.8705543983029794,1.047404338289057,0.9336031978217736,1.488400741958305,1.251642580407109,1.174920700626212,1.08163227537707,0.9898090654600622,1.699345553750421,2.316269087448906,1.385176847955208,1.504556863544166,1.248649023780883,1.25562191846715,1.160525042732286,1.359580566002785,1.024908677710419,1.035775745807813,1.595908018556113,1.291831014834967,1.429639569781878,1.327720707499807,1.035299628601064,0.8839934884997662,1.201218961394443,0.9596309233368048,1.593668676266482,1.207837732919255,1.214351908118619,1.155782273152479,1.135875438084112,1.143200325732899,1.095379178053395,1.035822463394514,1.035521546917317,1.221518543404513,1.136669286749883,1.120123960528628,1.004618647202427,0.9129233185200984,0.79194512949441,6.824794203952323,1.1532255894363,1.017575747899593,1.014607612514373,1.246385272722992,1.23585999969871,2.11025288027204,1.588596914175506,2.377190056983169,1.140403321850197,1.532255900259167,1.043593917573158,1.327885445012278,1.31569391787259,1.377323151042295,0.9472867483239742,1.057267359107018,4.64124649859944,1.620881247235736,2.08346800258565,1.521721701658566],[4276,4280,4446,4605,4757,4849,6277,77,76,70,72,83,84,75,78,90,82,95,74,74,77,74,74,90,100,101,95,117,102,98,104,109,108,127,120,115,115,109,106,130,150,123,148,142,136,141,129,194,155,189,157,164,157,190,146,191,158,183,207,200,162,148,205,212,171,181,186,184,181,196,194,187,242,271,257,254,237,244,274,344,268,241,241,308,346,387,299,481,332,465,317,419,430,465,326,471,347,307,405,318]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>LHS<\/th>\n      <th>RHS<\/th>\n      <th>support<\/th>\n      <th>confidence<\/th>\n      <th>coverage<\/th>\n      <th>lift<\/th>\n      <th>count<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"targets":3,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 3, 3, \",\", \".\", null);\n  }"},{"targets":4,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 3, 3, \",\", \".\", null);\n  }"},{"targets":5,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 3, 3, \",\", \".\", null);\n  }"},{"targets":6,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 3, 3, \",\", \".\", null);\n  }"},{"targets":7,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 3, 3, \",\", \".\", null);\n  }"},{"className":"dt-right","targets":[3,4,5,6,7]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"LHS","targets":1},{"name":"RHS","targets":2},{"name":"support","targets":3},{"name":"confidence","targets":4},{"name":"coverage","targets":5},{"name":"lift","targets":6},{"name":"count","targets":7}],"order":[],"autoWidth":false,"orderClasses":false,"orderCellsTop":true}},"evals":["options.columnDefs.0.render","options.columnDefs.1.render","options.columnDefs.2.render","options.columnDefs.3.render","options.columnDefs.4.render"],"jsHooks":[]}</script>
+<p>The <code>subset()</code> command is useful for filtering things down somewhat. We can
+use the <code>%in%</code>, <code>%ain%</code>, and <code>%pin%</code> operators to filter what appears on
+the lhs or rhs of the rules. The <code>%in%</code> operator matches any of the
+following complete strings, the <code>%ain%</code> operator matches all of the
+strings, and <code>%pin%</code> partially matches any of the following strings. Let
+us start by finding rules that associate with high income, with moderate
+lift.</p>
+<div class="sourceCode" id="cb324"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb324-1"><a href="association-rule-mining.html#cb324-1" tabindex="-1"></a>high_income <span class="ot">&lt;-</span> rules <span class="sc">|&gt;</span></span>
+<span id="cb324-2"><a href="association-rule-mining.html#cb324-2" tabindex="-1"></a>  <span class="fu">subset</span>(rhs <span class="sc">%in%</span> <span class="st">&quot;income=$40,000+&quot;</span> <span class="sc">&amp;</span> lift <span class="sc">&gt;</span> <span class="fl">1.2</span>)</span>
+<span id="cb324-3"><a href="association-rule-mining.html#cb324-3" tabindex="-1"></a>high_income <span class="sc">|&gt;</span></span>
+<span id="cb324-4"><a href="association-rule-mining.html#cb324-4" tabindex="-1"></a>  <span class="fu">sort</span>(<span class="at">by=</span><span class="st">&quot;confidence&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb324-5"><a href="association-rule-mining.html#cb324-5" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n=</span><span class="dv">3</span>) <span class="sc">|&gt;</span></span>
+<span id="cb324-6"><a href="association-rule-mining.html#cb324-6" tabindex="-1"></a>  <span class="fu">inspect</span>()</span></code></pre></div>
+<pre><code>#&gt;     lhs                                      rhs                  support confidence   coverage     lift count
+#&gt; [1] {education=college graduate,                                                                              
+#&gt;      years in bay area=1-9,                                                                                   
+#&gt;      dual incomes=yes,                                                                                        
+#&gt;      number of children=0,                                                                                    
+#&gt;      householder status=own,                                                                                  
+#&gt;      language in home=english}            =&gt; {income=$40,000+} 0.01308901  0.9782609 0.01337987 2.591110    90
+#&gt; [2] {sex=male,                                                                                                
+#&gt;      age=35+,                                                                                                 
+#&gt;      education=college graduate,                                                                              
+#&gt;      occupation=professional/managerial,                                                                      
+#&gt;      dual incomes=yes,                                                                                        
+#&gt;      number of children=0,                                                                                    
+#&gt;      householder status=own}              =&gt; {income=$40,000+} 0.01265271  0.9775281 0.01294357 2.589169    87
+#&gt; [3] {marital status=married,                                                                                  
+#&gt;      education=college graduate,                                                                              
+#&gt;      years in bay area=1-9,                                                                                   
+#&gt;      dual incomes=yes,                                                                                        
+#&gt;      number of children=0,                                                                                    
+#&gt;      householder status=own,                                                                                  
+#&gt;      language in home=english}            =&gt; {income=$40,000+} 0.01265271  0.9775281 0.01294357 2.589169    87</code></pre>
+<p>This suggests that a college graduate in a household with two incomes
+that own their home is likely to have a high household income, as one
+would expect. A little more interesting is the association with no
+children. Let us look at a different measure of wealth, home ownership.
+Obviously home ownership will be associated with high household income,
+but what about home ownership by those that aren’t earning a high annual
+income?</p>
+<div class="sourceCode" id="cb326"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb326-1"><a href="association-rule-mining.html#cb326-1" tabindex="-1"></a>home_own <span class="ot">&lt;-</span> rules <span class="sc">|&gt;</span></span>
+<span id="cb326-2"><a href="association-rule-mining.html#cb326-2" tabindex="-1"></a>  <span class="fu">subset</span>(lhs <span class="sc">%in%</span> <span class="st">&quot;income=$0-$40,000&quot;</span> <span class="sc">&amp;</span> </span>
+<span id="cb326-3"><a href="association-rule-mining.html#cb326-3" tabindex="-1"></a>         rhs <span class="sc">%in%</span> <span class="st">&quot;householder status=own&quot;</span> <span class="sc">&amp;</span></span>
+<span id="cb326-4"><a href="association-rule-mining.html#cb326-4" tabindex="-1"></a>         lift <span class="sc">&gt;</span> <span class="fl">1.2</span>)</span>
+<span id="cb326-5"><a href="association-rule-mining.html#cb326-5" tabindex="-1"></a>home_own <span class="sc">|&gt;</span></span>
+<span id="cb326-6"><a href="association-rule-mining.html#cb326-6" tabindex="-1"></a>  <span class="fu">sort</span>(<span class="at">by=</span><span class="st">&quot;confidence&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb326-7"><a href="association-rule-mining.html#cb326-7" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n=</span><span class="dv">2</span>) <span class="sc">|&gt;</span></span>
+<span id="cb326-8"><a href="association-rule-mining.html#cb326-8" tabindex="-1"></a>  <span class="fu">inspect</span>()</span></code></pre></div>
+<pre><code>#&gt;     lhs                               rhs                         support confidence   coverage     lift count
+#&gt; [1] {income=$0-$40,000,                                                                                       
+#&gt;      sex=female,                                                                                              
+#&gt;      marital status=married,                                                                                  
+#&gt;      age=35+,                                                                                                 
+#&gt;      dual incomes=no,                                                                                         
+#&gt;      number of children=0,                                                                                    
+#&gt;      type of home=house,                                                                                      
+#&gt;      ethnic classification=white}  =&gt; {householder status=own} 0.01163467  0.9756098 0.01192554 2.596088    80
+#&gt; [2] {income=$0-$40,000,                                                                                       
+#&gt;      sex=female,                                                                                              
+#&gt;      marital status=married,                                                                                  
+#&gt;      age=35+,                                                                                                 
+#&gt;      dual incomes=no,                                                                                         
+#&gt;      number of children=0,                                                                                    
+#&gt;      type of home=house,                                                                                      
+#&gt;      ethnic classification=white,                                                                             
+#&gt;      language in home=english}     =&gt; {householder status=own} 0.01163467  0.9756098 0.01192554 2.596088    80</code></pre>
+<p>The recurring theme in these rules are older people in a single-income
+household with no children. Finally, we look at one of the variables not
+present in Figure <a href="association-rule-mining.html#fig:income1">8.1</a>, i.e. one of those variables that is rare in the
+dataset: whether the person had answered the question regarding how long
+they’d resided in the San Francisco bay area.</p>
+<div class="sourceCode" id="cb328"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb328-1"><a href="association-rule-mining.html#cb328-1" tabindex="-1"></a>new_to_bay <span class="ot">&lt;-</span> rules <span class="sc">|&gt;</span></span>
+<span id="cb328-2"><a href="association-rule-mining.html#cb328-2" tabindex="-1"></a>  <span class="fu">subset</span>(rhs <span class="sc">%in%</span> <span class="st">&quot;years in bay area=1-9&quot;</span> <span class="sc">&amp;</span></span>
+<span id="cb328-3"><a href="association-rule-mining.html#cb328-3" tabindex="-1"></a>         lift <span class="sc">&gt;</span> <span class="fl">1.2</span>)</span>
+<span id="cb328-4"><a href="association-rule-mining.html#cb328-4" tabindex="-1"></a>new_to_bay <span class="sc">|&gt;</span></span>
+<span id="cb328-5"><a href="association-rule-mining.html#cb328-5" tabindex="-1"></a>  <span class="fu">sort</span>(<span class="at">by=</span><span class="st">&quot;lift&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb328-6"><a href="association-rule-mining.html#cb328-6" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n=</span><span class="dv">5</span>) <span class="sc">|&gt;</span></span>
+<span id="cb328-7"><a href="association-rule-mining.html#cb328-7" tabindex="-1"></a>  <span class="fu">inspect</span>()</span></code></pre></div>
+<pre><code>#&gt;     lhs                                 rhs                        support confidence   coverage     lift count
+#&gt; [1] {education=no college graduate,                                                                            
+#&gt;      occupation=military,                                                                                      
+#&gt;      number in household=1}          =&gt; {years in bay area=1-9} 0.01032577  0.8452381 0.01221640 2.391711    71
+#&gt; [2] {occupation=military,                                                                                      
+#&gt;      householder status=rent,                                                                                  
+#&gt;      language in home=english}       =&gt; {years in bay area=1-9} 0.01018034  0.8139535 0.01250727 2.303187    70
+#&gt; [3] {occupation=military,                                                                                      
+#&gt;      householder status=rent}        =&gt; {years in bay area=1-9} 0.01105294  0.8000000 0.01381617 2.263704    76
+#&gt; [4] {income=$0-$40,000,                                                                                        
+#&gt;      sex=male,                                                                                                 
+#&gt;      occupation=military}            =&gt; {years in bay area=1-9} 0.01003490  0.7931034 0.01265271 2.244189    69
+#&gt; [5] {income=$0-$40,000,                                                                                        
+#&gt;      age=14-34,                                                                                                
+#&gt;      occupation=military}            =&gt; {years in bay area=1-9} 0.01003490  0.7931034 0.01265271 2.244189    69</code></pre>
+<p>With small numbers, one shouldn’t read too much into this, but it is
+interesting that the military occupation comes up in the top 5
+association rules.</p>
+</div>
+<div class="example">
+<p><span id="exm:unlabeled-div-55" class="example"><strong>Example 8.3  </strong></span><strong>Recipe ingredients and recommendation-style rules</strong></p>
+<p>The lecture used a TidyTuesday dataset of recipes grouped by cuisine.
+Each recipe may be treated as a transaction and each ingredient as an
+item. After some string cleaning of the <code>ingredients</code> variable, the data
+may be converted to a <code>transactions</code> object and mined in exactly the
+same way as any supermarket basket dataset:</p>
+<div class="sourceCode" id="cb330"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb330-1"><a href="association-rule-mining.html#cb330-1" tabindex="-1"></a><span class="fu">library</span>(arules)</span>
+<span id="cb330-2"><a href="association-rule-mining.html#cb330-2" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb330-3"><a href="association-rule-mining.html#cb330-3" tabindex="-1"></a></span>
+<span id="cb330-4"><a href="association-rule-mining.html#cb330-4" tabindex="-1"></a>cuisines_raw <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
+<span id="cb330-5"><a href="association-rule-mining.html#cb330-5" tabindex="-1"></a>  <span class="st">&quot;https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-09-16/cuisines.csv&quot;</span>,</span>
+<span id="cb330-6"><a href="association-rule-mining.html#cb330-6" tabindex="-1"></a>  <span class="at">show_col_types =</span> <span class="cn">FALSE</span></span>
+<span id="cb330-7"><a href="association-rule-mining.html#cb330-7" tabindex="-1"></a>)</span>
+<span id="cb330-8"><a href="association-rule-mining.html#cb330-8" tabindex="-1"></a></span>
+<span id="cb330-9"><a href="association-rule-mining.html#cb330-9" tabindex="-1"></a>recipe_trans <span class="ot">&lt;-</span> cuisines_raw <span class="sc">|&gt;</span></span>
+<span id="cb330-10"><a href="association-rule-mining.html#cb330-10" tabindex="-1"></a>  ... <span class="co"># clean ingredients, keep one ingredient per row</span></span>
+<span id="cb330-11"><a href="association-rule-mining.html#cb330-11" tabindex="-1"></a>  <span class="fu">as</span>(<span class="st">&quot;transactions&quot;</span>)</span>
+<span id="cb330-12"><a href="association-rule-mining.html#cb330-12" tabindex="-1"></a></span>
+<span id="cb330-13"><a href="association-rule-mining.html#cb330-13" tabindex="-1"></a>recipe_rules <span class="ot">&lt;-</span> recipe_trans <span class="sc">|&gt;</span></span>
+<span id="cb330-14"><a href="association-rule-mining.html#cb330-14" tabindex="-1"></a>  <span class="fu">apriori</span>(<span class="at">parameter =</span> <span class="fu">list</span>(<span class="at">support =</span> <span class="fl">0.05</span>, <span class="at">confidence =</span> <span class="fl">0.4</span>,</span>
+<span id="cb330-15"><a href="association-rule-mining.html#cb330-15" tabindex="-1"></a>                           <span class="at">minlen =</span> <span class="dv">2</span>, <span class="at">maxlen =</span> <span class="dv">4</span>))</span>
+<span id="cb330-16"><a href="association-rule-mining.html#cb330-16" tabindex="-1"></a></span>
+<span id="cb330-17"><a href="association-rule-mining.html#cb330-17" tabindex="-1"></a>recipe_rules <span class="sc">|&gt;</span></span>
+<span id="cb330-18"><a href="association-rule-mining.html#cb330-18" tabindex="-1"></a>  <span class="fu">subset</span>(lhs <span class="sc">%in%</span> <span class="st">&quot;garlic&quot;</span> <span class="sc">&amp;</span> lift <span class="sc">&gt;</span> <span class="fl">1.1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb330-19"><a href="association-rule-mining.html#cb330-19" tabindex="-1"></a>  <span class="fu">sort</span>(<span class="at">by =</span> <span class="st">&quot;lift&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb330-20"><a href="association-rule-mining.html#cb330-20" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
+<span id="cb330-21"><a href="association-rule-mining.html#cb330-21" tabindex="-1"></a>  <span class="fu">inspect</span>()</span></code></pre></div>
+<p>The same interpretive issues arise as before. Ingredients that appear in
+many cuisines may lead to high-confidence but uninteresting rules,
+whereas large lift values tend to indicate more distinctive cuisine or
+technique pairings. This is very close in spirit to the recommender
+system statement “users who selected <span class="math inline">\(A\)</span> also selected <span class="math inline">\(B\)</span>”.</p>
+</div>
+</div>
+<div id="sec:association-fit" class="section level2 hasAnchor" number="8.6">
+<h2><span class="header-section-number">8.6</span> Where association rules fit<a href="association-rule-mining.html#sec:association-fit" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Association rule mining sits naturally beside several other topics in
+data mining and statistics.</p>
+<ul>
+<li><p>Confidence is simply an estimate of the conditional probability
+<span class="math inline">\(P(B|A)\)</span>.</p></li>
+<li><p>Lift compares <span class="math inline">\(P(B|A)\)</span> with the marginal probability <span class="math inline">\(P(B)\)</span>, so it
+acts as a measure of departure from independence.</p></li>
+<li><p>Unlike clustering, which groups observations, association rule
+mining studies co-occurrence patterns among the variables or items.</p></li>
+<li><p>Unlike classification, there is no designated target variable and no
+claim of causation. The rules are descriptive rather than
+predictive in the usual supervised-learning sense.</p></li>
+<li><p>In recommender systems, market basket analysis provides the basic
+intuition behind statements such as “customers who bought <span class="math inline">\(A\)</span> also
+bought <span class="math inline">\(B\)</span>”.</p></li>
+</ul>
+</div>
+<div id="summary-5" class="section level2 hasAnchor" number="8.7">
+<h2><span class="header-section-number">8.7</span> Summary<a href="association-rule-mining.html#summary-5" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Association rule mining is designed for sparse transactional or
+categorical data where co-occurrence is the main object of interest.</p>
+<ul>
+<li><p>Support controls how common an itemset is, confidence estimates a
+conditional probability, and lift compares that probability with a
+baseline of independence.</p></li>
+<li><p>The Apriori principle makes the search over large itemsets feasible,
+while filtering and visualisation help us focus on rules that are
+both strong and interesting.</p></li>
+<li><p>Association rules are descriptive rather than causal. Their value is
+usually in summarising behaviour, supporting recommendation, or
+surfacing patterns worth following up.</p></li>
+</ul>
+<p>Looking ahead, Section <a href="sec:ensemble.html#sec:ensemble">9</a> returns to supervised
+learning and shows how multiple models can be combined to improve
+prediction and classification performance.</p>
+
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol start="65">
+<li id="fn65"><p>or, for the paranoid, a more complete profile of each user.<a href="association-rule-mining.html#fnref65" class="footnote-back">↩︎</a></p></li>
+<li id="fn66"><p>Note, however, that we may also be filtering out useful
+information here, so an alternate might be to drop superfluous items
+instead<a href="association-rule-mining.html#fnref66" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="cluster-analysis.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="sec:ensemble.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": "https://github.com/jmarshallnz/161324/edit/main/notes/08-associationrules.Rmd",
+    "text": "Edit"
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": ["_main.pdf", "_main.epub"],
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

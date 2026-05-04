@@ -17,7 +17,7 @@ library(arules)
 
 theme_set(theme_minimal())
 
-load_tidytuesday_dataset <- function(tt_date, dataset_name, parquet_url) {
+load_tidytuesday_dataset <- function(tt_date, dataset_name, backup_url) {
   if (requireNamespace("tidytuesdayR", quietly = TRUE)) {
     tt_data <- tryCatch(
       suppressMessages(tidytuesdayR::tt_load(tt_date)),
@@ -31,29 +31,19 @@ load_tidytuesday_dataset <- function(tt_date, dataset_name, parquet_url) {
     }
   }
 
-  if (!requireNamespace("arrow", quietly = TRUE)) {
-    stop(
-      "Install the 'tidytuesdayR' package (RStudio will usually prompt you), ",
-      "or install 'arrow' to use the backup data file.",
-      call. = FALSE
-    )
-  }
-
-  parquet_file <- tempfile(fileext = ".parquet")
-  on.exit(unlink(parquet_file), add = TRUE)
-  download_status <- tryCatch(
-    utils::download.file(parquet_url, parquet_file, mode = "wb", quiet = TRUE),
-    error = function(e) 1L
+  backup <- tryCatch(
+    readr::read_csv(backup_url, show_col_types = FALSE),
+    error = function(e) NULL
   )
 
-  if (!identical(download_status, 0L) || !file.exists(parquet_file)) {
-    stop(
-      "Could not load the dataset from TidyTuesday or the course backup file.",
-      call. = FALSE
-    )
+  if (!is.null(backup)) {
+    return(backup |> tibble::as_tibble())
   }
 
-  arrow::read_parquet(parquet_file) |> tibble::as_tibble()
+  stop(
+    "Could not load the dataset from TidyTuesday or the course backup CSV file.",
+    call. = FALSE
+  )
 }
 
 compose_ggplot <- function(plot, ...) {
@@ -73,7 +63,7 @@ compose_ggplot <- function(plot, ...) {
 cuisines_raw <- load_tidytuesday_dataset(
   tt_date = "2025-09-16",
   dataset_name = "cuisines",
-  parquet_url = "https://knowlton.co.nz/161324/data/cuisines.parquet"
+  backup_url = "https://knowlton.co.nz/161324/data/cuisines.csv.gz"
 )
 
 cuisines_raw |> glimpse()

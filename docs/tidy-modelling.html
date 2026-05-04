@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 5 Tidy modelling | Data mining</title>
+  <meta name="description" content="Chapter 5 Tidy modelling | Data mining notes" />
+  <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 5 Tidy modelling | Data mining" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="Chapter 5 Tidy modelling | Data mining notes" />
+  <meta name="github-repo" content="jmarshallnz/161324" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 5 Tidy modelling | Data mining" />
+  
+  <meta name="twitter:description" content="Chapter 5 Tidy modelling | Data mining notes" />
+  
+
+<meta name="author" content="Jonathan Marshall, Martin Hazelton, Nick Knowlton" />
+
+
+<meta name="date" content="2026-05-03" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="prediction.html"/>
+<link rel="next" href="classification.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet" />
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="libs/datatables-binding-0.34.0/datatables.js"></script>
+<link href="libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+<link href="libs/nouislider-7.0.10/jquery.nouislider.min.css" rel="stylesheet" />
+<script src="libs/nouislider-7.0.10/jquery.nouislider.min.js"></script>
+<link href="libs/selectize-0.12.0/selectize.bootstrap3.css" rel="stylesheet" />
+<script src="libs/selectize-0.12.0/selectize.min.js"></script>
+<link href="libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+
+
+<style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">161.324 Data Mining</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="introduction.html"><a href="introduction.html#sec:intro1"><i class="fa fa-check"></i><b>1.1</b> What is Data Mining?</a></li>
+<li class="chapter" data-level="1.2" data-path="introduction.html"><a href="introduction.html#sec:Rinitial"><i class="fa fa-check"></i><b>1.2</b> Statistical Computing with R</a></li>
+<li class="chapter" data-level="1.3" data-path="introduction.html"><a href="introduction.html#the-tidyverse"><i class="fa fa-check"></i><b>1.3</b> The tidyverse</a></li>
+<li class="chapter" data-level="1.4" data-path="introduction.html"><a href="introduction.html#sec:notes-roadmap"><i class="fa fa-check"></i><b>1.4</b> A roadmap for these notes</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="introduction.html"><a href="introduction.html#sec:task-compare"><i class="fa fa-check"></i><b>1.4.1</b> Comparing the main task families</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html"><i class="fa fa-check"></i><b>2</b> Data Acquisition and Processing</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#obtaining-data"><i class="fa fa-check"></i><b>2.1</b> Obtaining Data</a></li>
+<li class="chapter" data-level="2.2" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#sec:dataload"><i class="fa fa-check"></i><b>2.2</b> Loading Data into R</a></li>
+<li class="chapter" data-level="2.3" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#organizing-the-data-in-r"><i class="fa fa-check"></i><b>2.3</b> Organizing the Data in R</a></li>
+<li class="chapter" data-level="2.4" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#sec:missing1"><i class="fa fa-check"></i><b>2.4</b> Missing Values</a></li>
+<li class="chapter" data-level="2.5" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#summary"><i class="fa fa-check"></i><b>2.5</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>3</b> Missing values</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="missing-values.html"><a href="missing-values.html#sec:missing"><i class="fa fa-check"></i><b>3.1</b> Patterns of Missingness</a></li>
+<li class="chapter" data-level="3.2" data-path="missing-values.html"><a href="missing-values.html#visualising-missing-values"><i class="fa fa-check"></i><b>3.2</b> Visualising missing values</a></li>
+<li class="chapter" data-level="3.3" data-path="missing-values.html"><a href="missing-values.html#working-with-complete-cases"><i class="fa fa-check"></i><b>3.3</b> Working with Complete Cases</a></li>
+<li class="chapter" data-level="3.4" data-path="missing-values.html"><a href="missing-values.html#sec:imputation"><i class="fa fa-check"></i><b>3.4</b> Missing Data Imputation</a></li>
+<li class="chapter" data-level="3.5" data-path="missing-values.html"><a href="missing-values.html#alternative-methods-of-imputation"><i class="fa fa-check"></i><b>3.5</b> Alternative Methods of Imputation</a></li>
+<li class="chapter" data-level="3.6" data-path="missing-values.html"><a href="missing-values.html#summary-1"><i class="fa fa-check"></i><b>3.6</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="prediction.html"><a href="prediction.html"><i class="fa fa-check"></i><b>4</b> Prediction</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="prediction.html"><a href="prediction.html#prediction-classification-and-clustering"><i class="fa fa-check"></i><b>4.1</b> Prediction, Classification and Clustering</a></li>
+<li class="chapter" data-level="4.2" data-path="prediction.html"><a href="prediction.html#sec:predictionbasics"><i class="fa fa-check"></i><b>4.2</b> The Basics of Prediction</a></li>
+<li class="chapter" data-level="4.3" data-path="prediction.html"><a href="prediction.html#sec:regress"><i class="fa fa-check"></i><b>4.3</b> Linear Regression for Prediction</a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="prediction.html"><a href="prediction.html#data-structures-and-notation"><i class="fa fa-check"></i><b>4.3.1</b> Data Structures and Notation</a></li>
+<li class="chapter" data-level="4.3.2" data-path="prediction.html"><a href="prediction.html#the-linear-regression-model"><i class="fa fa-check"></i><b>4.3.2</b> The Linear Regression Model</a></li>
+<li class="chapter" data-level="4.3.3" data-path="prediction.html"><a href="prediction.html#fitting-linear-regression-models"><i class="fa fa-check"></i><b>4.3.3</b> Fitting Linear Regression Models</a></li>
+<li class="chapter" data-level="4.3.4" data-path="prediction.html"><a href="prediction.html#prediction-1"><i class="fa fa-check"></i><b>4.3.4</b> Prediction</a></li>
+<li class="chapter" data-level="4.3.5" data-path="prediction.html"><a href="prediction.html#prediction-accuracy-and-the-bias-variance-trade-off"><i class="fa fa-check"></i><b>4.3.5</b> Prediction Accuracy and the Bias-Variance Trade-Off</a></li>
+<li class="chapter" data-level="4.3.6" data-path="prediction.html"><a href="prediction.html#model-selection"><i class="fa fa-check"></i><b>4.3.6</b> Model Selection</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="prediction.html"><a href="prediction.html#sec:regtree"><i class="fa fa-check"></i><b>4.4</b> Regression Trees</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="prediction.html"><a href="prediction.html#sec:introtree"><i class="fa fa-check"></i><b>4.4.1</b> Introduction to Regression Trees</a></li>
+<li class="chapter" data-level="4.4.2" data-path="prediction.html"><a href="prediction.html#how-to-grow-a-tree"><i class="fa fa-check"></i><b>4.4.2</b> How to Grow a Tree</a></li>
+<li class="chapter" data-level="4.4.3" data-path="prediction.html"><a href="prediction.html#implementing-regression-trees-in-r"><i class="fa fa-check"></i><b>4.4.3</b> Implementing Regression Trees in R</a></li>
+<li class="chapter" data-level="4.4.4" data-path="prediction.html"><a href="prediction.html#sec:treeprune"><i class="fa fa-check"></i><b>4.4.4</b> Pruning</a></li>
+<li class="chapter" data-level="4.4.5" data-path="prediction.html"><a href="prediction.html#sec:validation"><i class="fa fa-check"></i><b>4.4.5</b> Validation and Cross-Validation</a></li>
+<li class="chapter" data-level="4.4.6" data-path="prediction.html"><a href="prediction.html#sec:treeinstability"><i class="fa fa-check"></i><b>4.4.6</b> Tree instability</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="prediction.html"><a href="prediction.html#sec:randomforest"><i class="fa fa-check"></i><b>4.5</b> Random forests</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="prediction.html"><a href="prediction.html#implementation-in-r"><i class="fa fa-check"></i><b>4.5.1</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="prediction.html"><a href="prediction.html#sec:neuralnet"><i class="fa fa-check"></i><b>4.6</b> Neural Networks</a>
+<ul>
+<li class="chapter" data-level="4.6.1" data-path="prediction.html"><a href="prediction.html#an-introduction-to-neural-networks"><i class="fa fa-check"></i><b>4.6.1</b> An Introduction to Neural Networks</a></li>
+<li class="chapter" data-level="4.6.2" data-path="prediction.html"><a href="prediction.html#building-a-neural-network"><i class="fa fa-check"></i><b>4.6.2</b> Building a Neural Network</a></li>
+<li class="chapter" data-level="4.6.3" data-path="prediction.html"><a href="prediction.html#prediction-using-neural-networks-in-r"><i class="fa fa-check"></i><b>4.6.3</b> Prediction Using Neural Networks in R</a></li>
+</ul></li>
+<li class="chapter" data-level="4.7" data-path="prediction.html"><a href="prediction.html#summary-of-prediction-methods"><i class="fa fa-check"></i><b>4.7</b> Summary of Prediction Methods</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="tidy-modelling.html"><a href="tidy-modelling.html"><i class="fa fa-check"></i><b>5</b> Tidy modelling</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="tidy-modelling.html"><a href="tidy-modelling.html#splitting-and-resampling-data"><i class="fa fa-check"></i><b>5.1</b> Splitting and resampling data</a></li>
+<li class="chapter" data-level="5.2" data-path="tidy-modelling.html"><a href="tidy-modelling.html#data-processing-with-recipes"><i class="fa fa-check"></i><b>5.2</b> Data processing with recipes</a></li>
+<li class="chapter" data-level="5.3" data-path="tidy-modelling.html"><a href="tidy-modelling.html#modelling-with-parsnip"><i class="fa fa-check"></i><b>5.3</b> Modelling with parsnip</a></li>
+<li class="chapter" data-level="5.4" data-path="tidy-modelling.html"><a href="tidy-modelling.html#model-performance-with-yardstick"><i class="fa fa-check"></i><b>5.4</b> Model performance with yardstick</a></li>
+<li class="chapter" data-level="5.5" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-workflow"><i class="fa fa-check"></i><b>5.5</b> Workflows</a></li>
+<li class="chapter" data-level="5.6" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-resamples"><i class="fa fa-check"></i><b>5.6</b> Resampling with <code>fit_resamples()</code></a></li>
+<li class="chapter" data-level="5.7" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-tuning"><i class="fa fa-check"></i><b>5.7</b> Simple tuning with <code>tune_grid()</code></a></li>
+<li class="chapter" data-level="5.8" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-final"><i class="fa fa-check"></i><b>5.8</b> Final model fitting with <code>last_fit()</code></a></li>
+<li class="chapter" data-level="5.9" data-path="tidy-modelling.html"><a href="tidy-modelling.html#summary-2"><i class="fa fa-check"></i><b>5.9</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="classification.html"><a href="classification.html"><i class="fa fa-check"></i><b>6</b> Classification</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="classification.html"><a href="classification.html#introduction-to-classification"><i class="fa fa-check"></i><b>6.1</b> Introduction to Classification</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="classification.html"><a href="classification.html#statistical-theory-for-classification"><i class="fa fa-check"></i><b>6.1.1</b> Statistical Theory for Classification</a></li>
+<li class="chapter" data-level="6.1.2" data-path="classification.html"><a href="classification.html#misclassification-rates-and-confusion-matrices"><i class="fa fa-check"></i><b>6.1.2</b> Misclassification Rates and Confusion Matrices</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="classification.html"><a href="classification.html#sec:lda"><i class="fa fa-check"></i><b>6.2</b> Linear Discriminant Analysis</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="classification.html"><a href="classification.html#the-method-in-theory"><i class="fa fa-check"></i><b>6.2.1</b> The Method in Theory</a></li>
+<li class="chapter" data-level="6.2.2" data-path="classification.html"><a href="classification.html#implementation-in-r-1"><i class="fa fa-check"></i><b>6.2.2</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="classification.html"><a href="classification.html#sec:kda"><i class="fa fa-check"></i><b>6.3</b> Kernel Discriminant Analysis</a></li>
+<li class="chapter" data-level="6.4" data-path="classification.html"><a href="classification.html#sec:naive"><i class="fa fa-check"></i><b>6.4</b> Naive Bayes Classifiers</a></li>
+<li class="chapter" data-level="6.5" data-path="classification.html"><a href="classification.html#logistic-regression"><i class="fa fa-check"></i><b>6.5</b> Logistic regression</a>
+<ul>
+<li class="chapter" data-level="6.5.1" data-path="classification.html"><a href="classification.html#fitting-logistic-regression-models"><i class="fa fa-check"></i><b>6.5.1</b> Fitting Logistic Regression Models</a></li>
+<li class="chapter" data-level="6.5.2" data-path="classification.html"><a href="classification.html#logistic-regression-as-a-classifier"><i class="fa fa-check"></i><b>6.5.2</b> Logistic Regression as a classifier</a></li>
+<li class="chapter" data-level="6.5.3" data-path="classification.html"><a href="classification.html#sec:multinomial"><i class="fa fa-check"></i><b>6.5.3</b> Extending Logistic Regression to more than two classes</a></li>
+<li class="chapter" data-level="6.5.4" data-path="classification.html"><a href="classification.html#model-selection-1"><i class="fa fa-check"></i><b>6.5.4</b> Model selection</a></li>
+<li class="chapter" data-level="6.5.5" data-path="classification.html"><a href="classification.html#sec:roc"><i class="fa fa-check"></i><b>6.5.5</b> ROC curves and the classification threshold</a></li>
+</ul></li>
+<li class="chapter" data-level="6.6" data-path="classification.html"><a href="classification.html#other-methods-of-classification"><i class="fa fa-check"></i><b>6.6</b> Other Methods of Classification</a>
+<ul>
+<li class="chapter" data-level="6.6.1" data-path="classification.html"><a href="classification.html#k-nearest-neighbour-classification"><i class="fa fa-check"></i><b>6.6.1</b> k-Nearest Neighbour Classification</a></li>
+<li class="chapter" data-level="6.6.2" data-path="classification.html"><a href="classification.html#classification-trees"><i class="fa fa-check"></i><b>6.6.2</b> Classification Trees</a></li>
+<li class="chapter" data-level="6.6.3" data-path="classification.html"><a href="classification.html#random-forests-for-classification"><i class="fa fa-check"></i><b>6.6.3</b> Random Forests for Classification</a></li>
+<li class="chapter" data-level="6.6.4" data-path="classification.html"><a href="classification.html#neural-networks-for-classification"><i class="fa fa-check"></i><b>6.6.4</b> Neural Networks for Classification</a></li>
+</ul></li>
+<li class="chapter" data-level="6.7" data-path="classification.html"><a href="classification.html#sec:classimbalance"><i class="fa fa-check"></i><b>6.7</b> Dealing with Class Imbalance</a>
+<ul>
+<li class="chapter" data-level="6.7.1" data-path="classification.html"><a href="classification.html#resampling-strategies"><i class="fa fa-check"></i><b>6.7.1</b> Resampling strategies</a></li>
+<li class="chapter" data-level="6.7.2" data-path="classification.html"><a href="classification.html#sec:smote"><i class="fa fa-check"></i><b>6.7.2</b> SMOTE: synthetic minority oversampling</a></li>
+</ul></li>
+<li class="chapter" data-level="6.8" data-path="classification.html"><a href="classification.html#high-class-classifiers"><i class="fa fa-check"></i><b>6.8</b> High Class Classifiers</a></li>
+<li class="chapter" data-level="6.9" data-path="classification.html"><a href="classification.html#summary-3"><i class="fa fa-check"></i><b>6.9</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="cluster-analysis.html"><a href="cluster-analysis.html"><i class="fa fa-check"></i><b>7</b> Cluster Analysis</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#dissimilarity-matrices-for-multivariate-data"><i class="fa fa-check"></i><b>7.1</b> Dissimilarity Matrices for Multivariate Data</a></li>
+<li class="chapter" data-level="7.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering"><i class="fa fa-check"></i><b>7.2</b> Hierarchical Clustering</a></li>
+<li class="chapter" data-level="7.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means-clustering"><i class="fa fa-check"></i><b>7.3</b> K-means clustering</a></li>
+<li class="chapter" data-level="7.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-medoids-clustering"><i class="fa fa-check"></i><b>7.4</b> K-medoids clustering</a></li>
+<li class="chapter" data-level="7.5" data-path="cluster-analysis.html"><a href="cluster-analysis.html#silhouette-plots"><i class="fa fa-check"></i><b>7.5</b> Silhouette plots</a></li>
+<li class="chapter" data-level="7.6" data-path="cluster-analysis.html"><a href="cluster-analysis.html#bootstrap-stability-and-the-adjusted-rand-index"><i class="fa fa-check"></i><b>7.6</b> Bootstrap stability and the adjusted Rand index</a></li>
+<li class="chapter" data-level="7.7" data-path="cluster-analysis.html"><a href="cluster-analysis.html#density-based-clustering"><i class="fa fa-check"></i><b>7.7</b> Density-based clustering</a></li>
+<li class="chapter" data-level="7.8" data-path="cluster-analysis.html"><a href="cluster-analysis.html#choosing-varepsilon-using-a-k-distance-plot"><i class="fa fa-check"></i><b>7.8</b> Choosing <span class="math inline">\(\varepsilon\)</span> using a <span class="math inline">\(k\)</span>-distance plot</a></li>
+<li class="chapter" data-level="7.9" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hdbscan-and-umap"><i class="fa fa-check"></i><b>7.9</b> HDBSCAN and UMAP</a>
+<ul>
+<li class="chapter" data-level="7.9.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#sec:hdbscan"><i class="fa fa-check"></i><b>7.9.1</b> HDBSCAN</a></li>
+<li class="chapter" data-level="7.9.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#sec:umap"><i class="fa fa-check"></i><b>7.9.2</b> UMAP</a></li>
+<li class="chapter" data-level="7.9.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#sec:cluster-compare"><i class="fa fa-check"></i><b>7.9.3</b> Practical method comparison</a></li>
+</ul></li>
+<li class="chapter" data-level="7.10" data-path="cluster-analysis.html"><a href="cluster-analysis.html#summary-4"><i class="fa fa-check"></i><b>7.10</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="association-rule-mining.html"><a href="association-rule-mining.html"><i class="fa fa-check"></i><b>8</b> Association rule mining</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="association-rule-mining.html"><a href="association-rule-mining.html#transaction-data-as-a-binary-matrix"><i class="fa fa-check"></i><b>8.1</b> Transaction data as a binary matrix</a></li>
+<li class="chapter" data-level="8.2" data-path="association-rule-mining.html"><a href="association-rule-mining.html#the-apriori-principle"><i class="fa fa-check"></i><b>8.2</b> The Apriori principle</a></li>
+<li class="chapter" data-level="8.3" data-path="association-rule-mining.html"><a href="association-rule-mining.html#the-apriori-algorithm"><i class="fa fa-check"></i><b>8.3</b> The Apriori algorithm</a></li>
+<li class="chapter" data-level="8.4" data-path="association-rule-mining.html"><a href="association-rule-mining.html#apriori-and-eclat"><i class="fa fa-check"></i><b>8.4</b> Apriori and Eclat</a></li>
+<li class="chapter" data-level="8.5" data-path="association-rule-mining.html"><a href="association-rule-mining.html#inspecting-and-filtering-rules-in-arules"><i class="fa fa-check"></i><b>8.5</b> Inspecting and filtering rules in <code>arules</code></a></li>
+<li class="chapter" data-level="8.6" data-path="association-rule-mining.html"><a href="association-rule-mining.html#sec:association-fit"><i class="fa fa-check"></i><b>8.6</b> Where association rules fit</a></li>
+<li class="chapter" data-level="8.7" data-path="association-rule-mining.html"><a href="association-rule-mining.html#summary-5"><i class="fa fa-check"></i><b>8.7</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="sec:ensemble.html"><a href="sec:ensemble.html"><i class="fa fa-check"></i><b>9</b> Ensemble Learning</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:ensemble-motivation"><i class="fa fa-check"></i><b>9.1</b> Motivation: Why Combine Models?</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#the-variance-reduction-argument"><i class="fa fa-check"></i><b>9.1.1</b> The variance reduction argument</a></li>
+<li class="chapter" data-level="9.1.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#bias-vs-variance-in-ensembles"><i class="fa fa-check"></i><b>9.1.2</b> Bias vs variance in ensembles</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:bagging"><i class="fa fa-check"></i><b>9.2</b> Bagging</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#the-bootstrap-aggregating-algorithm"><i class="fa fa-check"></i><b>9.2.1</b> The bootstrap aggregating algorithm</a></li>
+<li class="chapter" data-level="9.2.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:oob"><i class="fa fa-check"></i><b>9.2.2</b> Out-of-bag error</a></li>
+<li class="chapter" data-level="9.2.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#implementation-in-r-2"><i class="fa fa-check"></i><b>9.2.3</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:ensemblerf"><i class="fa fa-check"></i><b>9.3</b> Random Forests</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:varimp"><i class="fa fa-check"></i><b>9.3.1</b> Variable importance</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:boosting"><i class="fa fa-check"></i><b>9.4</b> Boosting</a>
+<ul>
+<li class="chapter" data-level="9.4.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#forward-stagewise-additive-modelling"><i class="fa fa-check"></i><b>9.4.1</b> Forward stagewise additive modelling</a></li>
+<li class="chapter" data-level="9.4.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:gradboosting"><i class="fa fa-check"></i><b>9.4.2</b> Gradient boosting</a></li>
+<li class="chapter" data-level="9.4.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:xgboost"><i class="fa fa-check"></i><b>9.4.3</b> XGBoost: regularised gradient boosting</a></li>
+<li class="chapter" data-level="9.4.4" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:boost-r"><i class="fa fa-check"></i><b>9.4.4</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="9.5" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:stacking"><i class="fa fa-check"></i><b>9.5</b> Stacking</a>
+<ul>
+<li class="chapter" data-level="9.5.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#stacked-generalisation"><i class="fa fa-check"></i><b>9.5.1</b> Stacked generalisation</a></li>
+<li class="chapter" data-level="9.5.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:cv-meta"><i class="fa fa-check"></i><b>9.5.2</b> Cross-validated meta-features</a></li>
+<li class="chapter" data-level="9.5.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:stacking-r"><i class="fa fa-check"></i><b>9.5.3</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="9.6" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:automl"><i class="fa fa-check"></i><b>9.6</b> AutoML: Automated Model Selection</a></li>
+<li class="chapter" data-level="9.7" data-path="sec:ensemble.html"><a href="sec:ensemble.html#summary-6"><i class="fa fa-check"></i><b>9.7</b> Summary</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Data mining</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="tidy-modelling" class="section level1 hasAnchor" number="5">
+<h1><span class="header-section-number">Chapter 5</span> Tidy modelling<a href="tidy-modelling.html#tidy-modelling" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>The <a href="prediction.html#prediction">prediction chapter</a> has shown us how to fit and assess the performance
+of the <a href="prediction.html#sec:regress">linear model</a>, <a href="prediction.html#sec:regtree">regression trees</a>, <a href="prediction.html#sec:randomforest">random forests</a> and <a href="prediction.html#sec:neuralnet">neural networks</a>.</p>
+<p>In each case both the model fitting and obtaining predictions was consistent:</p>
+<ul>
+<li>We use a formula syntax to specify the model and provide the training data.</li>
+<li>We use the <code>predict</code> command on the resulting model object, providing testing data.</li>
+</ul>
+<p>This works well as long as all our models follow this same syntax. Unfortunately,
+many models require different syntaxes for one or both of these steps.</p>
+<p>In addition, there are often other things that we may want to do, such as
+processing the data beforehand (e.g. to scale predictors to a common scale or impute
+missing values). Any data transformation we perform on the training set will
+need to be replicated on the test set. Further, the tools we’ve used for
+summarising model performance (computing MSE via <code>dplyr::summarise()</code>) are metric-specific,
+and it would be nice to be able to easily switch to other metrics, or to compute
+many metrics at once (e.g. the mean absolute error, or root mean squared error).</p>
+<p>The <code>tidymodels</code> set of packages is designed for modelling in a consistent and tidy
+fashion. The idea is that it abstracts the specific syntaxes for
+fitting different models and provides a common interface that generally works across
+a wide range of model types. It also has packages for data processing and model
+evaluation, among other things.</p>
+<p>We will begin with the core pieces of the framework and then extend them
+to a more complete workflow using <code>workflows</code>, resampling, and simple
+tuning.</p>
+<p>The packages we’ll be focusing on in this chapter are:</p>
+<ul>
+<li><code>rsample</code> for resampling.</li>
+<li><code>recipes</code> for data processing.</li>
+<li><code>parsnip</code> for model fitting.</li>
+<li><code>workflows</code> for bundling preprocessing and a model together.</li>
+<li><code>tune</code> for resampling-based evaluation and tuning.</li>
+<li><code>yardstick</code> for measuring model performance.</li>
+</ul>
+<p>The <a href="https://tidymodels.org">tidymodels website</a> has a number of excellent tutorials and an overview of some of the additional packages available (e.g. <code>tune</code>, <code>workshop</code>).</p>
+<p><strong>How this chapter connects.</strong> Sections <a href="prediction.html#sec:predictionbasics">4.2</a> and
+<a href="classification.html#sec:roc">6.5.5</a> introduced the main supervised-learning methods. This
+chapter turns those ideas into a reusable workflow: split the data,
+preprocess them, fit a model, evaluate it honestly, then tune and
+finalise it. The preprocessing stage also connects back to
+Section <a href="missing-values.html#sec:missing">3.1</a>, because missing-value handling belongs in
+the same pipeline rather than being treated as a mysterious side quest.</p>
+<div id="splitting-and-resampling-data" class="section level2 hasAnchor" number="5.1">
+<h2><span class="header-section-number">5.1</span> Splitting and resampling data<a href="tidy-modelling.html#splitting-and-resampling-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The <code>rsample</code> package is used for resample data sets. A dataset resample is where the dataset is split in two in some way. This may be via <em>bootstrapping</em>, sampling the same number of rows from a data set with replacement, or by randomly dividing the rows into two sets, creating training and validation or artificial test sets. In either case the rows of the data are in one of two sets: Either in the ‘analysis’ or ‘training’ set, or the ‘assessment’, ‘testing’ or ‘validation’ sets<a href="#fn42" class="footnote-ref" id="fnref42"><sup>42</sup></a>.</p>
+<p>This process may be repeated multiple times, producing multiple pairs of analysis and assessment sets. In the case of bootstrapping, the analysis sets could be used to compute a resampling distribution of some summary statistic such as the sample mean<a href="#fn43" class="footnote-ref" id="fnref43"><sup>43</sup></a>. In the case of a data split, it might be for cross-validation. Collections of resamples like this can be managed using the <code>rsample</code> package.</p>
+<p>The main functionality that we’ll be using is to split a data set into training set and validation sets using the <code>initial_split()</code> function, so that we can compare model performance to select the best model for the dataset at hand. We can then use that best model, retrained on all the data to build a final model for predicting the outcome on a separate testing dataset where the outcome is unknown.</p>
+<div class="example">
+<p><span id="exm:wagesplit" class="example"><strong>Example 5.1  </strong></span><strong>Splitting the US Wage data</strong></p>
+<p>We can split the US wage data into a new training and artificial test/validation set using the <code>initial_split()</code> function.</p>
+<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb150-1"><a href="tidy-modelling.html#cb150-1" tabindex="-1"></a><span class="fu">library</span>(rsample)</span>
+<span id="cb150-2"><a href="tidy-modelling.html#cb150-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1945</span>)</span>
+<span id="cb150-3"><a href="tidy-modelling.html#cb150-3" tabindex="-1"></a>wage.orig <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../data/wage-train.csv&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">rowid_to_column</span>()</span>
+<span id="cb150-4"><a href="tidy-modelling.html#cb150-4" tabindex="-1"></a>split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(wage.orig, <span class="at">prop =</span> <span class="fl">0.75</span>)</span>
+<span id="cb150-5"><a href="tidy-modelling.html#cb150-5" tabindex="-1"></a>split</span></code></pre></div>
+<pre><code>#&gt; &lt;Training/Testing/Total&gt;
+#&gt; &lt;300/100/400&gt;</code></pre>
+<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb152-1"><a href="tidy-modelling.html#cb152-1" tabindex="-1"></a>wage.new.train <span class="ot">&lt;-</span> <span class="fu">training</span>(split)</span>
+<span id="cb152-2"><a href="tidy-modelling.html#cb152-2" tabindex="-1"></a>wage.validation <span class="ot">&lt;-</span> <span class="fu">testing</span>(split)</span>
+<span id="cb152-3"><a href="tidy-modelling.html#cb152-3" tabindex="-1"></a>wage.new.train <span class="sc">|&gt;</span> <span class="fu">slice_head</span>(<span class="at">n=</span><span class="dv">4</span>)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 4 × 12
+#&gt;   rowid   EDU SOUTH SEX     EXP UNION  WAGE   AGE RACE  OCCUP     SECTOR MARRIED
+#&gt;   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;  &lt;chr&gt;  
+#&gt; 1    59    12     0 M        16     1 13.26    34 White Other     Other  Yes    
+#&gt; 2   132    12     0 F        42     0  3.64    60 White Manageme… Other  Yes    
+#&gt; 3   333    13     1 M        17     0  8.06    36 White Professi… Other  Yes    
+#&gt; 4   262     8     0 F        29     0  3.4     43 Other Service   Other  Yes</code></pre>
+<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb154-1"><a href="tidy-modelling.html#cb154-1" tabindex="-1"></a>wage.validation <span class="sc">|&gt;</span> <span class="fu">slice_head</span>(<span class="at">n=</span><span class="dv">4</span>)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 4 × 12
+#&gt;   rowid   EDU SOUTH SEX     EXP UNION  WAGE   AGE RACE  OCCUP SECTOR     MARRIED
+#&gt;   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt;  
+#&gt; 1     7     8     1 M        27     0  6.5     41 White Other Other      Yes    
+#&gt; 2     8     9     1 M        30     1  6.25    45 White Other Other      No     
+#&gt; 3    11    12     0 F        16     1  5.71    34 White Other Manufactu… Yes    
+#&gt; 4    12     7     0 M        42     1  7       55 Other Other Manufactu… Yes</code></pre>
+<ul>
+<li><p>For demonstration purposes, we add row identifiers to the original data set using <code>rowid_to_column()</code>.</p></li>
+<li><p>We supply the proportion that we wish to remain in the training/analysis portion of the data to
+<code>initial_split()</code>. The default is 0.75 which is a good rule of thumb.</p></li>
+<li><p>The object returned by <code>initial_split</code> is of type <code>rsplit</code>, holding details of the data split
+(the underlying dataset and the rows to be assigned to either set).</p></li>
+<li><p>The <code>training()</code> and <code>testing()</code> functions then extract the relevant dataset from the split.</p></li>
+<li><p>Looking at the first few rows of each shows how the rows have been randomly assigned to each data set.</p></li>
+</ul>
+</div>
+</div>
+<div id="data-processing-with-recipes" class="section level2 hasAnchor" number="5.2">
+<h2><span class="header-section-number">5.2</span> Data processing with recipes<a href="tidy-modelling.html#data-processing-with-recipes" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Often the data that we have to work with needs processing prior to applying models. This may be due to data quality issues (e.g. we may have to impute missing values or remove columns or rows that are very incomplete) or may be to ensure the data is in the form for a particular model (e.g. neural networks require numeric variables to be reasonably small and on similar scales to avoid computational issues, and other models require factor variables to be converted to numeric via indicator variables).</p>
+<p>In the case of transforming variables via scaling, such as normalising a numeric measure to have mean zero and variance one, we need to ensure that the transformation is identical across the training and testing datasets. We can’t normalise variables across the two sets separately, as the datasets are likely to have at least slightly different means and variances.</p>
+<p>The <code>recipes</code> package takes care of these details, providing a set of instructions (a <code>recipe</code>) for taking our raw data (ingredients) and preparing a data set ready for modelling.</p>
+<p>If we need imputation, this is also where it should happen. For
+example, Section <a href="missing-values.html#sec:missing">3.1</a> discussed replacing missing values
+using summaries or nearby observations. In a modern modelling workflow,
+those choices should be encoded as recipe steps so that they are learned
+from the training data and then applied in exactly the same way to new
+data.</p>
+<div class="example">
+<p><span id="exm:wagerecipe" class="example"><strong>Example 5.2  </strong></span><strong>A recipe for scaling the US Wage data</strong></p>
+<p>Suppose we wish to prepare the new training and validation sets from example <a href="tidy-modelling.html#exm:wagesplit">5.1</a> for use in a neural network model, so wish to normalise the numeric variables to the same scale (mean 0, variance 1)<a href="#fn44" class="footnote-ref" id="fnref44"><sup>44</sup></a>. We do this by constructing a <code>recipe</code> for this data, specifying the formula and dataset we plan to use for modelling which defines outcome variable and predictors:</p>
+<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb156-1"><a href="tidy-modelling.html#cb156-1" tabindex="-1"></a><span class="fu">library</span>(recipes)</span>
+<span id="cb156-2"><a href="tidy-modelling.html#cb156-2" tabindex="-1"></a>wage.recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(WAGE <span class="sc">~</span> ., <span class="at">data=</span>wage.new.train)</span>
+<span id="cb156-3"><a href="tidy-modelling.html#cb156-3" tabindex="-1"></a>wage.recipe</span></code></pre></div>
+<p>Our next step is to remove the <code>rowid</code> variable as not being useful for modelling and to normalise the numeric variables except those that are binary indicators (<code>UNION</code> and <code>SOUTH</code>):</p>
+<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb157-1"><a href="tidy-modelling.html#cb157-1" tabindex="-1"></a>wage.recipe.norm <span class="ot">&lt;-</span> wage.recipe <span class="sc">|&gt;</span></span>
+<span id="cb157-2"><a href="tidy-modelling.html#cb157-2" tabindex="-1"></a>  <span class="fu">step_rm</span>(rowid) <span class="sc">|&gt;</span></span>
+<span id="cb157-3"><a href="tidy-modelling.html#cb157-3" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>(), <span class="sc">-</span>UNION, <span class="sc">-</span>SOUTH)</span>
+<span id="cb157-4"><a href="tidy-modelling.html#cb157-4" tabindex="-1"></a>wage.recipe.norm</span>
+<span id="cb157-5"><a href="tidy-modelling.html#cb157-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb157-6"><a href="tidy-modelling.html#cb157-6" tabindex="-1"></a><span class="co">#&gt; ── Recipe ──────────────────────────────────────────────────────────────────────</span></span>
+<span id="cb157-7"><a href="tidy-modelling.html#cb157-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb157-8"><a href="tidy-modelling.html#cb157-8" tabindex="-1"></a><span class="co">#&gt; ── Inputs</span></span>
+<span id="cb157-9"><a href="tidy-modelling.html#cb157-9" tabindex="-1"></a><span class="co">#&gt; Number of variables by role</span></span>
+<span id="cb157-10"><a href="tidy-modelling.html#cb157-10" tabindex="-1"></a><span class="co">#&gt; outcome:    1</span></span>
+<span id="cb157-11"><a href="tidy-modelling.html#cb157-11" tabindex="-1"></a><span class="co">#&gt; predictor: 11</span></span>
+<span id="cb157-12"><a href="tidy-modelling.html#cb157-12" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb157-13"><a href="tidy-modelling.html#cb157-13" tabindex="-1"></a><span class="co">#&gt; ── Operations</span></span>
+<span id="cb157-14"><a href="tidy-modelling.html#cb157-14" tabindex="-1"></a><span class="co">#&gt; • Variables removed: rowid</span></span>
+<span id="cb157-15"><a href="tidy-modelling.html#cb157-15" tabindex="-1"></a><span class="co">#&gt; • Centering and scaling for: all_numeric_predictors(), -UNION, -SOUTH</span></span></code></pre></div>
+<p>We then prep (train) this recipe with the training set:</p>
+<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb158-1"><a href="tidy-modelling.html#cb158-1" tabindex="-1"></a>wage.recipe.trained <span class="ot">&lt;-</span> wage.recipe.norm <span class="sc">|&gt;</span> <span class="fu">prep</span>(wage.new.train)</span>
+<span id="cb158-2"><a href="tidy-modelling.html#cb158-2" tabindex="-1"></a>wage.recipe.trained</span>
+<span id="cb158-3"><a href="tidy-modelling.html#cb158-3" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb158-4"><a href="tidy-modelling.html#cb158-4" tabindex="-1"></a><span class="co">#&gt; ── Recipe ──────────────────────────────────────────────────────────────────────</span></span>
+<span id="cb158-5"><a href="tidy-modelling.html#cb158-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb158-6"><a href="tidy-modelling.html#cb158-6" tabindex="-1"></a><span class="co">#&gt; ── Inputs</span></span>
+<span id="cb158-7"><a href="tidy-modelling.html#cb158-7" tabindex="-1"></a><span class="co">#&gt; Number of variables by role</span></span>
+<span id="cb158-8"><a href="tidy-modelling.html#cb158-8" tabindex="-1"></a><span class="co">#&gt; outcome:    1</span></span>
+<span id="cb158-9"><a href="tidy-modelling.html#cb158-9" tabindex="-1"></a><span class="co">#&gt; predictor: 11</span></span>
+<span id="cb158-10"><a href="tidy-modelling.html#cb158-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb158-11"><a href="tidy-modelling.html#cb158-11" tabindex="-1"></a><span class="co">#&gt; ── Training information</span></span>
+<span id="cb158-12"><a href="tidy-modelling.html#cb158-12" tabindex="-1"></a><span class="co">#&gt; Training data contained 300 data points and no incomplete rows.</span></span>
+<span id="cb158-13"><a href="tidy-modelling.html#cb158-13" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb158-14"><a href="tidy-modelling.html#cb158-14" tabindex="-1"></a><span class="co">#&gt; ── Operations</span></span>
+<span id="cb158-15"><a href="tidy-modelling.html#cb158-15" tabindex="-1"></a><span class="co">#&gt; • Variables removed: rowid | Trained</span></span>
+<span id="cb158-16"><a href="tidy-modelling.html#cb158-16" tabindex="-1"></a><span class="co">#&gt; • Centering and scaling for: EDU, EXP, AGE | Trained</span></span></code></pre></div>
+<p>Finally, we <code>bake</code> our recipe into the final datasets:</p>
+<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="tidy-modelling.html#cb159-1" tabindex="-1"></a>wage.train.baked <span class="ot">&lt;-</span> wage.recipe.trained <span class="sc">|&gt;</span> <span class="fu">bake</span>(wage.new.train)</span>
+<span id="cb159-2"><a href="tidy-modelling.html#cb159-2" tabindex="-1"></a>wage.valid.baked <span class="ot">&lt;-</span> wage.recipe.trained <span class="sc">|&gt;</span> <span class="fu">bake</span>(wage.validation)</span></code></pre></div>
+<p>This has resulted in datasets where our numeric variables have been centered and scaled to have mean zero and standard deviation one:</p>
+<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb160-1"><a href="tidy-modelling.html#cb160-1" tabindex="-1"></a>skimr<span class="sc">::</span><span class="fu">skim</span>(wage.train.baked)</span></code></pre></div>
+<pre><code>#&gt; ── Data Summary ────────────────────────
+#&gt;                            Values          
+#&gt; Name                       wage.train.baked
+#&gt; Number of rows             300             
+#&gt; Number of columns          11              
+#&gt; _______________________                    
+#&gt; Column type frequency:                     
+#&gt;   factor                   5               
+#&gt;   numeric                  6               
+#&gt; ________________________                   
+#&gt; Group variables            None            
+#&gt; 
+#&gt; ── Variable type: factor ───────────────────────────────────────────────────────
+#&gt;   skim_variable n_missing complete_rate ordered n_unique
+#&gt; 1 SEX                   0             1 FALSE          2
+#&gt; 2 RACE                  0             1 FALSE          3
+#&gt; 3 OCCUP                 0             1 FALSE          6
+#&gt; 4 SECTOR                0             1 FALSE          3
+#&gt; 5 MARRIED               0             1 FALSE          2
+#&gt;   top_counts                        
+#&gt; 1 M: 163, F: 137                    
+#&gt; 2 Whi: 244, Oth: 40, His: 16        
+#&gt; 3 Oth: 79, Pro: 66, Cle: 59, Ser: 50
+#&gt; 4 Oth: 238, Man: 49, Con: 13        
+#&gt; 5 Yes: 195, No: 105                 
+#&gt; 
+#&gt; ── Variable type: numeric ──────────────────────────────────────────────────────
+#&gt;   skim_variable n_missing complete_rate       mean      sd      p0      p25
+#&gt; 1 EDU                   0             1 9.0362e-17 1       -2.4861 -0.50040
+#&gt; 2 SOUTH                 0             1 2.7333e- 1 0.44642  0       0      
+#&gt; 3 EXP                   0             1 1.4767e-16 1       -1.4393 -0.74953
+#&gt; 4 UNION                 0             1 1.7667e- 1 0.38202  0       0      
+#&gt; 5 AGE                   0             1 2.0102e-16 1       -1.6121 -0.73595
+#&gt; 6 WAGE                  0             1 9.0937e+ 0 5.1498   2.01    5.25   
+#&gt;        p50      p75    p100 hist 
+#&gt; 1 -0.50040  1.0882   1.8825 ▁▁▇▂▅
+#&gt; 2  0        1        1      ▇▁▁▁▃
+#&gt; 3 -0.23222  0.62998  2.6992 ▇▇▃▂▂
+#&gt; 4  0        0        1      ▇▁▁▁▂
+#&gt; 5 -0.17433  0.63441  2.5215 ▆▇▅▂▂
+#&gt; 6  8       11.68    44.5    ▇▃▁▁▁</code></pre>
+<p>Note that the baked validation set will not have mean zero and standard deviation one, as it was normalised using the same transformation as used for the training set (i.e. subtract the mean and divide by the standard deviation from the training set). Nonetheless they should be expected to be close to zero and one:</p>
+<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="tidy-modelling.html#cb162-1" tabindex="-1"></a>skimr<span class="sc">::</span><span class="fu">skim</span>(wage.valid.baked)</span></code></pre></div>
+<pre><code>#&gt; ── Data Summary ────────────────────────
+#&gt;                            Values          
+#&gt; Name                       wage.valid.baked
+#&gt; Number of rows             100             
+#&gt; Number of columns          11              
+#&gt; _______________________                    
+#&gt; Column type frequency:                     
+#&gt;   factor                   5               
+#&gt;   numeric                  6               
+#&gt; ________________________                   
+#&gt; Group variables            None            
+#&gt; 
+#&gt; ── Variable type: factor ───────────────────────────────────────────────────────
+#&gt;   skim_variable n_missing complete_rate ordered n_unique
+#&gt; 1 SEX                   0             1 FALSE          2
+#&gt; 2 RACE                  0             1 FALSE          3
+#&gt; 3 OCCUP                 0             1 FALSE          6
+#&gt; 4 SECTOR                0             1 FALSE          3
+#&gt; 5 MARRIED               0             1 FALSE          2
+#&gt;   top_counts                        
+#&gt; 1 M: 52, F: 48                      
+#&gt; 2 Whi: 81, Oth: 14, His: 5          
+#&gt; 3 Oth: 33, Cle: 17, Man: 15, Ser: 13
+#&gt; 4 Oth: 80, Man: 16, Con: 4          
+#&gt; 5 Yes: 64, No: 36                   
+#&gt; 
+#&gt; ── Variable type: numeric ──────────────────────────────────────────────────────
+#&gt;   skim_variable n_missing complete_rate      mean      sd      p0      p25
+#&gt; 1 EDU                   0             1 -0.21446  0.93791 -2.8833 -0.50040
+#&gt; 2 SOUTH                 0             1  0.37     0.48524  0       0      
+#&gt; 3 EXP                   0             1  0.11525  1.0890  -1.4393 -0.68487
+#&gt; 4 UNION                 0             1  0.21     0.40936  0       0      
+#&gt; 5 AGE                   0             1  0.072786 1.0627  -1.6121 -0.71349
+#&gt; 6 WAGE                  0             1  8.4391   4.4758   1.75    5.4375 
+#&gt;         p50      p75    p100 hist 
+#&gt; 1 -0.50040   0.29389  1.8825 ▁▁▇▂▂
+#&gt; 2  0         1        1      ▇▁▁▁▅
+#&gt; 3 -0.14600   0.91019  2.4406 ▇▇▃▃▃
+#&gt; 4  0         0        1      ▇▁▁▁▂
+#&gt; 5 -0.084468  0.81413  2.5215 ▆▇▅▃▃
+#&gt; 6  7.25     10.448   22.5    ▇▇▃▁▁</code></pre>
+<p>Typically the above process will be done without many of the intermediate objects<a href="#fn45" class="footnote-ref" id="fnref45"><sup>45</sup></a>:</p>
+<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb164-1"><a href="tidy-modelling.html#cb164-1" tabindex="-1"></a>wage.recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(WAGE <span class="sc">~</span> ., <span class="at">data=</span>wage.new.train) <span class="sc">|&gt;</span></span>
+<span id="cb164-2"><a href="tidy-modelling.html#cb164-2" tabindex="-1"></a>  <span class="fu">step_rm</span>(rowid) <span class="sc">|&gt;</span></span>
+<span id="cb164-3"><a href="tidy-modelling.html#cb164-3" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>(), <span class="sc">-</span>UNION, <span class="sc">-</span>SOUTH)</span>
+<span id="cb164-4"><a href="tidy-modelling.html#cb164-4" tabindex="-1"></a>wage.prepped <span class="ot">&lt;-</span> wage.recipe <span class="sc">|&gt;</span> <span class="fu">prep</span>(wage.new.train)</span>
+<span id="cb164-5"><a href="tidy-modelling.html#cb164-5" tabindex="-1"></a>wage.train.baked <span class="ot">&lt;-</span> <span class="fu">bake</span>(wage.prepped, wage.new.train)</span>
+<span id="cb164-6"><a href="tidy-modelling.html#cb164-6" tabindex="-1"></a>wage.valid.baked <span class="ot">&lt;-</span> <span class="fu">bake</span>(wage.prepped, wage.validation)</span></code></pre></div>
+</div>
+</div>
+<div id="modelling-with-parsnip" class="section level2 hasAnchor" number="5.3">
+<h2><span class="header-section-number">5.3</span> Modelling with parsnip<a href="tidy-modelling.html#modelling-with-parsnip" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We have seen throughout the <a href="prediction.html#prediction">prediction chapter</a> that each prediction model has its own functions available for fitting the model and predicting new observations given a model.</p>
+<p>In the case of linear models via <code>lm</code>, regression trees via <code>rpart</code>, random forests via <code>randomForest</code>and neural networks via <code>nnet</code> both the construction of models and prediction from those models follow essentially identical syntaxes. We fit models using:</p>
+<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb165-1"><a href="tidy-modelling.html#cb165-1" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">model_fit_function</span>(outcome <span class="sc">~</span> predictors, <span class="at">data =</span> training)</span></code></pre></div>
+<p>and do prediction via:</p>
+<div class="sourceCode" id="cb166"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb166-1"><a href="tidy-modelling.html#cb166-1" tabindex="-1"></a>pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(model, <span class="at">newdata=</span>testing)</span></code></pre></div>
+<p>Unfortunately, this convenient formulation is not the norm. There are model types that are fit by providing a vector outcome and matrix of predictors (e.g. <code>glmnet</code> for penalised regression), and there are model types where predictions require additional processing to yield a vector of outcomes (e.g. <code>ranger</code> for random forests).</p>
+<p>The <code>parsnip</code> package<a href="#fn46" class="footnote-ref" id="fnref46"><sup>46</sup></a> is designed to alleviate this by providing a consistent interface to a wide range of models for both prediction and classification. The idea is that we have essentially two main functions <code>fit</code> and <code>predict</code> that apply over different types of model fit using different modelling engines. For example, the linear regression model <code>linear_reg</code> can be fit using the <code>lm</code> engine we’re familiar with, or via penalised regression<a href="#fn47" class="footnote-ref" id="fnref47"><sup>47</sup></a> with <code>glmnet</code> or in a Bayesian framework<a href="#fn48" class="footnote-ref" id="fnref48"><sup>48</sup></a> with <code>stan</code>. Whichever model or engine we choose, the <code>predict</code> method will always return a data frame with one row for each row of the new data supplied to it which is convenient for binding as a new column.</p>
+<div class="example">
+<p><span id="exm:wagefit" class="example"><strong>Example 5.3  </strong></span><strong>Fitting a linear regression and neural network to the US Wage data using parsnip</strong></p>
+<p>Below we utilise the baked training set from Example <a href="tidy-modelling.html#exm:wagerecipe">5.2</a> to
+fit a linear regression and neural network model with the <code>parsnip</code> package.</p>
+<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb167-1"><a href="tidy-modelling.html#cb167-1" tabindex="-1"></a><span class="fu">library</span>(parsnip)</span></code></pre></div>
+<pre><code>#&gt; Warning: package &#39;parsnip&#39; was built under R version 4.5.2</code></pre>
+<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="tidy-modelling.html#cb169-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1937</span>)</span>
+<span id="cb169-2"><a href="tidy-modelling.html#cb169-2" tabindex="-1"></a>wage.spec.lm <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">mode =</span> <span class="st">&quot;regression&quot;</span>,</span>
+<span id="cb169-3"><a href="tidy-modelling.html#cb169-3" tabindex="-1"></a>                           <span class="at">engine =</span> <span class="st">&quot;lm&quot;</span>)</span>
+<span id="cb169-4"><a href="tidy-modelling.html#cb169-4" tabindex="-1"></a>wage.spec.nn <span class="ot">&lt;-</span> <span class="fu">mlp</span>(<span class="at">mode =</span> <span class="st">&quot;regression&quot;</span>,</span>
+<span id="cb169-5"><a href="tidy-modelling.html#cb169-5" tabindex="-1"></a>                    <span class="at">engine=</span><span class="st">&quot;nnet&quot;</span>,</span>
+<span id="cb169-6"><a href="tidy-modelling.html#cb169-6" tabindex="-1"></a>                    <span class="at">hidden_units =</span> <span class="dv">5</span>,</span>
+<span id="cb169-7"><a href="tidy-modelling.html#cb169-7" tabindex="-1"></a>                    <span class="at">penalty =</span> <span class="fl">0.01</span>,</span>
+<span id="cb169-8"><a href="tidy-modelling.html#cb169-8" tabindex="-1"></a>                    <span class="at">epochs =</span> <span class="dv">1000</span>)</span>
+<span id="cb169-9"><a href="tidy-modelling.html#cb169-9" tabindex="-1"></a></span>
+<span id="cb169-10"><a href="tidy-modelling.html#cb169-10" tabindex="-1"></a>wage.fit.lm <span class="ot">&lt;-</span> wage.spec.lm <span class="sc">|&gt;</span> <span class="fu">fit</span>(WAGE <span class="sc">~</span> ., <span class="at">data=</span>wage.train.baked)</span>
+<span id="cb169-11"><a href="tidy-modelling.html#cb169-11" tabindex="-1"></a>wage.fit.nn <span class="ot">&lt;-</span> wage.spec.nn <span class="sc">|&gt;</span> <span class="fu">fit</span>(WAGE <span class="sc">~</span> ., <span class="at">data=</span>wage.train.baked)</span>
+<span id="cb169-12"><a href="tidy-modelling.html#cb169-12" tabindex="-1"></a></span>
+<span id="cb169-13"><a href="tidy-modelling.html#cb169-13" tabindex="-1"></a>wage.fit.lm <span class="sc">|&gt;</span> <span class="fu">extract_fit_engine</span>() <span class="sc">|&gt;</span> <span class="fu">summary</span>()</span></code></pre></div>
+<pre><code>#&gt; 
+#&gt; Call:
+#&gt; stats::lm(formula = WAGE ~ ., data = data)
+#&gt; 
+#&gt; Residuals:
+#&gt;     Min      1Q  Median      3Q     Max 
+#&gt; -10.633  -2.525  -0.484   1.756  33.448 
+#&gt; 
+#&gt; Coefficients:
+#&gt;                     Estimate Std. Error t value Pr(&gt;|t|)    
+#&gt; (Intercept)          8.89597    1.90234   4.676 4.53e-06 ***
+#&gt; EDU                  1.93566    2.83666   0.682   0.4956    
+#&gt; SOUTH               -0.79529    0.58502  -1.359   0.1751    
+#&gt; SEXM                 1.09477    0.58390   1.875   0.0618 .  
+#&gt; EXP                  2.24480   12.95455   0.173   0.8626    
+#&gt; UNION                1.66693    0.72430   2.301   0.0221 *  
+#&gt; AGE                 -1.39124   12.41196  -0.112   0.9108    
+#&gt; RACEOther           -0.67047    1.31630  -0.509   0.6109    
+#&gt; RACEWhite           -0.03322    1.15322  -0.029   0.9770    
+#&gt; OCCUPManagement      4.37077    1.06815   4.092 5.59e-05 ***
+#&gt; OCCUPOther           0.10389    0.98664   0.105   0.9162    
+#&gt; OCCUPProfessional    1.59936    0.89974   1.778   0.0765 .  
+#&gt; OCCUPSales          -1.41473    1.23081  -1.149   0.2513    
+#&gt; OCCUPService         0.02945    0.88981   0.033   0.9736    
+#&gt; SECTORManufacturing -0.09914    1.41650  -0.070   0.9442    
+#&gt; SECTOROther         -1.58032    1.37506  -1.149   0.2514    
+#&gt; MARRIEDYes           0.28569    0.58704   0.487   0.6269    
+#&gt; ---
+#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+#&gt; 
+#&gt; Residual standard error: 4.389 on 283 degrees of freedom
+#&gt; Multiple R-squared:  0.3125, Adjusted R-squared:  0.2736 
+#&gt; F-statistic:  8.04 on 16 and 283 DF,  p-value: 8.386e-16</code></pre>
+<p>Some notes:</p>
+<ul>
+<li><p>As we’ll be fitting a neural network, we set the random seed so we can reproduce these results.</p></li>
+<li><p>The <code>linear_reg</code> command details that we’re performing regression using the <code>lm</code> engine.
+These are the defaults, so we could have just used <code>linear_reg()</code> here.</p></li>
+<li><p>The <code>mlp</code> command is short for MultiLayer Perceptron model (a neural network). We’re configuring
+the model in regression mode (as neural nets can also do classification) using the <code>nnet</code> engine
+which is the default. The additional parameter <code>hidden_units</code> defines the number of nodes in the
+hidden layer (i.e. the <code>size</code> argument of <code>nnet</code>) while <code>penalty</code> defines the amount of weight decay
+(the <code>decay</code> parameter of <code>nnet</code>). The <code>epochs</code> parameter is for the maximum number of training
+iterations (<code>maxit</code> in <code>nnet</code>). The <code>parsnip</code> package redefines its own names for these
+parameters and translates them for each of the possible engines that can be used (e.g. neural nets
+can also be fit using the <code>keras</code> engine).</p></li>
+<li><p>Once we’ve defined the model specifications, we then fit each model via <code>fit()</code>, supplying the
+model formula and training data.</p></li>
+<li><p>The objects returned from <code>fit()</code> are of type <code>model_fit</code>, which is a wrapper around whichever
+object type was returned from the given engine. We can use <code>extract_fit_engine()</code> to pull out
+the actual model object (e.g. the result from <code>lm</code> in the case of linear regression). This can
+be useful for interogating the model fit such as looking at coefficients or plotting a regression
+tree.</p></li>
+</ul>
+<p>Once we have our model fits, we can perform prediction:</p>
+<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="tidy-modelling.html#cb171-1" tabindex="-1"></a>wage.pred <span class="ot">&lt;-</span> wage.validation <span class="sc">|&gt;</span></span>
+<span id="cb171-2"><a href="tidy-modelling.html#cb171-2" tabindex="-1"></a>  <span class="fu">bind_cols</span>(</span>
+<span id="cb171-3"><a href="tidy-modelling.html#cb171-3" tabindex="-1"></a>    <span class="fu">predict</span>(wage.fit.lm, <span class="at">new_data =</span> wage.valid.baked) <span class="sc">|&gt;</span> <span class="fu">rename</span>(<span class="at">pred.lm =</span> .pred),</span>
+<span id="cb171-4"><a href="tidy-modelling.html#cb171-4" tabindex="-1"></a>    <span class="fu">predict</span>(wage.fit.nn, <span class="at">new_data =</span> wage.valid.baked) <span class="sc">|&gt;</span> <span class="fu">rename</span>(<span class="at">pred.nn =</span> .pred)</span>
+<span id="cb171-5"><a href="tidy-modelling.html#cb171-5" tabindex="-1"></a>    )</span>
+<span id="cb171-6"><a href="tidy-modelling.html#cb171-6" tabindex="-1"></a></span>
+<span id="cb171-7"><a href="tidy-modelling.html#cb171-7" tabindex="-1"></a>wage.pred <span class="sc">|&gt;</span></span>
+<span id="cb171-8"><a href="tidy-modelling.html#cb171-8" tabindex="-1"></a>  <span class="fu">select</span>(rowid, WAGE, pred.lm, pred.nn, <span class="fu">everything</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb171-9"><a href="tidy-modelling.html#cb171-9" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n=</span><span class="dv">4</span>)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 4 × 14
+#&gt;   rowid  WAGE pred.lm pred.nn   EDU SOUTH SEX     EXP UNION   AGE RACE  OCCUP
+#&gt;   &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;
+#&gt; 1     7  6.5   5.2901  7.5072     8     1 M        27     0    41 White Other
+#&gt; 2     8  6.25  7.5207  4.8145     9     1 M        30     1    45 White Other
+#&gt; 3    11  5.71  9.9598 10.676     12     0 F        16     1    34 White Other
+#&gt; 4    12  7     8.9805  7.5999     7     0 M        42     1    55 Other Other
+#&gt; # ℹ 2 more variables: SECTOR &lt;chr&gt;, MARRIED &lt;chr&gt;</code></pre>
+<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="tidy-modelling.html#cb173-1" tabindex="-1"></a>wage.pred <span class="sc">|&gt;</span> <span class="fu">summarise</span>(</span>
+<span id="cb173-2"><a href="tidy-modelling.html#cb173-2" tabindex="-1"></a>  <span class="at">MSE.lm =</span> <span class="fu">mean</span>((WAGE <span class="sc">-</span> pred.lm)<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb173-3"><a href="tidy-modelling.html#cb173-3" tabindex="-1"></a>  <span class="at">MSE.nn =</span> <span class="fu">mean</span>((WAGE <span class="sc">-</span> pred.nn)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb173-4"><a href="tidy-modelling.html#cb173-4" tabindex="-1"></a>)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 1 × 2
+#&gt;   MSE.lm MSE.nn
+#&gt;    &lt;dbl&gt;  &lt;dbl&gt;
+#&gt; 1 12.831 19.256</code></pre>
+<ul>
+<li><p>In the <code>predict()</code> functions we’re providing the baked validation data so that we match the baked
+training data.</p></li>
+<li><p>We choose to bind the predictions to the original validation data, rather than the baked
+validation data. This can be useful for comparing predictions with predictors on the original
+scales.</p></li>
+<li><p>The <code>predict()</code> function returns a data frame with a column <code>.pred</code> containing the predictions. As
+we have two models here and wish to have the predictions side by side, we’re renaming each of these
+to something we will remember.</p></li>
+<li><p>As we have a data.frame from the prediction, we can easily summarise these results to extract the MSE.
+In this case, the linear regression performs better than the neural network.</p></li>
+</ul>
+</div>
+</div>
+<div id="model-performance-with-yardstick" class="section level2 hasAnchor" number="5.4">
+<h2><span class="header-section-number">5.4</span> Model performance with yardstick<a href="tidy-modelling.html#model-performance-with-yardstick" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We have largely been using the mean square error for assessing model predictive performance. This is a useful measure in that it generally decomposes to be the sum of the variance and bias squared, so captures the variance-bias trade-off well. However, as it is a squared measure, it is not on the same scale as the outcome variable, which makes translating the MSE into it’s effect on individual predictions difficult.</p>
+<p>An alternate measure would be the <strong>root mean squared error</strong> (RMSE), the square root of MSE. This is on the same scale as the data, so at least the magnitude can be used to assess predictive performance. If the MSE is 25, then this corresponds to an RMSE of 5, so we might expect predictions to generally be within about 10 units (twice the RMSE - in the same way a 95% confidence interval corresponds to roughly 2 standard errors) of their true value, assuming the errors are relatively symmetric.</p>
+<p>But there are other measures available as well. The <strong>mean absolute error</strong> is given by
+<span class="math display">\[\textsf{MAE} = \frac{1}{n} \sum_{i=1}^n |y_i - \hat{y}_i|,\]</span>
+which is also on the same scale as the outcome variable. This measure is preferred in the case where there may be just a few observations that are predicted poorly. Such observations contribute greatly to the MSE or RMSE as the squaring of already large errors amplifies their effects. These observations will still contribute more than other observations to the MAE, but there is no squaring to further accentuate their effect.</p>
+<p>The <code>yardstick</code> package provides a range of metrics for assessing model performance.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-25" class="example"><strong>Example 5.4  </strong></span><strong>Assessing model fits on the US Wage data with yardstick</strong></p>
+<p>Consider the models fit in Example <a href="tidy-modelling.html#exm:wagefit">5.3</a>. The <code>metrics</code> function from <code>yardstick</code> gives a set of standard metrics (RMSE, <span class="math inline">\(R^2\)</span>, MAE) for predictive performance on each model in turn.</p>
+<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="tidy-modelling.html#cb175-1" tabindex="-1"></a><span class="fu">library</span>(yardstick)</span></code></pre></div>
+<pre><code>#&gt; Warning: package &#39;yardstick&#39; was built under R version 4.5.2</code></pre>
+<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="tidy-modelling.html#cb177-1" tabindex="-1"></a>wage.pred <span class="sc">|&gt;</span> <span class="fu">metrics</span>(<span class="at">truth =</span> WAGE, <span class="at">estimate =</span> pred.lm)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 3 × 3
+#&gt;   .metric .estimator .estimate
+#&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+#&gt; 1 rmse    standard     3.5820 
+#&gt; 2 rsq     standard     0.35758
+#&gt; 3 mae     standard     2.7634</code></pre>
+<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="tidy-modelling.html#cb179-1" tabindex="-1"></a>wage.pred <span class="sc">|&gt;</span> <span class="fu">metrics</span>(<span class="at">truth =</span> WAGE, <span class="at">estimate =</span> pred.nn)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 3 × 3
+#&gt;   .metric .estimator .estimate
+#&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+#&gt; 1 rmse    standard     4.3882 
+#&gt; 2 rsq     standard     0.15622
+#&gt; 3 mae     standard     3.0061</code></pre>
+<p>Alternatively, we could pivot our two model predictions long so we can evaluate both
+models at once.</p>
+<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb181-1"><a href="tidy-modelling.html#cb181-1" tabindex="-1"></a>wage.long <span class="ot">&lt;-</span> wage.pred <span class="sc">|&gt;</span></span>
+<span id="cb181-2"><a href="tidy-modelling.html#cb181-2" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">starts_with</span>(<span class="st">&quot;pred.&quot;</span>), <span class="at">names_to=</span><span class="st">&quot;model&quot;</span>, <span class="at">values_to=</span><span class="st">&quot;pred&quot;</span>)</span>
+<span id="cb181-3"><a href="tidy-modelling.html#cb181-3" tabindex="-1"></a></span>
+<span id="cb181-4"><a href="tidy-modelling.html#cb181-4" tabindex="-1"></a>wage.long <span class="sc">|&gt;</span></span>
+<span id="cb181-5"><a href="tidy-modelling.html#cb181-5" tabindex="-1"></a>  <span class="fu">group_by</span>(model) <span class="sc">|&gt;</span></span>
+<span id="cb181-6"><a href="tidy-modelling.html#cb181-6" tabindex="-1"></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> WAGE, <span class="at">estimate =</span> pred)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 6 × 4
+#&gt;   model   .metric .estimator .estimate
+#&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+#&gt; 1 pred.lm rmse    standard     3.5820 
+#&gt; 2 pred.nn rmse    standard     4.3882 
+#&gt; 3 pred.lm rsq     standard     0.35758
+#&gt; 4 pred.nn rsq     standard     0.15622
+#&gt; 5 pred.lm mae     standard     2.7634 
+#&gt; 6 pred.nn mae     standard     3.0061</code></pre>
+<p>Some notes:</p>
+<ul>
+<li><p>The two columns <code>pred.lm</code> and <code>pred.nn</code> contain our predictions. We need the predictions
+in a single column if we wish to evaluate both at once. The <code>pivot_longer()</code> specification
+creates a <code>model</code> column filled with “pred.lm” and “pred.nn”, and a <code>pred</code> column with the
+corresponding predictions.</p></li>
+<li><p>We <code>group_by(model)</code> so that the <code>metrics</code> function is run on each model in turn.</p></li>
+<li><p>The result allows relatively easy comparison, though we could optionally add</p>
+<div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb183-1"><a href="tidy-modelling.html#cb183-1" tabindex="-1"></a><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> model, <span class="at">values_from =</span> .estimate)</span></code></pre></div>
+<p>if we wanted a three by two table.</p></li>
+<li><p>In this example the linear model does better than the neural network across all metrics.</p></li>
+</ul>
+<p>The other advantage to pivoting longer is we can more easily produce charts of the predictions, such as that given in Figure <a href="tidy-modelling.html#fig:wagepredictions">5.1</a>. It is clear from this chart that the neural network is performing considerably worse than the linear model.</p>
+<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="tidy-modelling.html#cb184-1" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> wage.long) <span class="sc">+</span></span>
+<span id="cb184-2"><a href="tidy-modelling.html#cb184-2" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x=</span>WAGE, <span class="at">y=</span>pred, <span class="at">col=</span>model), <span class="at">alpha=</span><span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb184-3"><a href="tidy-modelling.html#cb184-3" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="at">pred.lm =</span> <span class="st">&#39;black&#39;</span>, <span class="at">pred.nn=</span><span class="st">&#39;red&#39;</span>)) <span class="sc">+</span></span>
+<span id="cb184-4"><a href="tidy-modelling.html#cb184-4" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;WAGE (truth)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;WAGE (predicted)&quot;</span>)</span></code></pre></div>
+<div class="figure"><span style="display:block;" id="fig:wagepredictions"></span>
+<img src="05-tidymodels_files/figure-html/wagepredictions-1.png" alt="Comparison of predictions for the US Wage data from a linear model and neural network" width="672" />
+<p class="caption">
+Figure 5.1: Comparison of predictions for the US Wage data from a linear model and neural network
+</p>
+</div>
+</div>
+</div>
+<div id="sec:tidymodels-workflow" class="section level2 hasAnchor" number="5.5">
+<h2><span class="header-section-number">5.5</span> Workflows<a href="tidy-modelling.html#sec:tidymodels-workflow" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Once we have a recipe and a model specification, the next natural step
+is to bundle them together. A <code>workflow</code> does exactly that. This helps
+avoid the fiddly business of remembering which baked dataset matches
+which model, and it keeps preprocessing and modelling tied together in a
+single object.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-26" class="example"><strong>Example 5.5  </strong></span><strong>Bundling a recipe and model into a workflow</strong></p>
+<p>Below we combine the wage recipe with the linear model and neural
+network specifications from Example <a href="tidy-modelling.html#exm:wagefit">5.3</a>.</p>
+<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb185-1"><a href="tidy-modelling.html#cb185-1" tabindex="-1"></a><span class="fu">library</span>(workflows)</span></code></pre></div>
+<pre><code>#&gt; Warning: package &#39;workflows&#39; was built under R version 4.5.2</code></pre>
+<div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb187-1"><a href="tidy-modelling.html#cb187-1" tabindex="-1"></a>wage.wf.lm <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb187-2"><a href="tidy-modelling.html#cb187-2" tabindex="-1"></a>  <span class="fu">add_recipe</span>(wage.recipe) <span class="sc">|&gt;</span></span>
+<span id="cb187-3"><a href="tidy-modelling.html#cb187-3" tabindex="-1"></a>  <span class="fu">add_model</span>(wage.spec.lm)</span>
+<span id="cb187-4"><a href="tidy-modelling.html#cb187-4" tabindex="-1"></a></span>
+<span id="cb187-5"><a href="tidy-modelling.html#cb187-5" tabindex="-1"></a>wage.wf.nn <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb187-6"><a href="tidy-modelling.html#cb187-6" tabindex="-1"></a>  <span class="fu">add_recipe</span>(wage.recipe) <span class="sc">|&gt;</span></span>
+<span id="cb187-7"><a href="tidy-modelling.html#cb187-7" tabindex="-1"></a>  <span class="fu">add_model</span>(wage.spec.nn)</span>
+<span id="cb187-8"><a href="tidy-modelling.html#cb187-8" tabindex="-1"></a></span>
+<span id="cb187-9"><a href="tidy-modelling.html#cb187-9" tabindex="-1"></a>wage.wf.nn.fit <span class="ot">&lt;-</span> wage.wf.nn <span class="sc">|&gt;</span> <span class="fu">fit</span>(<span class="at">data =</span> wage.new.train)</span>
+<span id="cb187-10"><a href="tidy-modelling.html#cb187-10" tabindex="-1"></a><span class="fu">predict</span>(wage.wf.nn.fit, <span class="at">new_data =</span> wage.validation) <span class="sc">|&gt;</span></span>
+<span id="cb187-11"><a href="tidy-modelling.html#cb187-11" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">4</span>)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 4 × 1
+#&gt;     .pred
+#&gt;     &lt;dbl&gt;
+#&gt; 1  5.9473
+#&gt; 2 10.382 
+#&gt; 3 10.301 
+#&gt; 4  9.1853</code></pre>
+<p>Some notes:</p>
+<ul>
+<li><p>The workflow is given the <strong>raw</strong> training data. It takes care of
+prepping and baking the recipe internally before fitting the model.</p></li>
+<li><p>When we predict on <code>wage.validation</code>, we again supply the raw data.
+The workflow applies the same preprocessing steps automatically.</p></li>
+<li><p>If we later decide to add imputation or dummy-variable creation,
+those changes belong in the recipe, not scattered through multiple
+separate code blocks.</p></li>
+</ul>
+</div>
+</div>
+<div id="sec:tidymodels-resamples" class="section level2 hasAnchor" number="5.6">
+<h2><span class="header-section-number">5.6</span> Resampling with <code>fit_resamples()</code><a href="tidy-modelling.html#sec:tidymodels-resamples" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The validation split from Example <a href="tidy-modelling.html#exm:wagesplit">5.1</a> is useful, but
+it is still only one split. A model may look slightly better or worse
+just because of that one random partition. Resampling gives us a more
+stable picture by repeating the assessment over several training and
+validation folds.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-27" class="example"><strong>Example 5.6  </strong></span><strong>Comparing two workflows by cross-validation</strong></p>
+<p>We can compare the linear model and neural network workflows using
+5-fold cross-validation on the training data.</p>
+<div class="sourceCode" id="cb189"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb189-1"><a href="tidy-modelling.html#cb189-1" tabindex="-1"></a><span class="fu">library</span>(tune)</span></code></pre></div>
+<pre><code>#&gt; Warning: package &#39;tune&#39; was built under R version 4.5.2</code></pre>
+<div class="sourceCode" id="cb191"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb191-1"><a href="tidy-modelling.html#cb191-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1945</span>)</span>
+<span id="cb191-2"><a href="tidy-modelling.html#cb191-2" tabindex="-1"></a>wage_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(wage.new.train, <span class="at">v =</span> <span class="dv">5</span>)</span>
+<span id="cb191-3"><a href="tidy-modelling.html#cb191-3" tabindex="-1"></a></span>
+<span id="cb191-4"><a href="tidy-modelling.html#cb191-4" tabindex="-1"></a>wage.resamples.lm <span class="ot">&lt;-</span> wage.wf.lm <span class="sc">|&gt;</span></span>
+<span id="cb191-5"><a href="tidy-modelling.html#cb191-5" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(<span class="at">resamples =</span> wage_folds,</span>
+<span id="cb191-6"><a href="tidy-modelling.html#cb191-6" tabindex="-1"></a>                <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse, mae, rsq))</span>
+<span id="cb191-7"><a href="tidy-modelling.html#cb191-7" tabindex="-1"></a></span>
+<span id="cb191-8"><a href="tidy-modelling.html#cb191-8" tabindex="-1"></a>wage.resamples.nn <span class="ot">&lt;-</span> wage.wf.nn <span class="sc">|&gt;</span></span>
+<span id="cb191-9"><a href="tidy-modelling.html#cb191-9" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(<span class="at">resamples =</span> wage_folds,</span>
+<span id="cb191-10"><a href="tidy-modelling.html#cb191-10" tabindex="-1"></a>                <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse, mae, rsq))</span>
+<span id="cb191-11"><a href="tidy-modelling.html#cb191-11" tabindex="-1"></a></span>
+<span id="cb191-12"><a href="tidy-modelling.html#cb191-12" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb191-13"><a href="tidy-modelling.html#cb191-13" tabindex="-1"></a>  <span class="fu">collect_metrics</span>(wage.resamples.lm) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">&quot;linear model&quot;</span>),</span>
+<span id="cb191-14"><a href="tidy-modelling.html#cb191-14" tabindex="-1"></a>  <span class="fu">collect_metrics</span>(wage.resamples.nn) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">&quot;neural network&quot;</span>)</span>
+<span id="cb191-15"><a href="tidy-modelling.html#cb191-15" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb191-16"><a href="tidy-modelling.html#cb191-16" tabindex="-1"></a>  <span class="fu">select</span>(model, .metric, mean, std_err)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 6 × 4
+#&gt;   model          .metric    mean  std_err
+#&gt;   &lt;chr&gt;          &lt;chr&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 linear model   mae     3.0457  0.20526 
+#&gt; 2 linear model   rmse    4.3640  0.42507 
+#&gt; 3 linear model   rsq     0.29957 0.061394
+#&gt; 4 neural network mae     4.1655  0.30019 
+#&gt; 5 neural network rmse    5.7765  0.58700 
+#&gt; 6 neural network rsq     0.17560 0.032067</code></pre>
+<p>Some notes:</p>
+<ul>
+<li><p><code>vfold_cv()</code> creates a collection of training/assessment splits from
+<code>wage.new.train</code>. The original held-out set <code>wage.validation</code>
+remains untouched for later.</p></li>
+<li><p><code>fit_resamples()</code> fits the workflow separately on each analysis fold
+and evaluates it on the corresponding assessment fold.</p></li>
+<li><p>The resulting summary is usually more trustworthy than judging two
+models from a single split alone.</p></li>
+</ul>
+</div>
+</div>
+<div id="sec:tidymodels-tuning" class="section level2 hasAnchor" number="5.7">
+<h2><span class="header-section-number">5.7</span> Simple tuning with <code>tune_grid()</code><a href="tidy-modelling.html#sec:tidymodels-tuning" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Resampling is also the natural setting for tuning hyperparameters. To
+illustrate this, let us tune a random forest using the same wage data.
+This updates the random-forest story from Section <a href="prediction.html#sec:randomforest">4.5</a>
+into a more modern workflow.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-28" class="example"><strong>Example 5.7  </strong></span><strong>Tuning a random forest with <code>ranger</code></strong></p>
+<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb193-1"><a href="tidy-modelling.html#cb193-1" tabindex="-1"></a><span class="fu">library</span>(ranger)</span>
+<span id="cb193-2"><a href="tidy-modelling.html#cb193-2" tabindex="-1"></a></span>
+<span id="cb193-3"><a href="tidy-modelling.html#cb193-3" tabindex="-1"></a>wage.spec.rf <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">mode =</span> <span class="st">&quot;regression&quot;</span>,</span>
+<span id="cb193-4"><a href="tidy-modelling.html#cb193-4" tabindex="-1"></a>                            <span class="at">trees =</span> <span class="dv">500</span>,</span>
+<span id="cb193-5"><a href="tidy-modelling.html#cb193-5" tabindex="-1"></a>                            <span class="at">mtry =</span> <span class="fu">tune</span>(),</span>
+<span id="cb193-6"><a href="tidy-modelling.html#cb193-6" tabindex="-1"></a>                            <span class="at">min_n =</span> <span class="fu">tune</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb193-7"><a href="tidy-modelling.html#cb193-7" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;ranger&quot;</span>)</span>
+<span id="cb193-8"><a href="tidy-modelling.html#cb193-8" tabindex="-1"></a></span>
+<span id="cb193-9"><a href="tidy-modelling.html#cb193-9" tabindex="-1"></a>wage.wf.rf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb193-10"><a href="tidy-modelling.html#cb193-10" tabindex="-1"></a>  <span class="fu">add_recipe</span>(wage.recipe) <span class="sc">|&gt;</span></span>
+<span id="cb193-11"><a href="tidy-modelling.html#cb193-11" tabindex="-1"></a>  <span class="fu">add_model</span>(wage.spec.rf)</span>
+<span id="cb193-12"><a href="tidy-modelling.html#cb193-12" tabindex="-1"></a></span>
+<span id="cb193-13"><a href="tidy-modelling.html#cb193-13" tabindex="-1"></a>wage.rf.grid <span class="ot">&lt;-</span> <span class="fu">crossing</span>(</span>
+<span id="cb193-14"><a href="tidy-modelling.html#cb193-14" tabindex="-1"></a>  <span class="at">mtry =</span> <span class="fu">c</span>(<span class="dv">2</span><span class="dt">L</span>, <span class="dv">4</span><span class="dt">L</span>, <span class="dv">6</span><span class="dt">L</span>),</span>
+<span id="cb193-15"><a href="tidy-modelling.html#cb193-15" tabindex="-1"></a>  <span class="at">min_n =</span> <span class="fu">c</span>(<span class="dv">2</span><span class="dt">L</span>, <span class="dv">5</span><span class="dt">L</span>, <span class="dv">20</span><span class="dt">L</span>)</span>
+<span id="cb193-16"><a href="tidy-modelling.html#cb193-16" tabindex="-1"></a>)</span>
+<span id="cb193-17"><a href="tidy-modelling.html#cb193-17" tabindex="-1"></a></span>
+<span id="cb193-18"><a href="tidy-modelling.html#cb193-18" tabindex="-1"></a>wage.rf.tune <span class="ot">&lt;-</span> wage.wf.rf <span class="sc">|&gt;</span></span>
+<span id="cb193-19"><a href="tidy-modelling.html#cb193-19" tabindex="-1"></a>  <span class="fu">tune_grid</span>(<span class="at">resamples =</span> wage_folds,</span>
+<span id="cb193-20"><a href="tidy-modelling.html#cb193-20" tabindex="-1"></a>            <span class="at">grid =</span> wage.rf.grid,</span>
+<span id="cb193-21"><a href="tidy-modelling.html#cb193-21" tabindex="-1"></a>            <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse, mae, rsq))</span>
+<span id="cb193-22"><a href="tidy-modelling.html#cb193-22" tabindex="-1"></a></span>
+<span id="cb193-23"><a href="tidy-modelling.html#cb193-23" tabindex="-1"></a><span class="fu">show_best</span>(wage.rf.tune, <span class="at">metric =</span> <span class="st">&quot;rmse&quot;</span>)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 5 × 8
+#&gt;    mtry min_n .metric .estimator   mean     n std_err .config        
+#&gt;   &lt;int&gt; &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;          
+#&gt; 1     2    20 rmse    standard   4.5334     5 0.41464 pre0_mod3_post0
+#&gt; 2     2     2 rmse    standard   4.5721     5 0.42773 pre0_mod1_post0
+#&gt; 3     2     5 rmse    standard   4.5724     5 0.41870 pre0_mod2_post0
+#&gt; 4     4    20 rmse    standard   4.6240     5 0.40413 pre0_mod6_post0
+#&gt; 5     4     5 rmse    standard   4.7249     5 0.41311 pre0_mod5_post0</code></pre>
+<p>Some notes:</p>
+<ul>
+<li><p>The arguments <code>mtry = tune()</code> and <code>min_n = tune()</code> mark these
+quantities as hyperparameters to be chosen by resampling rather than
+fixed in advance.</p></li>
+<li><p>The grid here is deliberately small so that the example is easy to
+follow. In a real project we might search more values or use a more
+efficient tuning strategy.</p></li>
+<li><p><code>show_best()</code> gives the strongest settings under the chosen metric,
+here RMSE.</p></li>
+</ul>
+</div>
+</div>
+<div id="sec:tidymodels-final" class="section level2 hasAnchor" number="5.8">
+<h2><span class="header-section-number">5.8</span> Final model fitting with <code>last_fit()</code><a href="tidy-modelling.html#sec:tidymodels-final" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Once tuning is complete, we choose the preferred hyperparameters,
+finalise the workflow, and then fit it one last time using the original
+training/test split from Example <a href="tidy-modelling.html#exm:wagesplit">5.1</a>. This gives us an
+honest assessment on data that were not used during tuning.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-29" class="example"><strong>Example 5.8  </strong></span><strong>Finalising the tuned random forest</strong></p>
+<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb195-1"><a href="tidy-modelling.html#cb195-1" tabindex="-1"></a>best_wage_rf <span class="ot">&lt;-</span> <span class="fu">select_best</span>(wage.rf.tune, <span class="at">metric =</span> <span class="st">&quot;rmse&quot;</span>)</span>
+<span id="cb195-2"><a href="tidy-modelling.html#cb195-2" tabindex="-1"></a>wage.rf.final <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(wage.wf.rf, best_wage_rf)</span>
+<span id="cb195-3"><a href="tidy-modelling.html#cb195-3" tabindex="-1"></a></span>
+<span id="cb195-4"><a href="tidy-modelling.html#cb195-4" tabindex="-1"></a>wage.rf.last <span class="ot">&lt;-</span> wage.rf.final <span class="sc">|&gt;</span></span>
+<span id="cb195-5"><a href="tidy-modelling.html#cb195-5" tabindex="-1"></a>  <span class="fu">last_fit</span>(<span class="at">split =</span> split, <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse, mae, rsq))</span>
+<span id="cb195-6"><a href="tidy-modelling.html#cb195-6" tabindex="-1"></a></span>
+<span id="cb195-7"><a href="tidy-modelling.html#cb195-7" tabindex="-1"></a><span class="fu">collect_metrics</span>(wage.rf.last)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 3 × 4
+#&gt;   .metric .estimator .estimate .config        
+#&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;          
+#&gt; 1 rmse    standard     3.9007  pre0_mod0_post0
+#&gt; 2 mae     standard     3.0174  pre0_mod0_post0
+#&gt; 3 rsq     standard     0.24682 pre0_mod0_post0</code></pre>
+<p>Some notes:</p>
+<ul>
+<li><p><code>select_best()</code> extracts the tuning settings that performed best on
+the resamples.</p></li>
+<li><p><code>finalize_workflow()</code> plugs those settings into the workflow.</p></li>
+<li><p><code>last_fit()</code> refits the final workflow on the full training portion
+of <code>split</code> and evaluates it once on the held-out test portion.</p></li>
+<li><p>This is the supervised-learning pipeline in compact form: import and
+clean the data, define the recipe, resample, tune, and only then
+look at the final test-set performance.</p></li>
+</ul>
+</div>
+</div>
+<div id="summary-2" class="section level2 hasAnchor" number="5.9">
+<h2><span class="header-section-number">5.9</span> Summary<a href="tidy-modelling.html#summary-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The <code>tidymodels</code> framework provides a tidy and reproducible supervised
+modelling pipeline.</p>
+<ul>
+<li><p><code>rsample</code> handles splitting and resampling, so that model assessment
+is not based on a lucky or unlucky single split.</p></li>
+<li><p><code>recipes</code> encodes preprocessing such as scaling, dummy-variable
+creation, and imputation in a form that can be reused consistently.</p></li>
+<li><p><code>parsnip</code> provides a common interface to many model families, while
+<code>workflows</code> keeps the recipe and model together so they do not drift
+apart.</p></li>
+<li><p><code>fit_resamples()</code>, <code>tune_grid()</code>, and <code>last_fit()</code> turn model
+comparison, tuning, and final evaluation into a coherent pipeline.</p></li>
+</ul>
+<p>Looking ahead, the same workflow ideas support the classification
+methods in Section <a href="classification.html#sec:roc">6.5.5</a> and the ensemble methods in
+Section <a href="sec:ensemble.html#sec:ensemble">9</a>.</p>
+
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol start="42">
+<li id="fn42"><p>In the case of a bootstrap resample, rows may appear multiple times in the analysis set, as they are sampled with replacement. The rows in the assessment set are rows that don’t appear in the analysis set.<a href="tidy-modelling.html#fnref42" class="footnote-back">↩︎</a></p></li>
+<li id="fn43"><p>The great thing about the bootstrap, is that it can be applied to just about any summary statistic. e.g. you could fit a complicated model to each analysis set and extract the resampling distribution of any parameter from the model.<a href="tidy-modelling.html#fnref43" class="footnote-back">↩︎</a></p></li>
+<li id="fn44"><p>The numeric variables in the US wage are not on vastly different scales, so this may be less important for this example than for other datasets.<a href="tidy-modelling.html#fnref44" class="footnote-back">↩︎</a></p></li>
+<li id="fn45"><p>Often, rather than creating the final baked datasets, the baking is done directly in the modelling stage by supplying <code>bake(recipe, data)</code> directly to the modelling or predict functions.<a href="tidy-modelling.html#fnref45" class="footnote-back">↩︎</a></p></li>
+<li id="fn46"><p>The name <code>parsnip</code> is a play on words. It is a reference to the older <code>caret</code> package (short for classification and regression training) which has a similar goal, but is implemented very differently from a technical perspective.<a href="tidy-modelling.html#fnref46" class="footnote-back">↩︎</a></p></li>
+<li id="fn47"><p>In a penalised regression the coefficients <span class="math inline">\(\beta_k\)</span> are found by minimising <span class="math display">\[RSS + \lambda \sum_{k=1}^p \beta_k^2.\]</span> Setting <span class="math inline">\(\lambda=0\)</span> results in the conventional estimates of <span class="math inline">\(\beta_k\)</span> that <code>lm</code> would provide, while increasing <span class="math inline">\(\lambda &gt; 0\)</span> results in optimal <span class="math inline">\(\beta_k\)</span>’s that are closer to 0. This is particularly useful in the case where we have more predictors than we do observations, where the classical estimator would be underspecified. The penalisation parameter <span class="math inline">\(\lambda\)</span> is often found by cross-validation.<a href="tidy-modelling.html#fnref47" class="footnote-back">↩︎</a></p></li>
+<li id="fn48"><p>In a Bayesian framework we provide probability distributions that capture our prior beliefs about which values are plausible for the parameters of the model. The data (likelihood) is then used to update these beliefs to reflect the information provided by the data.<a href="tidy-modelling.html#fnref48" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="prediction.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="classification.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": "https://github.com/jmarshallnz/161324/edit/main/notes/05-tidymodels.Rmd",
+    "text": "Edit"
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": ["_main.pdf", "_main.epub"],
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
