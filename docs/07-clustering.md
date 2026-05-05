@@ -911,8 +911,8 @@ peng.dist <- peng.scaled |> dist(method='euclidean')
 peng.sil.1 <- peng.km.1 |> pluck('cluster') |> silhouette(dist=peng.dist)
 peng.sil.2 <- peng.km.2 |> pluck('cluster') |> silhouette(dist=peng.dist)
 peng.sil <- bind_rows(
-    peng.sil.1 |> as.data.frame() |> mutate(k='k=3'),
-    peng.sil.2 |> as.data.frame() |> mutate(k='k=4')
+    peng.sil.1 |> unclass() |> as_tibble() |> mutate(k='k=3'),
+    peng.sil.2 |> unclass() |> as_tibble() |> mutate(k='k=4')
   ) |>
   mutate(cluster = as.factor(cluster))
 
@@ -1112,22 +1112,21 @@ points and leaves isolated observations as noise.
 :::
 
 ::: {.example}
-**High-dimensional clustering in practice**
+**A multivariate clustering workflow for penguins**
 
-A high-dimensional clustering workflow on the Qatar Cars data might use
-the variables
-`length`, `width`, `height`, `mass`, `horsepower`, `price`,
-`performance`, `economy`, `trunk`, and `seating`, with `type` and
-`enginetype` used only after fitting for interpretation. A simple
-workflow is:
+Although the Palmer Penguins data are not truly high-dimensional, they
+still provide a useful illustration of the workflow. We can cluster
+using the four numeric measurements `bill_length_mm`, `bill_depth_mm`,
+`flipper_length_mm`, and `body_mass_g`, while retaining `species` and
+`island` only for interpretation after fitting. A simple workflow is:
 
 
 ``` r
-qatarcars |>
-  select(type, enginetype, length, width, height, mass,
-         horsepower, price, performance, economy, trunk, seating) |>
+penguins |>
+  select(species, island, bill_length_mm, bill_depth_mm,
+         flipper_length_mm, body_mass_g) |>
   drop_na() |>
-  mutate(across(length:seating, ~ as.numeric(scale(.x))))
+  mutate(across(bill_length_mm:body_mass_g, ~ as.numeric(scale(.x))))
 ```
 
 The key point is that the clustering is fit only on the numeric
@@ -1170,32 +1169,50 @@ $\varepsilon$ manually, making HDBSCAN particularly useful when cluster
 densities vary across the dataset.
 
 ::: {.example}
-**HDBSCAN on the Qatar Cars data**
+**HDBSCAN on the penguins data**
 
 
 ``` r
 library(dbscan)
 
-cars_scaled <- qatarcars |>
-  select(length, width, height, mass, horsepower,
-         price, performance, economy, trunk, seating) |>
+penguins_density <- penguins |>
+  select(species, island, bill_length_mm, bill_depth_mm,
+         flipper_length_mm, body_mass_g) |>
   drop_na() |>
-  mutate(across(everything(), ~ as.numeric(scale(.x))))
+  mutate(across(bill_length_mm:body_mass_g, ~ as.numeric(scale(.x))))
 
-hdb <- hdbscan(cars_scaled, minPts = 5)
-hdb
-plot(hdb)   # condensed cluster tree
+hdb <- hdbscan(
+  as.matrix(select(penguins_density, bill_length_mm:body_mass_g)),
+  minPts = 8
+)
+
+tibble(
+  cluster = factor(if_else(hdb$cluster == 0L, "noise", paste0("cluster ", hdb$cluster))),
+  species = penguins_density$species
+) |>
+  count(cluster, species) |>
+  pivot_wider(names_from = species, values_from = n, values_fill = 0)
+```
+
+```
+#> # A tibble: 3 × 4
+#>   cluster   Gentoo Adelie Chinstrap
+#>   <fct>      <int>  <int>     <int>
+#> 1 cluster 1    118      0         0
+#> 2 cluster 2      0    146        67
+#> 3 noise          1      0         1
 ```
 
 Points to note:
 
--   Only the `minPts` parameter need be chosen. A value of 5 is a
-    common default; larger values produce fewer, more conservative
-    clusters.
+-   Only the `minPts` parameter need be chosen. We use `minPts = 8`
+    here to look for reasonably stable density groups in the scaled
+    penguin measurements.
 
--   `plot()` on an `hdbscan` object draws the condensed cluster tree.
-    Wide bands indicate large, stable clusters; thin bands that
-    correspond to briefly-present density groups are collapsed to noise.
+-   HDBSCAN identifies one cluster that is almost entirely Gentoo, and a
+    second cluster that combines most Adélie and Chinstrap penguins.
+    This is a useful reminder that a density-based method may discover a
+    different grouping structure from $K$-means.
 
 -   Observations with cluster label 0 are noise points that did not
     belong to any stable cluster.
@@ -1286,19 +1303,31 @@ UMAP is used to display clustering results, not to determine them.
 ``` r
 library(uwot)
 
-# Fit UMAP on the scaled data (same matrix used for clustering)
-umap_coords <- umap(cars_scaled, n_neighbors = 15, min_dist = 0.1,
-                    n_components = 2, n_threads = 1)
+set.seed(161324)
+umap_coords <- umap(
+  as.matrix(select(penguins_density, bill_length_mm:body_mass_g)),
+  n_neighbors = 15,
+  min_dist = 0.1,
+  n_components = 2,
+  n_threads = 1
+)
 
-car_umap <- as_tibble(umap_coords, .name_repair = ~ c("UMAP1", "UMAP2")) |>
-  bind_cols(cluster = factor(hdb$cluster),
-            type    = qatarcars_complete$type)
+penguin_umap <- as_tibble(umap_coords, .name_repair = ~ c("UMAP1", "UMAP2")) |>
+  bind_cols(
+    cluster = factor(if_else(hdb$cluster == 0L, "noise", paste0("cluster ", hdb$cluster))),
+    species = penguins_density$species
+  )
 
-ggplot(car_umap, aes(x = UMAP1, y = UMAP2, colour = cluster,
-                     shape = type)) +
+ggplot(penguin_umap, aes(x = UMAP1, y = UMAP2, colour = cluster,
+                     shape = species)) +
   geom_point(alpha = 0.7) +
-  labs(title = "UMAP view of Qatar Cars -- HDBSCAN clusters")
+  labs(title = "UMAP view of Palmer Penguins -- HDBSCAN clusters")
 ```
+
+<div class="figure">
+<img src="07-clustering_files/figure-html/umappeng-1.png" alt="UMAP display of the scaled penguin measurements, coloured by HDBSCAN cluster and shaped by species." width="672" />
+<p class="caption">(\#fig:umappeng)UMAP display of the scaled penguin measurements, coloured by HDBSCAN cluster and shaped by species.</p>
+</div>
 
 Points to note:
 
@@ -1306,12 +1335,12 @@ Points to note:
     implementation. Setting `n_threads = 1` makes the result
     reproducible when combined with a fixed seed.
 
--   The UMAP is fit using the same scaled numeric matrix as HDBSCAN,
-    so the display is consistent with what the algorithm actually saw.
+-   The UMAP is fit using the same scaled numeric matrix as HDBSCAN, so
+    the display is consistent with what the algorithm actually saw.
 
--   Setting `shape = type` uses the car body type as an independent
-    label (not used in fitting) to check whether the clusters align
-    with domain categories. This is a useful validity check.
+-   Setting `shape = species` uses the known species labels as an
+    independent check on the clustering. This is a useful validity
+    check because the species information was not used during fitting.
 :::
 
 ### Practical method comparison {#sec:cluster-compare}
