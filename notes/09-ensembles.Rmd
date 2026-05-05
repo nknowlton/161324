@@ -39,7 +39,7 @@ source("../common/longbeach.R")
 longbeach <- read_csv("../data/longbeach.csv", show_col_types = FALSE)
 adoption_data <- prepare_longbeach_adoption_data(longbeach)
 
-set.seed(2024)
+set.seed(67)
 adopt_split  <- initial_split(adoption_data, prop = 0.75, strata = is_adopted)
 adopt_train  <- training(adopt_split)
 adopt_test   <- testing(adopt_split)
