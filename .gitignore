@@ -20,3 +20,6 @@ notes/*.utf8.md
 notes/_book/
 notes/_main.Rmd
 notes/_main.md
+!docs/*.html
+!docs/*_files/
+!docs/*_files/**

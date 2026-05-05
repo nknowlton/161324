@@ -2,13 +2,13 @@
 
 
 
-While classification assigns observations to pre-specified categories
-using predictive modelling from *a priori* training data, cluster
-analysis assigns observations to categories without any *a priori*
-labels. In this chapter we look at several approaches to finding and
-analysing clusters. We start by developing a methodology based on
-measures of dissimilarity ('pseudo-distance', if you like) between
-multivariate observations.
+While classification looks to assign observations to pre-specified
+categories using predictive modelling from *apriori* training data,
+cluster analysis looks to assign observations to categories without any
+apriori knowledge. In this chapter we will look at several approaches to
+the detection and analysis of clusters. We start by developing a
+methodology based upon measures of dissimilarity ('pseudo-distance', if
+you like) between multivariate observations.
 
 **How this chapter connects.** Prediction and classification use a
 labelled outcome, whereas clustering removes that outcome and asks
@@ -17,13 +17,6 @@ comparison table in Section \@ref(sec:task-compare) places clustering
 beside the supervised tasks, and the preprocessing ideas from
 Section \@ref(sec:missing) still matter here because scaling, outliers,
 and missingness can strongly affect the groups we find.
-
-In clustering, the first question is whether meaningful structure is
-present at all. That makes the dissimilarity measure part of the model,
-not just a computational detail. Different clustering methods then make
-different assumptions about the group structure: hierarchical methods
-build nested trees, centre-based methods look for compact groups, and
-density methods look for concentrated regions separated by sparse space.
 
 ## Dissimilarity Matrices for Multivariate Data
 
@@ -72,7 +65,7 @@ coefficient give same dissimilarity.
 
 **Jaccard Coefficient**
 
-The Jaccard coefficient is a *similarity measure* for binary variables,
+The Jaccard cofficient is a *similarity measure* for binary variables,
 given by
 $$\gamma_{st} = \frac{\sum_{j=1}^p {\bf 1}[x_{sj} = x_{tj} = 1]}
 {\sum_{j=1}^p {\bf 1}[x_{sj} + x_{tj} > 0]}.$$ The corresponding
@@ -82,7 +75,7 @@ Note that $\gamma_{st}$ is the proportion of variables on which the
 individuals are matched once the variables on which both individuals
 have a 0 response is removed. This is a very natural measure of
 similarity when 1 represents presence of a rare characteristic, so that
-the vast majority of individuals have 0 responses on most
+the vast majority of individuals have 0 responses on most most
 variables. In that situation, 0-0 matches provide almost no useful
 information about the similarity between individuals. We therefore omit
 these matches.
@@ -92,7 +85,7 @@ these matches.
 Gower's dissimilarity was the metric used to identify nearest neighbours
 in the `kNN()` function from `VIM`, which we discussed in \@ref(sec:imputation).
 To compute Gower's dissimilarity we first divide any numeric variable by
-its range (to ensure all variables have range 1), and then use Manhattan
+it's range (to ensure all variables have range 1), and then use Manhattan
 dissimilarity. For categorical variables we use simple matching. Gower's
 distance is then the combination of these:
 $$\gamma_{st} = \frac{1}{p_n}\sum_{j=1}^{p_n} \frac{|x_{sj} - x_{tj}|}{r_j} + \frac{1}{p_c} \sum_{j=1}^{p_c} {\bf 1}[x_{sj} \neq x_{tj}].$$ where $p_n$ is the number of numeric predictors,
@@ -145,7 +138,7 @@ Agglomerative hierarchical clustering uses the following algorithm.
 
 3.  Stop if only one cluster remains. Otherwise go to 2.
 
-To operate this algorithm we need to define dissimilarities between
+To operate this algorithm we need to define disimilarities between
 clusters. Options include:
 
 Single linkage:
@@ -158,15 +151,11 @@ Complete linkage:
 
 :   $$\delta_{AB} = \max \{ \delta_{st}: \, s \in A, \, t \in B \}.$$
 
-Average dissimilarity:
+Average dissimiliary:
 
 :   $$\delta_{AB} = n_A^{-1} n_B^{-1} \sum_{s \in A} \sum_{t \in B}
     \delta_{st}$$ where $n_A$ and $n_B$ are number of members of
     clusters $A$ and $B$ respectively.
-
-This linkage choice is not a minor setting. It changes the merge history
-of the tree, so cutting two dendrograms at the same height can lead to
-different final partitions.
 
 ::: {.example}
 **Dissimilarities Between Clusters**
@@ -216,28 +205,30 @@ neatly displayed as a *dendrogram* -- see Example \@ref(exm:repubclust).
 ::: {.example #repubclust}
 **Cluster Analysis for US Republican Voting Data**
 
-The data set `repub` contains the percentage of the vote given to the
-Republican candidate in American presidential elections from 1916 to
-1976 for a selection of states. Clusters of states with similar voting
-patterns may be of interest to political analysts. We can start with a
-star plot as an informal way to assess whether any clustering might be
-present. A star plot gives a 2-dimensional summary of a multivariate
-dataset by plotting variable values (normalized to lie between 0 and 1)
-as rays projecting from the star's centre. This gives a quick visual
-comparison between states and helps us see which ones seem to group
-together. Figure \@ref(fig:repubstars) is produced using `stars(repub)`.
-It is easy to see that several states have very similar Republican
-voting patterns. Notice also the unusual pattern in Mississippi, where
-the Republican vote is usually poor but there are some exceptional years
-relative to the other states.
+The data set `repub` contained the percentage of the vote given to the
+republican candidate in American Presidential elections from 1916 to
+1976 for a selection of states. Looking for clusters containing states
+with similiar voting patterns might be of potential interest to
+political analysts. We could start by using a star plot as an informal
+way to assess whether any clustering might be present. A star plot
+presents a 2-dimensional summary of a multivariate dataset by plotting
+variable values (normalized to lie between 0 and 1) as rays projecting
+from the star's center. This technique allows for a quick comparison
+between individuals in a dataset, allowing one to see which individuals
+cluster together. Figure \@ref(fig:repubstars) is
+produced using `stars(repub)`. It is quite
+easy to see that there are several very similar states (in terms of
+Republican voting). Notice the somewhat strange voting pattern in
+Mississippi, where the Republican vote is usually poor but there are
+some exceptional years (in comparison to other states).
 
 <div class="figure">
 <img src="07-clustering_files/figure-html/repubstars-1.png" alt="Stars plot for republican voting data." width="672" />
 <p class="caption">(\#fig:repubstars)Stars plot for republican voting data.</p>
 </div>
 
-The following code uses `hclust()` to produce dendrograms for the
-hierarchical clustering.
+Applying the `hclust` command, R code for producing a dendrogram to
+display hierarchical clustering is given below.
 
 
 ``` r
@@ -254,9 +245,8 @@ ggdendrogram(repub.clust.complete)
 Note that we use `column_to_rownames()` here to move the `State` column
 to the rownames. This is so that when we apply `dist()` to produce the
 distance matrix, the rows and columns are labelled. These labels are
-then kept through the `hclust()` functions. The `ggdendrogram()`
-function from the `ggdendro` package gives us plotting consistent with
-`ggplot2`.
+then kept through the `hclust()` functions. The `ggdendrogram()` function
+from the `ggdendro` package gives us `ggplot2` consistent plotting.
 
 The dendrograms produced are displayed in Figures \@ref(fig:repubsingle) and
 \@ref(fig:repubcomplete). Note
@@ -267,6 +257,11 @@ the group $\{ \textsf{Arkansas}, \textsf{Florida},
 \textsf{Texas} \}$ join at a dissimilarity of about 38. (In fact, the exact
 figure is $37.79937$ which can be obtained by inspecting
 `repub.clust.single$height`).
+
+
+```
+#> Warning: package 'ggdendro' was built under R version 4.5.2
+```
 
 <div class="figure">
 <img src="07-clustering_files/figure-html/repubsingle-1.png" alt="Dendrogram for Republican voting data, obtained using single linkage." width="672" />
@@ -310,9 +305,6 @@ repub.groups.complete
 #>  Washington     Wyoming 
 #>           2           2
 ```
-
-Lower cuts would produce more clusters, while higher cuts would merge
-these groups into fewer clusters.
 :::
 
 **Single and Complete Linkage Compared**
@@ -325,7 +317,7 @@ these groups into fewer clusters.
     the right. This can be viewed as an unwanted lack of robustness with
     single linkage.
     
-    ![](graphics/linkage_single.png)<!-- -->
+    <img src="graphics/linkage_single.png" alt="" width="536" />
 
     The central cluster in Figure \@ref(fig:repubsingle) in
     Example \@ref(exm:repubclust) shows an instance of chaining with real data.
@@ -333,15 +325,15 @@ these groups into fewer clusters.
 -   The growth of large clusters at small heights is very unlikely under
     complete linkage. In the figure below the middle cluster will
     combine with the right hand cluster because the extreme left hand
-    edge of the large left cluster is distant. Nonetheless, our
-    intuition is that the middle cluster should first combine with the
+    edge of the large left cluster is distant. Nonetheless, one's
+    intuitive feel is that the middle cluster should first combine with
     left hand cluster.
 
-    ![](graphics/linkage_complete.png)<!-- -->
+    <img src="graphics/linkage_complete.png" alt="" width="563" />
 
 ## K-means clustering
 
-If we have some knowledge *a priori* of the number of clusters $K$, then
+If we have some knowledge apriori of the number of clusters $K$, then
 the problem of clustering changes to assigning each datum to a cluster
 such that within-cluster variation is minimized (and between-cluster
 variation maximised).
@@ -400,13 +392,13 @@ There are a number of pros and cons to this method.
     distances to be calculated.
 
 -   The algorithm will always converge, but may only converge to a local
-    minimum rather than the global minimum[^avoidminima].
+    minima rather than the global minimum[^avoidminima].
 
 -   It is restricted to numerical data.
 
 -   As means are used (Euclidean distance), outliers may be problematic.
 
--   Requires *a priori* knowledge of the number of clusters $K$.
+-   Requires apriori knowledge of the number of clusters $K$.
 
 ::: {.example #kmeans}
 **$K$-means example on synthetic data**
@@ -449,6 +441,11 @@ this for the above example. The majority of the reduction in cluster
 variance occurs by $K=3$, and while things continue to improve, the
 relative improvement is minor.
 
+
+```
+#> Warning: package 'broom' was built under R version 4.5.2
+```
+
 <div class="figure">
 <img src="07-clustering_files/figure-html/kmeans3-1.png" alt="The within cluster variance for one to six clusters for Example \@ref(exm:kmeans)" width="672" />
 <p class="caption">(\#fig:kmeans3)The within cluster variance for one to six clusters for Example \@ref(exm:kmeans)</p>
@@ -464,9 +461,9 @@ kmeans(x, centers, nstart = 1)
 ```
 
 where `x` is the data, `centers` the number of clusters, and `nstart`
-may be optionally specified to run the algorithm several times from
+may be optionally specifed to run the algorithm several times from
 different starting points, helping to minimise the chance of us being
-left with a local minimum rather than the global minimum. The output
+left with a local minima rather than the global minimum. The output
 class contains components
 
 -   `clusters`: the cluster assignment for each observation.
@@ -484,28 +481,36 @@ as we can extract information for linear models.
 ::: {.example #penguins}
 **$K$-means of Penguins from the Palmer Archipelago**
 
-These data consist of size measurements, clutch observations, and blood
+These data consiste of measurements of size, clutch observations and blood
 isotope ratios for adult foraging Adélie, Chinstrap, and Gentoo penguins
-observed on islands in the Palmer Archipelago near Palmer Station,
-Antarctica. The data were collected and made available by Dr Kristen
-Gorman and the Palmer Station Long Term Ecological Research (LTER)
-Program.
+observed on islands in the Palmer Archipelago near Palmer Station, Antartica.
+Data were collected and made available by Dr Kristen Gorman and the Palmer
+Station Long Term Ecological Research (LTER) Program.
 
-We will use the measurements `flipper_length_mm`, `bill_length_mm`, and
-`body_mass_g` to cluster the penguins. Suppose we do not know the
-species labels and want to see whether the $K$-means algorithm can
-recover them from the numeric features alone.
+We'll use the measurements `flipper_length_mm`, `bill_length_mm` and `body_mass_g`
+in order to cluster the penguins, under the assumption that we don't know what the
+underlying species is, and see whether the $K$-means algorithm allows us to
+distinguish the species.
+
+
+```
+#> Warning: package 'palmerpenguins' was built under R version 4.5.2
+```
+
+```
+#> Warning: package 'patchwork' was built under R version 4.5.2
+```
 
 <div class="figure">
 <img src="07-clustering_files/figure-html/peng1-1.png" alt="The actual species (left) and clusters found using $K$-means with 3 clusters (right) for Example \@ref(exm:penguins)." width="672" />
 <p class="caption">(\#fig:peng1)The actual species (left) and clusters found using $K$-means with 3 clusters (right) for Example \@ref(exm:penguins).</p>
 </div>
 
-Figure \@ref(fig:peng1) compares the actual species (on the left) with
-the clusters found by the $K$-means algorithm (on the right). The
-algorithm does reasonably well, although there is some incorrect
-allocation for penguins with moderate flipper lengths and body masses.
-The code used is below:
+Figure \@ref(fig:peng1)
+compares the actual species (on the left) with the clusters found by the
+$K$-means algorithm on the right. We can see that the $K$-means algorithm does
+reasonably well, though there is some incorrect allocation fo moderate flipper
+lengths and body masses. The code used is below:
 
 
 ``` r
@@ -527,12 +532,12 @@ km |> augment(penguins) |>
 ```
 
 Notice that we're specifying `nstart=20` when using `kmeans`. This
-requests that the $K$-means algorithm is run from 20 separate starting
-cluster positions, which helps reduce the chance of being left at a
-local minimum rather than the global minimum. We are also scaling each
-predictor (via the `mutate` function) to a common scale. If we do not do
-that, `body_mass_g` dominates the distance calculation, as shown in
-Figure \@ref(fig:peng2).
+requests that the $K$-means algorithm is run using 20 separate starting
+cluster positions, helping to minimise the chance of us being left with
+a local minima rather than the global minimum. We're also scaling each
+predictor (via the `mutate` function) to a common scale to ensure that
+all the variables were on the same scale. If we don't do that, we'd end
+up with `body_mass_g` dominating, as shown in Figure \@ref(fig:peng2)
 
 <div class="figure">
 <img src="07-clustering_files/figure-html/peng2-1.png" alt="The actual species (left) and clusters found using $K$-means with 3 clusters (right) for Example \@ref(exm:penguins) without scaling." width="672" />
@@ -542,7 +547,7 @@ Figure \@ref(fig:peng2).
 Figure \@ref(fig:peng2) shows that without scaling, the division into clusters happens
 almost exclusively along the `body_mass_g` axis, as this contributes the most to the
 distance between observations. This clearly gives a clustering that does not align
-well with the actual species.
+well at all to the actual species.
 
 Figure \@ref(fig:peng3) compares the total within cluster sum of squares for a
 range of $k$ for scaled (left) and unscaled (right) data. We see in either case
@@ -554,7 +559,7 @@ show a very slightly larger kink at 3 clusters.
 <p class="caption">(\#fig:peng3)Cluster size versus within cluster variation for Example \@ref(exm:penguins). Scaled data left, unscaled data right</p>
 </div>
 
-The code used to produce the datasets for these charts is below:
+The code to produce the datasets for these charts is below:
 
 
 ``` r
@@ -632,7 +637,7 @@ shows the same image clustered using a range of colours.
 So far we have used only the Euclidean distance as our dissimilarity
 measure. The Euclidean distance is not appropriate, however, if we have
 categorical data, or the data are on very different scales. Instead, the
-$K$-medoids algorithm may be used. It uses only the distances between
+$K$-mediods algorithm may be used which uses only the distances between
 data points, allowing any dissimilarity matrix to be used. The algorithm
 is as follows:
 
@@ -650,12 +655,12 @@ is as follows:
 
 4.  Repeat from 1 until the $m_k$ reach convergence.
 
-This is significantly more costly than $K$-means because we have lost the
+This is significantly more costly than $K$-means as we have lost the
 simplification of using the means of each cluster as the center. The
 `pam` function (Partitioning Around Medoids) in the `cluster` package
 may be used to compute the $K$-medoids of a dataset. Like `hclust`, it
 can take a dissimilarity object directly, thus overcoming the
-restriction of using only the Euclidean distance function. The
+restriction of utilising only the Euclidean distance function. The
 syntax is
 
 
@@ -670,12 +675,19 @@ in the case `x` is a data frame.
 ::: {.example}
 **$K$-medoids to Republican voting data**
 
-We show how to use the `pam` function on the US Republican voting data
+We show how to use the `pam` function on the US republican voting data
 from example \@ref(exm:repubclust).
 
 
 ``` r
 library(cluster)
+```
+
+```
+#> Warning: package 'cluster' was built under R version 4.5.2
+```
+
+``` r
 pam(repub, k=3, metric="manhattan")
 ```
 
@@ -709,9 +721,9 @@ As with `kmeans`, we can clean up this output using `tidy()` to extract the medo
 `glance()` to extract the model fit information, and `augment()` to add the
 clustering information to the original data.
 
-Here we've used the Manhattan distance rather than the Euclidean
-distance, yet we've retrieved the same grouping as we did in example
-\@ref(exm:repubclust), with Mississippi being in a cluster on its own, and the other
+Here we've used the Manhattan distance as opposed to the Euclidean
+distance, yet we've retreived the same grouping as we did in example
+\@ref(exm:repubclust), with Mississippi being in a cluster on it's own, and the other
 states grouping into two clusters. We could also do this using some
 other distance measures, by passing the dissimilarity object into `pam`
 instead of the data frame.
@@ -743,11 +755,6 @@ pam(repub.dist, k=3)
 #> [1] "medoids"    "id.med"     "clustering" "objective"  "isolation" 
 #> [6] "clusinfo"   "silinfo"    "diss"       "call"
 ```
-
-When $K$-means and PAM disagree, the difference often shows up around
-boundary points or outliers. $K$-means averages within a cluster, so the
-centroid can be pulled by extreme observations, while PAM keeps the
-centre anchored to an actual data point.
 :::
 
 ## Silhouette plots
@@ -763,7 +770,7 @@ $$s(i) = \frac{b(i) - a(i)}{\max\{a(i),b(i)\} },$$ where $a(i)$ is the
 average dissimilarity between $x_i$ and the rest of the points in the
 cluster to which $x_i$ belongs, and $b(i)$ is the smallest average
 dissimilarity between $x_i$ and the points in the other clusters[^silzero].
-Figure \@ref(fig:silhouette) shows this diagrammatically.
+Figure \@ref(fig:silhouette) shows this diagramatically.
 
 <div class="figure">
 <img src="07-clustering_files/figure-html/silhouette-1.png" alt="$x$ lies in cluster $A$, so $a(i)$ will be the average of the dissimilarities to other points in $A$. $b(i)$ will be the average dissimilarity to points in cluster $B$ as this is smaller than the average dissimilarity to cluster $C$." width="672" />
@@ -881,7 +888,7 @@ repub.pam.2 |> pluck('silinfo', 'widths') |>
 
 <img src="07-clustering_files/figure-html/unnamed-chunk-15-1.png" alt="" width="672" />
 
-This can be useful for larger datasets, where you might like to just do a boxplot of the silhouette
+This can be useful for larger datasets, where you might like to just do a boxplot of the silhoutte
 widths for each cluster.
 
 If you wish to generate a plot of silhouettes for output from `kmeans` or
@@ -911,8 +918,8 @@ peng.dist <- peng.scaled |> dist(method='euclidean')
 peng.sil.1 <- peng.km.1 |> pluck('cluster') |> silhouette(dist=peng.dist)
 peng.sil.2 <- peng.km.2 |> pluck('cluster') |> silhouette(dist=peng.dist)
 peng.sil <- bind_rows(
-    peng.sil.1 |> unclass() |> as_tibble() |> mutate(k='k=3'),
-    peng.sil.2 |> unclass() |> as_tibble() |> mutate(k='k=4')
+    peng.sil.1 |> as.data.frame() |> mutate(k='k=3'),
+    peng.sil.2 |> as.data.frame() |> mutate(k='k=4')
   ) |>
   mutate(cluster = as.factor(cluster))
 
@@ -946,15 +953,14 @@ Plots are given in Figure \@ref(fig:silhouettepeng). Points to note:
     lower average silhouette, suggesting this split is artificial.
 
 -   Notice in both plots there are points with negative silhouettes.
-    This suggests that these penguins may be better suited to one of the
-    other clusters. While the $k$-means algorithm has assigned these
-    observations to the closest cluster based on the cluster centroid,
-    that doesn't necessarily mean that each point is close to all the
-    other points in that cluster. The different ways of measuring how
-    close a point is to each cluster (e.g. cluster centroid versus
-    average dissimilarity to other points in the cluster) may give
-    different results, in the same way that single and complete linkage
-    give different results in hierarchical clustering.
+    This suggests that these penguins may be better suited in one of the other
+    clusters. Whilst the $k$-means algorithm has assigned these observations
+    to the closest cluster based on the cluster centroid, that doesn't necessarily
+    mean that it is closest to all the points in that cluster. The different ways of
+    measuring how close a point is to each cluster (e.g. cluster
+    centroid versus average dissimilarity to other points in the
+    cluster) may give different results, in the same way that single and
+    complete linkage give different results in heirarchical clustering.
 
 ## Bootstrap stability and the adjusted Rand index
 
@@ -962,9 +968,6 @@ The output of a clustering algorithm is only one partition of the data.
 It is natural to ask whether that partition is *stable*: if the data
 were perturbed slightly, would essentially the same clusters be found
 again? One common approach is to use bootstrap resampling.
-
-A useful clustering should survive small perturbations to the data, not
-just look convincing on a single fitted partition.
 
 Suppose that a baseline clustering gives a partition
 $C = \{C_1, \ldots, C_K\}$, and a bootstrap resample gives another
@@ -1058,9 +1061,6 @@ The DBSCAN algorithm is:
     density reachable from $x_i$.
 
 5.  Repeat until every point has been visited.
-
-A point that is labelled as noise early in the scan can still be
-absorbed into a cluster later if a nearby core point reaches it.
 
 Unlike $K$-means or PAM, DBSCAN does not require the number of clusters
 to be fixed in advance. It can also identify non-convex cluster shapes,
@@ -1351,7 +1351,17 @@ UMAP is used to display clustering results, not to determine them.
 
 ``` r
 library(uwot)
+```
 
+```
+#> Warning: package 'uwot' was built under R version 4.5.2
+```
+
+```
+#> Warning: package 'Matrix' was built under R version 4.5.2
+```
+
+``` r
 set.seed(161324)
 umap_coords <- umap(
   penguins_matrix,
@@ -1428,10 +1438,6 @@ A few practical guidelines:
     methods, particularly when the data are high-dimensional. Always
     fit the clustering in the original feature space.
 
-The same dataset can look quite different under different clustering
-assumptions, so the method choice is part of the analysis rather than a
-software default.
-
 ## Summary
 
 Clustering is the main unsupervised grouping tool in these notes.
@@ -1462,3 +1468,4 @@ co-occurrence patterns rather than grouping observations.
 [^silzero]: If a cluster contains only one point, the average dissimilarity to
     other points in the cluster is not well defined. We use the natural
     definition that $a(i)\equiv 0$ which gives $s(i)=1$ in this case.
+
