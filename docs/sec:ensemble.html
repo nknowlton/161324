@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 9 Ensemble Learning | Data mining</title>
+  <meta name="description" content="Chapter 9 Ensemble Learning | Data mining notes" />
+  <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 9 Ensemble Learning | Data mining" />
+  <meta property="og:type" content="book" />
+  <meta property="og:image" content="/graphics/Datamining_cover.png" />
+  <meta property="og:description" content="Chapter 9 Ensemble Learning | Data mining notes" />
+  <meta name="github-repo" content="jmarshallnz/161324" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 9 Ensemble Learning | Data mining" />
+  
+  <meta name="twitter:description" content="Chapter 9 Ensemble Learning | Data mining notes" />
+  <meta name="twitter:image" content="/graphics/Datamining_cover.png" />
+
+<meta name="author" content="Jonathan Marshall, Martin Hazelton, Nick Knowlton" />
+
+
+<meta name="date" content="2026-05-05" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="association-rule-mining.html"/>
+
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet" />
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="libs/datatables-binding-0.34.0/datatables.js"></script>
+<link href="libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+<link href="libs/nouislider-7.0.10/jquery.nouislider.min.css" rel="stylesheet" />
+<script src="libs/nouislider-7.0.10/jquery.nouislider.min.js"></script>
+<link href="libs/selectize-0.12.0/selectize.bootstrap3.css" rel="stylesheet" />
+<script src="libs/selectize-0.12.0/selectize.min.js"></script>
+<link href="libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+
+
+<style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">161.324 Data Mining</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="0.1" data-path="index.html"><a href="index.html#course-structure"><i class="fa fa-check"></i><b>0.1</b> Course structure</a></li>
+<li class="chapter" data-level="0.2" data-path="index.html"><a href="index.html#prerequisites"><i class="fa fa-check"></i><b>0.2</b> Prerequisites</a></li>
+<li class="chapter" data-level="0.3" data-path="index.html"><a href="index.html#how-to-use-these-notes"><i class="fa fa-check"></i><b>0.3</b> How to use these notes</a></li>
+<li class="chapter" data-level="0.4" data-path="index.html"><a href="index.html#acknowledgements"><i class="fa fa-check"></i><b>0.4</b> Acknowledgements</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="introduction.html"><a href="introduction.html#sec:intro1"><i class="fa fa-check"></i><b>1.1</b> What is Data Mining?</a></li>
+<li class="chapter" data-level="1.2" data-path="introduction.html"><a href="introduction.html#sec:Rinitial"><i class="fa fa-check"></i><b>1.2</b> Statistical Computing with R</a></li>
+<li class="chapter" data-level="1.3" data-path="introduction.html"><a href="introduction.html#the-tidyverse"><i class="fa fa-check"></i><b>1.3</b> The tidyverse</a></li>
+<li class="chapter" data-level="1.4" data-path="introduction.html"><a href="introduction.html#sec:notes-roadmap"><i class="fa fa-check"></i><b>1.4</b> A roadmap for these notes</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="introduction.html"><a href="introduction.html#sec:task-compare"><i class="fa fa-check"></i><b>1.4.1</b> Comparing the main task families</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html"><i class="fa fa-check"></i><b>2</b> Data Acquisition and Processing</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#obtaining-data"><i class="fa fa-check"></i><b>2.1</b> Obtaining Data</a></li>
+<li class="chapter" data-level="2.2" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#sec:dataload"><i class="fa fa-check"></i><b>2.2</b> Loading Data into R</a></li>
+<li class="chapter" data-level="2.3" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#organizing-the-data-in-r"><i class="fa fa-check"></i><b>2.3</b> Organizing the Data in R</a></li>
+<li class="chapter" data-level="2.4" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#sec:missing1"><i class="fa fa-check"></i><b>2.4</b> Missing Values</a></li>
+<li class="chapter" data-level="2.5" data-path="data-acquisition-and-processing.html"><a href="data-acquisition-and-processing.html#summary"><i class="fa fa-check"></i><b>2.5</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>3</b> Missing values</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="missing-values.html"><a href="missing-values.html#sec:missing"><i class="fa fa-check"></i><b>3.1</b> Patterns of Missingness</a></li>
+<li class="chapter" data-level="3.2" data-path="missing-values.html"><a href="missing-values.html#visualising-missing-values"><i class="fa fa-check"></i><b>3.2</b> Visualising missing values</a></li>
+<li class="chapter" data-level="3.3" data-path="missing-values.html"><a href="missing-values.html#working-with-complete-cases"><i class="fa fa-check"></i><b>3.3</b> Working with Complete Cases</a></li>
+<li class="chapter" data-level="3.4" data-path="missing-values.html"><a href="missing-values.html#sec:imputation"><i class="fa fa-check"></i><b>3.4</b> Missing Data Imputation</a></li>
+<li class="chapter" data-level="3.5" data-path="missing-values.html"><a href="missing-values.html#alternative-methods-of-imputation"><i class="fa fa-check"></i><b>3.5</b> Alternative Methods of Imputation</a></li>
+<li class="chapter" data-level="3.6" data-path="missing-values.html"><a href="missing-values.html#summary-1"><i class="fa fa-check"></i><b>3.6</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="prediction.html"><a href="prediction.html"><i class="fa fa-check"></i><b>4</b> Prediction</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="prediction.html"><a href="prediction.html#prediction-classification-and-clustering"><i class="fa fa-check"></i><b>4.1</b> Prediction, Classification and Clustering</a></li>
+<li class="chapter" data-level="4.2" data-path="prediction.html"><a href="prediction.html#sec:predictionbasics"><i class="fa fa-check"></i><b>4.2</b> The Basics of Prediction</a></li>
+<li class="chapter" data-level="4.3" data-path="prediction.html"><a href="prediction.html#sec:regress"><i class="fa fa-check"></i><b>4.3</b> Linear Regression for Prediction</a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="prediction.html"><a href="prediction.html#data-structures-and-notation"><i class="fa fa-check"></i><b>4.3.1</b> Data Structures and Notation</a></li>
+<li class="chapter" data-level="4.3.2" data-path="prediction.html"><a href="prediction.html#the-linear-regression-model"><i class="fa fa-check"></i><b>4.3.2</b> The Linear Regression Model</a></li>
+<li class="chapter" data-level="4.3.3" data-path="prediction.html"><a href="prediction.html#fitting-linear-regression-models"><i class="fa fa-check"></i><b>4.3.3</b> Fitting Linear Regression Models</a></li>
+<li class="chapter" data-level="4.3.4" data-path="prediction.html"><a href="prediction.html#prediction-1"><i class="fa fa-check"></i><b>4.3.4</b> Prediction</a></li>
+<li class="chapter" data-level="4.3.5" data-path="prediction.html"><a href="prediction.html#prediction-accuracy-and-the-bias-variance-trade-off"><i class="fa fa-check"></i><b>4.3.5</b> Prediction Accuracy and the Bias-Variance Trade-Off</a></li>
+<li class="chapter" data-level="4.3.6" data-path="prediction.html"><a href="prediction.html#model-selection"><i class="fa fa-check"></i><b>4.3.6</b> Model Selection</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="prediction.html"><a href="prediction.html#sec:regtree"><i class="fa fa-check"></i><b>4.4</b> Regression Trees</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="prediction.html"><a href="prediction.html#sec:introtree"><i class="fa fa-check"></i><b>4.4.1</b> Introduction to Regression Trees</a></li>
+<li class="chapter" data-level="4.4.2" data-path="prediction.html"><a href="prediction.html#how-to-grow-a-tree"><i class="fa fa-check"></i><b>4.4.2</b> How to Grow a Tree</a></li>
+<li class="chapter" data-level="4.4.3" data-path="prediction.html"><a href="prediction.html#implementing-regression-trees-in-r"><i class="fa fa-check"></i><b>4.4.3</b> Implementing Regression Trees in R</a></li>
+<li class="chapter" data-level="4.4.4" data-path="prediction.html"><a href="prediction.html#sec:treeprune"><i class="fa fa-check"></i><b>4.4.4</b> Pruning</a></li>
+<li class="chapter" data-level="4.4.5" data-path="prediction.html"><a href="prediction.html#sec:validation"><i class="fa fa-check"></i><b>4.4.5</b> Validation and Cross-Validation</a></li>
+<li class="chapter" data-level="4.4.6" data-path="prediction.html"><a href="prediction.html#sec:treeinstability"><i class="fa fa-check"></i><b>4.4.6</b> Tree instability</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="prediction.html"><a href="prediction.html#sec:randomforest"><i class="fa fa-check"></i><b>4.5</b> Random forests</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="prediction.html"><a href="prediction.html#implementation-in-r"><i class="fa fa-check"></i><b>4.5.1</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="prediction.html"><a href="prediction.html#sec:neuralnet"><i class="fa fa-check"></i><b>4.6</b> Neural Networks</a>
+<ul>
+<li class="chapter" data-level="4.6.1" data-path="prediction.html"><a href="prediction.html#an-introduction-to-neural-networks"><i class="fa fa-check"></i><b>4.6.1</b> An Introduction to Neural Networks</a></li>
+<li class="chapter" data-level="4.6.2" data-path="prediction.html"><a href="prediction.html#building-a-neural-network"><i class="fa fa-check"></i><b>4.6.2</b> Building a Neural Network</a></li>
+<li class="chapter" data-level="4.6.3" data-path="prediction.html"><a href="prediction.html#prediction-using-neural-networks-in-r"><i class="fa fa-check"></i><b>4.6.3</b> Prediction Using Neural Networks in R</a></li>
+</ul></li>
+<li class="chapter" data-level="4.7" data-path="prediction.html"><a href="prediction.html#summary-of-prediction-methods"><i class="fa fa-check"></i><b>4.7</b> Summary of Prediction Methods</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="tidy-modelling.html"><a href="tidy-modelling.html"><i class="fa fa-check"></i><b>5</b> Tidy modelling</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="tidy-modelling.html"><a href="tidy-modelling.html#splitting-and-resampling-data"><i class="fa fa-check"></i><b>5.1</b> Splitting and resampling data</a></li>
+<li class="chapter" data-level="5.2" data-path="tidy-modelling.html"><a href="tidy-modelling.html#data-processing-with-recipes"><i class="fa fa-check"></i><b>5.2</b> Data processing with recipes</a></li>
+<li class="chapter" data-level="5.3" data-path="tidy-modelling.html"><a href="tidy-modelling.html#modelling-with-parsnip"><i class="fa fa-check"></i><b>5.3</b> Modelling with parsnip</a></li>
+<li class="chapter" data-level="5.4" data-path="tidy-modelling.html"><a href="tidy-modelling.html#model-performance-with-yardstick"><i class="fa fa-check"></i><b>5.4</b> Model performance with yardstick</a></li>
+<li class="chapter" data-level="5.5" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-workflow"><i class="fa fa-check"></i><b>5.5</b> Workflows</a></li>
+<li class="chapter" data-level="5.6" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-resamples"><i class="fa fa-check"></i><b>5.6</b> Resampling with <code>fit_resamples()</code></a></li>
+<li class="chapter" data-level="5.7" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-tuning"><i class="fa fa-check"></i><b>5.7</b> Simple tuning with <code>tune_grid()</code></a></li>
+<li class="chapter" data-level="5.8" data-path="tidy-modelling.html"><a href="tidy-modelling.html#sec:tidymodels-final"><i class="fa fa-check"></i><b>5.8</b> Final model fitting with <code>last_fit()</code></a></li>
+<li class="chapter" data-level="5.9" data-path="tidy-modelling.html"><a href="tidy-modelling.html#summary-2"><i class="fa fa-check"></i><b>5.9</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="classification.html"><a href="classification.html"><i class="fa fa-check"></i><b>6</b> Classification</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="classification.html"><a href="classification.html#introduction-to-classification"><i class="fa fa-check"></i><b>6.1</b> Introduction to Classification</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="classification.html"><a href="classification.html#statistical-theory-for-classification"><i class="fa fa-check"></i><b>6.1.1</b> Statistical Theory for Classification</a></li>
+<li class="chapter" data-level="6.1.2" data-path="classification.html"><a href="classification.html#misclassification-rates-and-confusion-matrices"><i class="fa fa-check"></i><b>6.1.2</b> Misclassification Rates and Confusion Matrices</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="classification.html"><a href="classification.html#sec:lda"><i class="fa fa-check"></i><b>6.2</b> Linear Discriminant Analysis</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="classification.html"><a href="classification.html#the-method-in-theory"><i class="fa fa-check"></i><b>6.2.1</b> The Method in Theory</a></li>
+<li class="chapter" data-level="6.2.2" data-path="classification.html"><a href="classification.html#implementation-in-r-1"><i class="fa fa-check"></i><b>6.2.2</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="classification.html"><a href="classification.html#sec:kda"><i class="fa fa-check"></i><b>6.3</b> Kernel Discriminant Analysis</a></li>
+<li class="chapter" data-level="6.4" data-path="classification.html"><a href="classification.html#sec:naive"><i class="fa fa-check"></i><b>6.4</b> Naive Bayes Classifiers</a></li>
+<li class="chapter" data-level="6.5" data-path="classification.html"><a href="classification.html#logistic-regression"><i class="fa fa-check"></i><b>6.5</b> Logistic regression</a>
+<ul>
+<li class="chapter" data-level="6.5.1" data-path="classification.html"><a href="classification.html#fitting-logistic-regression-models"><i class="fa fa-check"></i><b>6.5.1</b> Fitting Logistic Regression Models</a></li>
+<li class="chapter" data-level="6.5.2" data-path="classification.html"><a href="classification.html#logistic-regression-as-a-classifier"><i class="fa fa-check"></i><b>6.5.2</b> Logistic Regression as a classifier</a></li>
+<li class="chapter" data-level="6.5.3" data-path="classification.html"><a href="classification.html#sec:multinomial"><i class="fa fa-check"></i><b>6.5.3</b> Extending Logistic Regression to more than two classes</a></li>
+<li class="chapter" data-level="6.5.4" data-path="classification.html"><a href="classification.html#model-selection-1"><i class="fa fa-check"></i><b>6.5.4</b> Model selection</a></li>
+<li class="chapter" data-level="6.5.5" data-path="classification.html"><a href="classification.html#sec:roc"><i class="fa fa-check"></i><b>6.5.5</b> ROC curves and the classification threshold</a></li>
+</ul></li>
+<li class="chapter" data-level="6.6" data-path="classification.html"><a href="classification.html#other-methods-of-classification"><i class="fa fa-check"></i><b>6.6</b> Other Methods of Classification</a>
+<ul>
+<li class="chapter" data-level="6.6.1" data-path="classification.html"><a href="classification.html#k-nearest-neighbour-classification"><i class="fa fa-check"></i><b>6.6.1</b> k-Nearest Neighbour Classification</a></li>
+<li class="chapter" data-level="6.6.2" data-path="classification.html"><a href="classification.html#classification-trees"><i class="fa fa-check"></i><b>6.6.2</b> Classification Trees</a></li>
+<li class="chapter" data-level="6.6.3" data-path="classification.html"><a href="classification.html#random-forests-for-classification"><i class="fa fa-check"></i><b>6.6.3</b> Random Forests for Classification</a></li>
+<li class="chapter" data-level="6.6.4" data-path="classification.html"><a href="classification.html#neural-networks-for-classification"><i class="fa fa-check"></i><b>6.6.4</b> Neural Networks for Classification</a></li>
+</ul></li>
+<li class="chapter" data-level="6.7" data-path="classification.html"><a href="classification.html#sec:classimbalance"><i class="fa fa-check"></i><b>6.7</b> Dealing with Class Imbalance</a>
+<ul>
+<li class="chapter" data-level="6.7.1" data-path="classification.html"><a href="classification.html#resampling-strategies"><i class="fa fa-check"></i><b>6.7.1</b> Resampling strategies</a></li>
+<li class="chapter" data-level="6.7.2" data-path="classification.html"><a href="classification.html#sec:smote"><i class="fa fa-check"></i><b>6.7.2</b> SMOTE: synthetic minority oversampling</a></li>
+</ul></li>
+<li class="chapter" data-level="6.8" data-path="classification.html"><a href="classification.html#high-class-classifiers"><i class="fa fa-check"></i><b>6.8</b> High Class Classifiers</a></li>
+<li class="chapter" data-level="6.9" data-path="classification.html"><a href="classification.html#summary-3"><i class="fa fa-check"></i><b>6.9</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="cluster-analysis.html"><a href="cluster-analysis.html"><i class="fa fa-check"></i><b>7</b> Cluster Analysis</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#dissimilarity-matrices-for-multivariate-data"><i class="fa fa-check"></i><b>7.1</b> Dissimilarity Matrices for Multivariate Data</a></li>
+<li class="chapter" data-level="7.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hierarchical-clustering"><i class="fa fa-check"></i><b>7.2</b> Hierarchical Clustering</a></li>
+<li class="chapter" data-level="7.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-means-clustering"><i class="fa fa-check"></i><b>7.3</b> K-means clustering</a></li>
+<li class="chapter" data-level="7.4" data-path="cluster-analysis.html"><a href="cluster-analysis.html#k-medoids-clustering"><i class="fa fa-check"></i><b>7.4</b> K-medoids clustering</a></li>
+<li class="chapter" data-level="7.5" data-path="cluster-analysis.html"><a href="cluster-analysis.html#silhouette-plots"><i class="fa fa-check"></i><b>7.5</b> Silhouette plots</a></li>
+<li class="chapter" data-level="7.6" data-path="cluster-analysis.html"><a href="cluster-analysis.html#bootstrap-stability-and-the-adjusted-rand-index"><i class="fa fa-check"></i><b>7.6</b> Bootstrap stability and the adjusted Rand index</a></li>
+<li class="chapter" data-level="7.7" data-path="cluster-analysis.html"><a href="cluster-analysis.html#density-based-clustering"><i class="fa fa-check"></i><b>7.7</b> Density-based clustering</a></li>
+<li class="chapter" data-level="7.8" data-path="cluster-analysis.html"><a href="cluster-analysis.html#choosing-varepsilon-using-a-k-distance-plot"><i class="fa fa-check"></i><b>7.8</b> Choosing <span class="math inline">\(\varepsilon\)</span> using a <span class="math inline">\(k\)</span>-distance plot</a></li>
+<li class="chapter" data-level="7.9" data-path="cluster-analysis.html"><a href="cluster-analysis.html#hdbscan-and-umap"><i class="fa fa-check"></i><b>7.9</b> HDBSCAN and UMAP</a>
+<ul>
+<li class="chapter" data-level="7.9.1" data-path="cluster-analysis.html"><a href="cluster-analysis.html#sec:hdbscan"><i class="fa fa-check"></i><b>7.9.1</b> HDBSCAN</a></li>
+<li class="chapter" data-level="7.9.2" data-path="cluster-analysis.html"><a href="cluster-analysis.html#sec:umap"><i class="fa fa-check"></i><b>7.9.2</b> UMAP</a></li>
+<li class="chapter" data-level="7.9.3" data-path="cluster-analysis.html"><a href="cluster-analysis.html#sec:cluster-compare"><i class="fa fa-check"></i><b>7.9.3</b> Practical method comparison</a></li>
+</ul></li>
+<li class="chapter" data-level="7.10" data-path="cluster-analysis.html"><a href="cluster-analysis.html#summary-4"><i class="fa fa-check"></i><b>7.10</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="association-rule-mining.html"><a href="association-rule-mining.html"><i class="fa fa-check"></i><b>8</b> Association rule mining</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="association-rule-mining.html"><a href="association-rule-mining.html#transaction-data-as-a-binary-matrix"><i class="fa fa-check"></i><b>8.1</b> Transaction data as a binary matrix</a></li>
+<li class="chapter" data-level="8.2" data-path="association-rule-mining.html"><a href="association-rule-mining.html#the-apriori-principle"><i class="fa fa-check"></i><b>8.2</b> The Apriori principle</a></li>
+<li class="chapter" data-level="8.3" data-path="association-rule-mining.html"><a href="association-rule-mining.html#the-apriori-algorithm"><i class="fa fa-check"></i><b>8.3</b> The Apriori algorithm</a></li>
+<li class="chapter" data-level="8.4" data-path="association-rule-mining.html"><a href="association-rule-mining.html#apriori-and-eclat"><i class="fa fa-check"></i><b>8.4</b> Apriori and Eclat</a></li>
+<li class="chapter" data-level="8.5" data-path="association-rule-mining.html"><a href="association-rule-mining.html#inspecting-and-filtering-rules-in-arules"><i class="fa fa-check"></i><b>8.5</b> Inspecting and filtering rules in <code>arules</code></a></li>
+<li class="chapter" data-level="8.6" data-path="association-rule-mining.html"><a href="association-rule-mining.html#sec:association-fit"><i class="fa fa-check"></i><b>8.6</b> Where association rules fit</a></li>
+<li class="chapter" data-level="8.7" data-path="association-rule-mining.html"><a href="association-rule-mining.html#summary-5"><i class="fa fa-check"></i><b>8.7</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="sec:ensemble.html"><a href="sec:ensemble.html"><i class="fa fa-check"></i><b>9</b> Ensemble Learning</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:ensemble-motivation"><i class="fa fa-check"></i><b>9.1</b> Motivation: Why Combine Models?</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#the-variance-reduction-argument"><i class="fa fa-check"></i><b>9.1.1</b> The variance reduction argument</a></li>
+<li class="chapter" data-level="9.1.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#bias-vs-variance-in-ensembles"><i class="fa fa-check"></i><b>9.1.2</b> Bias vs variance in ensembles</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:bagging"><i class="fa fa-check"></i><b>9.2</b> Bagging</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#the-bootstrap-aggregating-algorithm"><i class="fa fa-check"></i><b>9.2.1</b> The bootstrap aggregating algorithm</a></li>
+<li class="chapter" data-level="9.2.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:oob"><i class="fa fa-check"></i><b>9.2.2</b> Out-of-bag error</a></li>
+<li class="chapter" data-level="9.2.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#implementation-in-r-2"><i class="fa fa-check"></i><b>9.2.3</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:ensemblerf"><i class="fa fa-check"></i><b>9.3</b> Random Forests</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:varimp"><i class="fa fa-check"></i><b>9.3.1</b> Variable importance</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:boosting"><i class="fa fa-check"></i><b>9.4</b> Boosting</a>
+<ul>
+<li class="chapter" data-level="9.4.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#forward-stagewise-additive-modelling"><i class="fa fa-check"></i><b>9.4.1</b> Forward stagewise additive modelling</a></li>
+<li class="chapter" data-level="9.4.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:gradboosting"><i class="fa fa-check"></i><b>9.4.2</b> Gradient boosting</a></li>
+<li class="chapter" data-level="9.4.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:xgboost"><i class="fa fa-check"></i><b>9.4.3</b> XGBoost: regularised gradient boosting</a></li>
+<li class="chapter" data-level="9.4.4" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:boost-r"><i class="fa fa-check"></i><b>9.4.4</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="9.5" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:stacking"><i class="fa fa-check"></i><b>9.5</b> Stacking</a>
+<ul>
+<li class="chapter" data-level="9.5.1" data-path="sec:ensemble.html"><a href="sec:ensemble.html#stacked-generalisation"><i class="fa fa-check"></i><b>9.5.1</b> Stacked generalisation</a></li>
+<li class="chapter" data-level="9.5.2" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:cv-meta"><i class="fa fa-check"></i><b>9.5.2</b> Cross-validated meta-features</a></li>
+<li class="chapter" data-level="9.5.3" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:stacking-r"><i class="fa fa-check"></i><b>9.5.3</b> Implementation in R</a></li>
+</ul></li>
+<li class="chapter" data-level="9.6" data-path="sec:ensemble.html"><a href="sec:ensemble.html#sec:automl"><i class="fa fa-check"></i><b>9.6</b> AutoML: Automated Model Selection</a></li>
+<li class="chapter" data-level="9.7" data-path="sec:ensemble.html"><a href="sec:ensemble.html#summary-6"><i class="fa fa-check"></i><b>9.7</b> Summary</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Data mining</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="sec:ensemble" class="section level1 hasAnchor" number="9">
+<h1><span class="header-section-number">Chapter 9</span> Ensemble Learning<a href="sec:ensemble.html#sec:ensemble" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>The methods covered in previous chapters each build a single predictive
+model: a regression equation, a tree, a neural network, and so on. An
+<em>ensemble</em> takes a different approach: it builds many models and
+combines their predictions. The resulting ensemble often outperforms any
+of its constituent learners, sometimes dramatically so.</p>
+<p><strong>How this chapter connects.</strong> This chapter builds directly on the
+supervised modelling workflow from Chapter 5 and on the single-model
+methods introduced earlier in prediction and classification. In the
+comparison table in Section <a href="introduction.html#sec:task-compare">1.4.1</a>, ensembles are not a
+separate problem type so much as a strategy for improving supervised
+performance by combining several learners.</p>
+<p>We will use the <strong>Long Beach Animal Shelter</strong> data introduced in
+Lecture 10 to anchor the examples in this chapter. The modelling task is
+to predict whether a cat or dog will be <em>adopted</em>, using only information
+available at the time of intake.</p>
+<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb279-1"><a href="sec:ensemble.html#cb279-1" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb279-2"><a href="sec:ensemble.html#cb279-2" tabindex="-1"></a><span class="fu">library</span>(baguette)</span>
+<span id="cb279-3"><a href="sec:ensemble.html#cb279-3" tabindex="-1"></a><span class="fu">library</span>(mirai)</span>
+<span id="cb279-4"><a href="sec:ensemble.html#cb279-4" tabindex="-1"></a><span class="fu">daemons</span>(<span class="dv">10</span>)</span>
+<span id="cb279-5"><a href="sec:ensemble.html#cb279-5" tabindex="-1"></a><span class="fu">tidymodels_prefer</span>()</span>
+<span id="cb279-6"><a href="sec:ensemble.html#cb279-6" tabindex="-1"></a></span>
+<span id="cb279-7"><a href="sec:ensemble.html#cb279-7" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;../common/longbeach.R&quot;</span>)</span>
+<span id="cb279-8"><a href="sec:ensemble.html#cb279-8" tabindex="-1"></a>longbeach <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../data/longbeach.csv&quot;</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb279-9"><a href="sec:ensemble.html#cb279-9" tabindex="-1"></a>adoption_data <span class="ot">&lt;-</span> <span class="fu">prepare_longbeach_adoption_data</span>(longbeach)</span>
+<span id="cb279-10"><a href="sec:ensemble.html#cb279-10" tabindex="-1"></a></span>
+<span id="cb279-11"><a href="sec:ensemble.html#cb279-11" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">67</span>)</span>
+<span id="cb279-12"><a href="sec:ensemble.html#cb279-12" tabindex="-1"></a>adopt_split  <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(adoption_data, <span class="at">prop =</span> <span class="fl">0.75</span>, <span class="at">strata =</span> is_adopted)</span>
+<span id="cb279-13"><a href="sec:ensemble.html#cb279-13" tabindex="-1"></a>adopt_train  <span class="ot">&lt;-</span> <span class="fu">training</span>(adopt_split)</span>
+<span id="cb279-14"><a href="sec:ensemble.html#cb279-14" tabindex="-1"></a>adopt_test   <span class="ot">&lt;-</span> <span class="fu">testing</span>(adopt_split)</span>
+<span id="cb279-15"><a href="sec:ensemble.html#cb279-15" tabindex="-1"></a>adopt_folds  <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(adopt_train, <span class="at">v =</span> <span class="dv">5</span>, <span class="at">strata =</span> is_adopted)</span></code></pre></div>
+<div id="sec:ensemble-motivation" class="section level2 hasAnchor" number="9.1">
+<h2><span class="header-section-number">9.1</span> Motivation: Why Combine Models?<a href="sec:ensemble.html#sec:ensemble-motivation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="the-variance-reduction-argument" class="section level3 hasAnchor" number="9.1.1">
+<h3><span class="header-section-number">9.1.1</span> The variance reduction argument<a href="sec:ensemble.html#the-variance-reduction-argument" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>To see why aggregation helps, suppose we have <span class="math inline">\(B\)</span> learners
+<span class="math inline">\(\hat{f}_1, \ldots, \hat{f}_B\)</span>, each with variance <span class="math inline">\(\sigma^2\)</span> for a
+given test point. If the pairwise correlation between any two learners
+is <span class="math inline">\(\rho\)</span>, then the variance of their average is
+<span class="math display" id="eq:ensemble-var">\[\begin{equation}
+\operatorname{Var}\!\left(\frac{1}{B}\sum_{b=1}^B \hat{f}_b(x)\right)
+  = \rho\sigma^2 + \frac{1-\rho}{B}\,\sigma^2.
+\tag{9.1}
+\end{equation}\]</span>
+The second term, <span class="math inline">\(\frac{(1-\rho)\sigma^2}{B}\)</span>, shrinks to zero as <span class="math inline">\(B\)</span>
+increases, showing that averaging many learners reduces the uncertainty
+from any one of them. The first term, <span class="math inline">\(\rho\sigma^2\)</span>, remains no matter
+how large <span class="math inline">\(B\)</span> becomes. This is the irreducible variance floor imposed by
+the correlation between models.</p>
+<p>Equation <a href="sec:ensemble.html#eq:ensemble-var">(9.1)</a> has two immediate practical lessons.</p>
+<ol style="list-style-type: decimal">
+<li><p>Averaging helps most when individual learners are highly variable
+(high <span class="math inline">\(\sigma^2\)</span>). Trees are a classic example of such an unstable
+learner (see Section <a href="prediction.html#sec:treeinstability">4.4.6</a>).</p></li>
+<li><p>Averaging helps most when learners are weakly correlated (low
+<span class="math inline">\(\rho\)</span>). Building diverse learners – by resampling, by restricting
+features, or by using entirely different model families – is
+therefore central to ensemble design.</p></li>
+</ol>
+</div>
+<div id="bias-vs-variance-in-ensembles" class="section level3 hasAnchor" number="9.1.2">
+<h3><span class="header-section-number">9.1.2</span> Bias vs variance in ensembles<a href="sec:ensemble.html#bias-vs-variance-in-ensembles" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Recall from Section <a href="prediction.html#sec:predictionbasics">4.2</a> that prediction error
+decomposes as MSE <span class="math inline">\(=\)</span> Bias<span class="math inline">\(^2\)</span> <span class="math inline">\(+\)</span> Variance <span class="math inline">\(+\)</span> Irreducible noise. The
+different ensemble strategies attack this decomposition in different
+ways.</p>
+<p><em>Bagging</em> averages many learners trained on bootstrap samples. It
+reduces variance (Equation <a href="sec:ensemble.html#eq:ensemble-var">(9.1)</a>) but does not reduce
+bias, because each individual learner is still fit on a sample from the
+same distribution.</p>
+<p><em>Boosting</em> builds learners sequentially, with each learner targeting the
+errors of the previous stage. It primarily reduces bias by progressively
+improving the fit, at the cost of some increase in variance if too many
+rounds are used.</p>
+<p><em>Stacking</em> combines different model families. Since each family has
+different inductive biases, a well-chosen meta-learner can exploit
+situations where each base learner makes different errors, potentially
+reducing both bias and variance.</p>
+</div>
+</div>
+<div id="sec:bagging" class="section level2 hasAnchor" number="9.2">
+<h2><span class="header-section-number">9.2</span> Bagging<a href="sec:ensemble.html#sec:bagging" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="the-bootstrap-aggregating-algorithm" class="section level3 hasAnchor" number="9.2.1">
+<h3><span class="header-section-number">9.2.1</span> The bootstrap aggregating algorithm<a href="sec:ensemble.html#the-bootstrap-aggregating-algorithm" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Bagging (Breiman, 1996) applies the bootstrap idea from validation
+(Section <a href="prediction.html#sec:validation">4.4.5</a>) to model building. The full algorithm
+for regression is:</p>
+<ol style="list-style-type: decimal">
+<li>For <span class="math inline">\(b = 1, \ldots, B\)</span>:
+<ol style="list-style-type: lower-alpha">
+<li>Draw a bootstrap sample <span class="math inline">\(\mathcal{D}^{(b)}\)</span> of size <span class="math inline">\(n\)</span> from
+the training data, sampling rows uniformly with replacement.</li>
+<li>Fit a learner <span class="math inline">\(\hat{f}_b\)</span> to <span class="math inline">\(\mathcal{D}^{(b)}\)</span>.</li>
+</ol></li>
+<li>For a new test point <span class="math inline">\(x\)</span>, predict
+<span class="math display" id="eq:bagging-pred">\[\begin{equation}
+\hat{f}_{\text{bag}}(x) = \frac{1}{B}\sum_{b=1}^B \hat{f}_b(x).
+\tag{9.2}
+\end{equation}\]</span></li>
+</ol>
+<p>For classification the individual learners produce class probabilities
+<span class="math inline">\(\hat{p}_{bc}(x)\)</span> for class <span class="math inline">\(c\)</span>. These are averaged across the <span class="math inline">\(B\)</span>
+learners,
+<span class="math display">\[\hat{p}_c(x) = \frac{1}{B}\sum_{b=1}^B \hat{p}_{bc}(x),\]</span>
+and the predicted class is <span class="math inline">\(\arg\max_c \hat{p}_c(x)\)</span>.</p>
+<p>Because each bootstrap sample is drawn independently, the <span class="math inline">\(B\)</span> learners
+are not perfectly correlated, giving the variance reduction in
+Equation <a href="sec:ensemble.html#eq:ensemble-var">(9.1)</a>. Bias is unchanged because each individual
+tree is trained on a dataset that has the same distribution as the
+original training set.</p>
+</div>
+<div id="sec:oob" class="section level3 hasAnchor" number="9.2.2">
+<h3><span class="header-section-number">9.2.2</span> Out-of-bag error<a href="sec:ensemble.html#sec:oob" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>A useful property of bagging is that each observation is absent from
+roughly <span class="math inline">\(1/e \approx 36.8\%\)</span> of the bootstrap samples<a href="#fn67" class="footnote-ref" id="fnref67"><sup>67</sup></a>. The
+observations not included in <span class="math inline">\(\mathcal{D}^{(b)}\)</span> are called
+<em>out-of-bag</em> (OOB) for tree <span class="math inline">\(b\)</span>. For each training observation <span class="math inline">\(i\)</span>, we
+can form an OOB prediction</p>
+<p><span class="math display">\[\hat{f}_{\text{OOB}}(x_i) = \frac{1}{|\mathcal{B}_i|}\sum_{b \in \mathcal{B}_i} \hat{f}_b(x_i)\]</span></p>
+<p>where <span class="math inline">\(\mathcal{B}_i = \{b : i \notin \mathcal{D}^{(b)}\}\)</span> is the set
+of trees for which observation <span class="math inline">\(i\)</span> was out-of-bag. The mean square
+error of these OOB predictions is a nearly unbiased estimate of the
+test error, without needing a separate validation set.</p>
+</div>
+<div id="implementation-in-r-2" class="section level3 hasAnchor" number="9.2.3">
+<h3><span class="header-section-number">9.2.3</span> Implementation in R<a href="sec:ensemble.html#implementation-in-r-2" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Bagged trees are available in <code>tidymodels</code> via the <code>bag_tree()</code> function
+from the <code>baguette</code> package.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-56" class="example"><strong>Example 9.1  </strong></span><strong>Bagged trees for the Long Beach adoption data</strong></p>
+<p>We fit a bagged tree model with 50 trees and compare it to a single
+decision tree on the same data.</p>
+<div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb280-1"><a href="sec:ensemble.html#cb280-1" tabindex="-1"></a>adopt_recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(is_adopted <span class="sc">~</span> ., <span class="at">data =</span> adopt_train) <span class="sc">|&gt;</span></span>
+<span id="cb280-2"><a href="sec:ensemble.html#cb280-2" tabindex="-1"></a>  <span class="fu">step_novel</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb280-3"><a href="sec:ensemble.html#cb280-3" tabindex="-1"></a>  <span class="fu">step_unknown</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb280-4"><a href="sec:ensemble.html#cb280-4" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>())</span>
+<span id="cb280-5"><a href="sec:ensemble.html#cb280-5" tabindex="-1"></a></span>
+<span id="cb280-6"><a href="sec:ensemble.html#cb280-6" tabindex="-1"></a>single_tree_spec <span class="ot">&lt;-</span> <span class="fu">decision_tree</span>(<span class="at">mode =</span> <span class="st">&quot;classification&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb280-7"><a href="sec:ensemble.html#cb280-7" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;rpart&quot;</span>)</span>
+<span id="cb280-8"><a href="sec:ensemble.html#cb280-8" tabindex="-1"></a></span>
+<span id="cb280-9"><a href="sec:ensemble.html#cb280-9" tabindex="-1"></a>bag_spec <span class="ot">&lt;-</span> <span class="fu">bag_tree</span>(<span class="at">mode =</span> <span class="st">&quot;classification&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb280-10"><a href="sec:ensemble.html#cb280-10" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;rpart&quot;</span>, <span class="at">times =</span> <span class="dv">50</span>)</span>
+<span id="cb280-11"><a href="sec:ensemble.html#cb280-11" tabindex="-1"></a></span>
+<span id="cb280-12"><a href="sec:ensemble.html#cb280-12" tabindex="-1"></a>wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> <span class="fu">add_recipe</span>(adopt_recipe)</span>
+<span id="cb280-13"><a href="sec:ensemble.html#cb280-13" tabindex="-1"></a></span>
+<span id="cb280-14"><a href="sec:ensemble.html#cb280-14" tabindex="-1"></a>single_tree_res <span class="ot">&lt;-</span> wf <span class="sc">|&gt;</span></span>
+<span id="cb280-15"><a href="sec:ensemble.html#cb280-15" tabindex="-1"></a>  <span class="fu">add_model</span>(single_tree_spec) <span class="sc">|&gt;</span></span>
+<span id="cb280-16"><a href="sec:ensemble.html#cb280-16" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(adopt_folds, <span class="at">metrics =</span> <span class="fu">metric_set</span>(accuracy, roc_auc))</span>
+<span id="cb280-17"><a href="sec:ensemble.html#cb280-17" tabindex="-1"></a></span>
+<span id="cb280-18"><a href="sec:ensemble.html#cb280-18" tabindex="-1"></a>bag_res <span class="ot">&lt;-</span> wf <span class="sc">|&gt;</span></span>
+<span id="cb280-19"><a href="sec:ensemble.html#cb280-19" tabindex="-1"></a>  <span class="fu">add_model</span>(bag_spec) <span class="sc">|&gt;</span></span>
+<span id="cb280-20"><a href="sec:ensemble.html#cb280-20" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(adopt_folds, <span class="at">metrics =</span> <span class="fu">metric_set</span>(accuracy, roc_auc))</span>
+<span id="cb280-21"><a href="sec:ensemble.html#cb280-21" tabindex="-1"></a></span>
+<span id="cb280-22"><a href="sec:ensemble.html#cb280-22" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb280-23"><a href="sec:ensemble.html#cb280-23" tabindex="-1"></a>  <span class="fu">collect_metrics</span>(single_tree_res) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">&quot;single tree&quot;</span>),</span>
+<span id="cb280-24"><a href="sec:ensemble.html#cb280-24" tabindex="-1"></a>  <span class="fu">collect_metrics</span>(bag_res)         <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">&quot;bagged trees&quot;</span>)</span>
+<span id="cb280-25"><a href="sec:ensemble.html#cb280-25" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb280-26"><a href="sec:ensemble.html#cb280-26" tabindex="-1"></a>  <span class="fu">select</span>(model, .metric, mean)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 4 × 3
+#&gt;   model        .metric     mean
+#&gt;   &lt;chr&gt;        &lt;chr&gt;      &lt;dbl&gt;
+#&gt; 1 single tree  accuracy 0.81818
+#&gt; 2 single tree  roc_auc  0.83150
+#&gt; 3 bagged trees accuracy 0.83425
+#&gt; 4 bagged trees roc_auc  0.87423</code></pre>
+<p>Points to note:</p>
+<ul>
+<li><p><code>step_novel()</code> assigns unseen factor levels (in folds) to a new
+level, and <code>step_unknown()</code> handles <code>NA</code> values in nominal
+predictors, both of which are needed when working with many folds.</p></li>
+<li><p>The 5-fold cross-validation AUC provides an honest comparison
+between the two models without touching the test set.</p></li>
+<li><p>The bagged version typically shows reduced variance across folds,
+consistent with Equation <a href="sec:ensemble.html#eq:ensemble-var">(9.1)</a>.</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="sec:ensemblerf" class="section level2 hasAnchor" number="9.3">
+<h2><span class="header-section-number">9.3</span> Random Forests<a href="sec:ensemble.html#sec:ensemblerf" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Random forests (Section <a href="prediction.html#sec:randomforest">4.5</a>) are bagged trees with
+one important modification: at each candidate split, only a random
+subset of <span class="math inline">\(m\)</span> predictors is considered rather than all <span class="math inline">\(p\)</span> predictors.
+Choosing <span class="math inline">\(m &lt; p\)</span> ensures that the individual trees are less correlated
+with each other, thereby pushing <span class="math inline">\(\rho\)</span> in Equation <a href="sec:ensemble.html#eq:ensemble-var">(9.1)</a>
+closer to zero and further improving ensemble accuracy.</p>
+<p>A common default is <span class="math inline">\(m = \lfloor \sqrt{p} \rfloor\)</span> for classification
+and <span class="math inline">\(m = \lfloor p/3 \rfloor\)</span> for regression, corresponding to the
+<code>mtry</code> argument in most R implementations.</p>
+<div id="sec:varimp" class="section level3 hasAnchor" number="9.3.1">
+<h3><span class="header-section-number">9.3.1</span> Variable importance<a href="sec:ensemble.html#sec:varimp" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Ensembles of trees lose the legibility of a single tree, but they gain
+the ability to measure the <em>importance</em> of each predictor in a
+systematic way.</p>
+<p><strong>Impurity-based importance</strong> (also called Gini importance) sums the
+reduction in node impurity – measured by the Gini index
+(Equation <a href="classification.html#eq:gini">(6.5)</a>) for classification, or variance reduction for
+regression – attributed to splits on variable <span class="math inline">\(j\)</span>, weighted by the
+proportion of observations reaching each node and averaged over all <span class="math inline">\(B\)</span>
+trees:
+<span class="math display">\[\hat{\mathcal{I}}_j = \frac{1}{B}\sum_{b=1}^B \sum_{t:\, j_t = j} \frac{n_t}{n}\,\Delta\mathcal{G}(t)\]</span>
+where <span class="math inline">\(j_t\)</span> is the variable used at node <span class="math inline">\(t\)</span>, <span class="math inline">\(n_t\)</span> is the number of
+training observations reaching node <span class="math inline">\(t\)</span>, <span class="math inline">\(n\)</span> is the total training
+size, and <span class="math inline">\(\Delta\mathcal{G}(t)\)</span> is the impurity reduction at node <span class="math inline">\(t\)</span>.</p>
+<p><strong>Permutation importance</strong> provides a more direct measure of predictive
+contribution. For each tree <span class="math inline">\(b\)</span> and each variable <span class="math inline">\(j\)</span>:
+1. Compute the OOB error for tree <span class="math inline">\(b\)</span> on the unperturbed OOB data.
+2. Randomly permute the values of variable <span class="math inline">\(j\)</span> in the OOB data and
+recompute the OOB error.
+3. The importance of <span class="math inline">\(j\)</span> is the average <em>increase</em> in error caused by
+the permutation.</p>
+<p>A large permutation importance value indicates that the variable
+carries genuine predictive information; permuting it hurts performance.
+A near-zero value suggests the variable is irrelevant.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-57" class="example"><strong>Example 9.2  </strong></span><strong>Random forest and variable importance for the Long Beach adoption data</strong></p>
+<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb282-1"><a href="sec:ensemble.html#cb282-1" tabindex="-1"></a><span class="fu">library</span>(ranger)</span>
+<span id="cb282-2"><a href="sec:ensemble.html#cb282-2" tabindex="-1"></a>rf_spec <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">mode =</span> <span class="st">&quot;classification&quot;</span>, <span class="at">trees =</span> <span class="dv">500</span>,</span>
+<span id="cb282-3"><a href="sec:ensemble.html#cb282-3" tabindex="-1"></a>                       <span class="at">mtry =</span> <span class="fu">tune</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb282-4"><a href="sec:ensemble.html#cb282-4" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;ranger&quot;</span>, <span class="at">importance =</span> <span class="st">&quot;impurity&quot;</span>)</span>
+<span id="cb282-5"><a href="sec:ensemble.html#cb282-5" tabindex="-1"></a></span>
+<span id="cb282-6"><a href="sec:ensemble.html#cb282-6" tabindex="-1"></a>rf_wf <span class="ot">&lt;-</span> wf <span class="sc">|&gt;</span> <span class="fu">add_model</span>(rf_spec)</span>
+<span id="cb282-7"><a href="sec:ensemble.html#cb282-7" tabindex="-1"></a></span>
+<span id="cb282-8"><a href="sec:ensemble.html#cb282-8" tabindex="-1"></a><span class="co"># Tune mtry over a small grid</span></span>
+<span id="cb282-9"><a href="sec:ensemble.html#cb282-9" tabindex="-1"></a>rf_grid <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">mtry =</span> <span class="fu">c</span>(<span class="dv">2</span><span class="dt">L</span>, <span class="dv">4</span><span class="dt">L</span>, <span class="dv">6</span><span class="dt">L</span>))</span>
+<span id="cb282-10"><a href="sec:ensemble.html#cb282-10" tabindex="-1"></a>rf_tune <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(rf_wf, <span class="at">resamples =</span> adopt_folds,</span>
+<span id="cb282-11"><a href="sec:ensemble.html#cb282-11" tabindex="-1"></a>                     <span class="at">grid =</span> rf_grid,</span>
+<span id="cb282-12"><a href="sec:ensemble.html#cb282-12" tabindex="-1"></a>                     <span class="at">metrics =</span> <span class="fu">metric_set</span>(roc_auc))</span>
+<span id="cb282-13"><a href="sec:ensemble.html#cb282-13" tabindex="-1"></a><span class="fu">show_best</span>(rf_tune, <span class="at">metric =</span> <span class="st">&quot;roc_auc&quot;</span>)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 3 × 7
+#&gt;    mtry .metric .estimator    mean     n   std_err .config        
+#&gt;   &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;int&gt;     &lt;dbl&gt; &lt;chr&gt;          
+#&gt; 1     6 roc_auc binary     0.87405     5 0.0023920 pre0_mod3_post0
+#&gt; 2     4 roc_auc binary     0.86500     5 0.0025043 pre0_mod2_post0
+#&gt; 3     2 roc_auc binary     0.84820     5 0.0025612 pre0_mod1_post0</code></pre>
+<div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb284-1"><a href="sec:ensemble.html#cb284-1" tabindex="-1"></a><span class="co"># Fit best model on full training set and inspect importance</span></span>
+<span id="cb284-2"><a href="sec:ensemble.html#cb284-2" tabindex="-1"></a>best_mtry <span class="ot">&lt;-</span> <span class="fu">select_best</span>(rf_tune, <span class="at">metric =</span> <span class="st">&quot;roc_auc&quot;</span>)</span>
+<span id="cb284-3"><a href="sec:ensemble.html#cb284-3" tabindex="-1"></a>final_rf  <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(rf_wf, best_mtry) <span class="sc">|&gt;</span> <span class="fu">fit</span>(adopt_train)</span>
+<span id="cb284-4"><a href="sec:ensemble.html#cb284-4" tabindex="-1"></a></span>
+<span id="cb284-5"><a href="sec:ensemble.html#cb284-5" tabindex="-1"></a>final_rf <span class="sc">|&gt;</span></span>
+<span id="cb284-6"><a href="sec:ensemble.html#cb284-6" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>() <span class="sc">|&gt;</span></span>
+<span id="cb284-7"><a href="sec:ensemble.html#cb284-7" tabindex="-1"></a>  (\(m) <span class="fu">tibble</span>(<span class="at">variable =</span> <span class="fu">names</span>(m<span class="sc">$</span>variable.importance),</span>
+<span id="cb284-8"><a href="sec:ensemble.html#cb284-8" tabindex="-1"></a>               <span class="at">importance =</span> m<span class="sc">$</span>variable.importance))() <span class="sc">|&gt;</span></span>
+<span id="cb284-9"><a href="sec:ensemble.html#cb284-9" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(importance)) <span class="sc">|&gt;</span></span>
+<span id="cb284-10"><a href="sec:ensemble.html#cb284-10" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
+<span id="cb284-11"><a href="sec:ensemble.html#cb284-11" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(variable, importance), <span class="at">y =</span> importance)) <span class="sc">+</span></span>
+<span id="cb284-12"><a href="sec:ensemble.html#cb284-12" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">&quot;steelblue&quot;</span>) <span class="sc">+</span></span>
+<span id="cb284-13"><a href="sec:ensemble.html#cb284-13" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb284-14"><a href="sec:ensemble.html#cb284-14" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">&quot;Impurity importance&quot;</span>, <span class="at">title =</span> <span class="st">&quot;Random forest: variable importance&quot;</span>)</span></code></pre></div>
+<p><img src="09-ensembles_files/figure-html/unnamed-chunk-4-1.png" alt="" width="672" /></p>
+<p>The plot shows which intake-time features drive the adoption prediction.
+Variables near the top account for the largest total impurity reduction
+across the 500 trees.</p>
+</div>
+</div>
+</div>
+<div id="sec:boosting" class="section level2 hasAnchor" number="9.4">
+<h2><span class="header-section-number">9.4</span> Boosting<a href="sec:ensemble.html#sec:boosting" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="forward-stagewise-additive-modelling" class="section level3 hasAnchor" number="9.4.1">
+<h3><span class="header-section-number">9.4.1</span> Forward stagewise additive modelling<a href="sec:ensemble.html#forward-stagewise-additive-modelling" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Boosting belongs to a class of methods known as <em>forward stagewise
+additive modelling</em>. The goal is to construct an additive expansion</p>
+<p><span class="math display" id="eq:additive-expansion">\[\begin{equation}
+F_M(x) = \sum_{m=1}^M \beta_m f_m(x)
+\tag{9.3}
+\end{equation}\]</span></p>
+<p>where each <span class="math inline">\(f_m\)</span> is a weak learner (typically a shallow tree) and
+<span class="math inline">\(\beta_m &gt; 0\)</span> is its contribution weight. We want to minimise a loss
+function</p>
+<p><span class="math display">\[\sum_{i=1}^n L\bigl(y_i,\, F_M(x_i)\bigr)\]</span></p>
+<p>over the choices of <span class="math inline">\(\beta_m\)</span> and <span class="math inline">\(f_m\)</span>. Minimising this jointly over
+all <span class="math inline">\(M\)</span> terms simultaneously is computationally intractable. The
+<em>forward stagewise</em> approach instead adds one term at a time, keeping
+all previous terms fixed:</p>
+<p>At step <span class="math inline">\(m\)</span>, with <span class="math inline">\(F_{m-1}\)</span> already constructed, we find
+<span class="math display">\[(\beta_m, f_m) = \arg\min_{\beta, f} \sum_{i=1}^n L\bigl(y_i,\, F_{m-1}(x_i) + \beta f(x_i)\bigr).\]</span></p>
+<p>When the loss is squared error, <span class="math inline">\(L(y, \hat y) = \tfrac{1}{2}(y - \hat y)^2\)</span>, the
+optimal next step is simply to fit <span class="math inline">\(f_m\)</span> to the residuals
+<span class="math inline">\(r_i = y_i - F_{m-1}(x_i)\)</span>. For other loss functions the residuals are
+replaced by <em>pseudo-residuals</em>.</p>
+</div>
+<div id="sec:gradboosting" class="section level3 hasAnchor" number="9.4.2">
+<h3><span class="header-section-number">9.4.2</span> Gradient boosting<a href="sec:ensemble.html#sec:gradboosting" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Gradient boosting (Friedman, 2001) generalises the forward stagewise
+approach to any differentiable loss <span class="math inline">\(L\)</span> by interpreting each new step as
+a gradient descent move in function space.</p>
+<p>Define the pseudo-residuals at step <span class="math inline">\(m\)</span> as the negative gradient of the
+loss with respect to the current predictions:
+<span class="math display" id="eq:pseudoresid">\[\begin{equation}
+r_i^{(m)} = - \left[\frac{\partial L(y_i,\, F(x_i))}{\partial F(x_i)}\right]_{F = F_{m-1}}.
+\tag{9.4}
+\end{equation}\]</span></p>
+<p>The algorithm is then:</p>
+<ol style="list-style-type: decimal">
+<li><p>Initialise <span class="math inline">\(F_0(x) = \arg\min_c \sum_i L(y_i, c)\)</span>
+(e.g. the mean response for squared error, or the log-odds of the
+majority class for log-loss).</p></li>
+<li><p>For <span class="math inline">\(m = 1, \ldots, M\)</span>:</p>
+<ol style="list-style-type: lower-alpha">
+<li>Compute pseudo-residuals <span class="math inline">\(r_i^{(m)}\)</span> from
+Equation <a href="sec:ensemble.html#eq:pseudoresid">(9.4)</a>.</li>
+<li>Fit a weak learner <span class="math inline">\(h_m\)</span> to the pairs
+<span class="math inline">\(\{(x_i, r_i^{(m)})\}_{i=1}^n\)</span>.</li>
+<li>Update
+<span class="math display" id="eq:boost-update">\[\begin{equation}
+F_m(x) = F_{m-1}(x) + \eta\, h_m(x)
+\tag{9.5}
+\end{equation}\]</span>
+where <span class="math inline">\(\eta \in (0, 1]\)</span> is the <em>learning rate</em> (shrinkage
+parameter).</li>
+</ol></li>
+</ol>
+<p>The key connection is that the pseudo-residuals
+<span class="math inline">\(r_i^{(m)}\)</span> are the negative gradient of the total loss with respect to
+the current functional predictions <span class="math inline">\(F_{m-1}(x_i)\)</span>. Fitting <span class="math inline">\(h_m\)</span> to
+these residuals therefore moves the ensemble prediction in the steepest
+descent direction of the loss functional.</p>
+<p><strong>For squared error loss:</strong> <span class="math inline">\(L(y, \hat y) = \tfrac{1}{2}(y-\hat y)^2\)</span>, so
+<span class="math inline">\(r_i^{(m)} = y_i - F_{m-1}(x_i)\)</span>; the pseudo-residuals are the ordinary
+residuals.</p>
+<p><strong>For log-loss (binary classification):</strong> Writing
+<span class="math inline">\(p(x) = \operatorname{sigmoid}(F(x))\)</span> and
+<span class="math inline">\(L(y, F) = -y\log p - (1-y)\log(1-p)\)</span>, the pseudo-residuals simplify to
+<span class="math inline">\(r_i^{(m)} = y_i - p_{m-1}(x_i)\)</span>. In both cases the pseudo-residuals
+have the same interpretation: the part of the target that the current
+model has not yet explained.</p>
+<p>The learning rate <span class="math inline">\(\eta\)</span> controls how aggressively each new tree moves
+the ensemble prediction. A small <span class="math inline">\(\eta\)</span> requires more trees <span class="math inline">\(M\)</span> to
+achieve the same fit, but the combined effect of many small steps can be
+more accurate and more robust to overfitting than a few large ones.</p>
+</div>
+<div id="sec:xgboost" class="section level3 hasAnchor" number="9.4.3">
+<h3><span class="header-section-number">9.4.3</span> XGBoost: regularised gradient boosting<a href="sec:ensemble.html#sec:xgboost" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>XGBoost (Chen and Guestrin, 2016) extends gradient boosting with a
+regularised objective function and an efficient implementation.</p>
+<p>At round <span class="math inline">\(m\)</span>, after a second-order Taylor expansion of the loss around
+<span class="math inline">\(F_{m-1}(x_i)\)</span>, the objective for the new tree <span class="math inline">\(f_m\)</span> becomes
+<span class="math display" id="eq:xgboost-obj">\[\begin{equation}
+\tilde{\mathcal{L}}^{(m)} =
+  \sum_{i=1}^n \Bigl[ g_i\, w_{q(x_i)} + \tfrac{1}{2}(h_i + \lambda)\, w_{q(x_i)}^2 \Bigr]
+  + \gamma T
+\tag{9.6}
+\end{equation}\]</span>
+where</p>
+<ul>
+<li><span class="math inline">\(g_i = \partial_{F} L(y_i, F(x_i))\big|_{F_{m-1}}\)</span> and
+<span class="math inline">\(h_i = \partial^2_{F} L(y_i, F(x_i))\big|_{F_{m-1}}\)</span> are the
+first and second derivatives of the loss for observation <span class="math inline">\(i\)</span>;</li>
+<li><span class="math inline">\(q : \mathbb{R}^p \to \{1, \ldots, T\}\)</span> maps each observation to
+its leaf index in the current tree;</li>
+<li><span class="math inline">\(w_t\)</span> is the score (weight) assigned to leaf <span class="math inline">\(t\)</span>;</li>
+<li><span class="math inline">\(T\)</span> is the number of leaves;</li>
+<li><span class="math inline">\(\lambda \geq 0\)</span> is an L2 regularisation penalty on leaf weights;</li>
+<li><span class="math inline">\(\gamma \geq 0\)</span> is a penalty on tree complexity (number of leaves).</li>
+</ul>
+<p>For a fixed tree structure, the objective <a href="sec:ensemble.html#eq:xgboost-obj">(9.6)</a> is
+quadratic in the leaf weights. Minimising over <span class="math inline">\(w_t\)</span> for each leaf <span class="math inline">\(t\)</span> gives the
+<em>optimal leaf weight</em>
+<span class="math display" id="eq:xgboost-leafwt">\[\begin{equation}
+w_t^* = -\frac{G_t}{H_t + \lambda},
+\qquad
+G_t = \sum_{i \in \text{leaf}\,t} g_i, \quad
+H_t = \sum_{i \in \text{leaf}\,t} h_i.
+\tag{9.7}
+\end{equation}\]</span>
+Substituting back yields the <em>gain</em> from adding a split at node <span class="math inline">\(t\)</span>,
+which XGBoost uses to select the best split at each node in place of
+the usual impurity criteria.</p>
+<p>The practical implication of <span class="math inline">\(\lambda\)</span> and <span class="math inline">\(\gamma\)</span> is that they shrink
+and prune the trees, acting as a form of regularisation that reduces
+overfitting. In combination with the learning rate <span class="math inline">\(\eta\)</span>, row and
+column subsampling, and tree depth limits, XGBoost provides many axes
+for controlling the bias-variance trade-off.</p>
+<p><strong>Key hyperparameters and their interpretation:</strong></p>
+<table style="width:100%;">
+<colgroup>
+<col width="27%" />
+<col width="17%" />
+<col width="55%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"><code>tidymodels</code> argument</th>
+<th align="left">Symbol</th>
+<th align="left">Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>trees</code></td>
+<td align="left"><span class="math inline">\(M\)</span></td>
+<td align="left">Number of boosting rounds; more is not always better</td>
+</tr>
+<tr class="even">
+<td align="left"><code>tree_depth</code></td>
+<td align="left">max depth</td>
+<td align="left">Deeper trees capture interactions but overfit more easily</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>learn_rate</code></td>
+<td align="left"><span class="math inline">\(\eta\)</span></td>
+<td align="left">Shrinks each tree’s contribution; smaller requires more trees</td>
+</tr>
+<tr class="even">
+<td align="left"><code>mtry</code></td>
+<td align="left">subsample cols</td>
+<td align="left">Fraction of columns used per tree; adds diversity</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>sample_size</code></td>
+<td align="left">subsample rows</td>
+<td align="left">Fraction of rows used per tree; reduces overfitting</td>
+</tr>
+<tr class="even">
+<td align="left"><code>min_n</code></td>
+<td align="left">min child wt</td>
+<td align="left">Minimum <span class="math inline">\(H_t\)</span> in a leaf; controls minimum leaf size</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>loss_reduction</code></td>
+<td align="left"><span class="math inline">\(\gamma\)</span></td>
+<td align="left">Minimum gain required to make a split</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="sec:boost-r" class="section level3 hasAnchor" number="9.4.4">
+<h3><span class="header-section-number">9.4.4</span> Implementation in R<a href="sec:ensemble.html#sec:boost-r" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="example">
+<p><span id="exm:unlabeled-div-58" class="example"><strong>Example 9.3  </strong></span><strong>Gradient boosting for the Long Beach adoption data</strong></p>
+<p>We compare a default boosted tree with a tuned XGBoost model. The
+<code>bonsai</code> package is required to use the <code>lightgbm</code> engine; here we use
+the more portable <code>xgboost</code> engine.</p>
+<div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb285-1"><a href="sec:ensemble.html#cb285-1" tabindex="-1"></a><span class="fu">library</span>(xgboost)</span>
+<span id="cb285-2"><a href="sec:ensemble.html#cb285-2" tabindex="-1"></a></span>
+<span id="cb285-3"><a href="sec:ensemble.html#cb285-3" tabindex="-1"></a>boost_spec <span class="ot">&lt;-</span> <span class="fu">boost_tree</span>(</span>
+<span id="cb285-4"><a href="sec:ensemble.html#cb285-4" tabindex="-1"></a>  <span class="at">mode       =</span> <span class="st">&quot;classification&quot;</span>,</span>
+<span id="cb285-5"><a href="sec:ensemble.html#cb285-5" tabindex="-1"></a>  <span class="at">trees      =</span> <span class="fu">tune</span>(),</span>
+<span id="cb285-6"><a href="sec:ensemble.html#cb285-6" tabindex="-1"></a>  <span class="at">tree_depth =</span> <span class="fu">tune</span>(),</span>
+<span id="cb285-7"><a href="sec:ensemble.html#cb285-7" tabindex="-1"></a>  <span class="at">learn_rate =</span> <span class="fu">tune</span>()</span>
+<span id="cb285-8"><a href="sec:ensemble.html#cb285-8" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb285-9"><a href="sec:ensemble.html#cb285-9" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;xgboost&quot;</span>)</span>
+<span id="cb285-10"><a href="sec:ensemble.html#cb285-10" tabindex="-1"></a></span>
+<span id="cb285-11"><a href="sec:ensemble.html#cb285-11" tabindex="-1"></a>boost_wf   <span class="ot">&lt;-</span> wf <span class="sc">|&gt;</span> <span class="fu">add_model</span>(boost_spec)</span>
+<span id="cb285-12"><a href="sec:ensemble.html#cb285-12" tabindex="-1"></a></span>
+<span id="cb285-13"><a href="sec:ensemble.html#cb285-13" tabindex="-1"></a><span class="co"># A small grid covering key hyperparameters</span></span>
+<span id="cb285-14"><a href="sec:ensemble.html#cb285-14" tabindex="-1"></a>boost_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(</span>
+<span id="cb285-15"><a href="sec:ensemble.html#cb285-15" tabindex="-1"></a>  <span class="fu">trees</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">50</span><span class="dt">L</span>, <span class="dv">300</span><span class="dt">L</span>)),</span>
+<span id="cb285-16"><a href="sec:ensemble.html#cb285-16" tabindex="-1"></a>  <span class="fu">tree_depth</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">2</span><span class="dt">L</span>, <span class="dv">5</span><span class="dt">L</span>)),</span>
+<span id="cb285-17"><a href="sec:ensemble.html#cb285-17" tabindex="-1"></a>  <span class="fu">learn_rate</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="sc">-</span><span class="fl">0.5</span>), <span class="at">trans =</span> <span class="fu">log10_trans</span>()),</span>
+<span id="cb285-18"><a href="sec:ensemble.html#cb285-18" tabindex="-1"></a>  <span class="at">levels =</span> <span class="dv">3</span></span>
+<span id="cb285-19"><a href="sec:ensemble.html#cb285-19" tabindex="-1"></a>)</span>
+<span id="cb285-20"><a href="sec:ensemble.html#cb285-20" tabindex="-1"></a></span>
+<span id="cb285-21"><a href="sec:ensemble.html#cb285-21" tabindex="-1"></a>boost_tune <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
+<span id="cb285-22"><a href="sec:ensemble.html#cb285-22" tabindex="-1"></a>  boost_wf, <span class="at">resamples =</span> adopt_folds,</span>
+<span id="cb285-23"><a href="sec:ensemble.html#cb285-23" tabindex="-1"></a>  <span class="at">grid   =</span> boost_grid,</span>
+<span id="cb285-24"><a href="sec:ensemble.html#cb285-24" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(roc_auc)</span>
+<span id="cb285-25"><a href="sec:ensemble.html#cb285-25" tabindex="-1"></a>)</span>
+<span id="cb285-26"><a href="sec:ensemble.html#cb285-26" tabindex="-1"></a></span>
+<span id="cb285-27"><a href="sec:ensemble.html#cb285-27" tabindex="-1"></a><span class="fu">show_best</span>(boost_tune, <span class="at">metric =</span> <span class="st">&quot;roc_auc&quot;</span>, <span class="at">n =</span> <span class="dv">5</span>)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 5 × 9
+#&gt;   trees tree_depth learn_rate .metric .estimator    mean     n   std_err .config
+#&gt;   &lt;int&gt;      &lt;int&gt;      &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;int&gt;     &lt;dbl&gt; &lt;chr&gt;  
+#&gt; 1   300          3   0.31623  roc_auc binary     0.88729     5 0.0022825 pre0_m…
+#&gt; 2   300          5   0.056234 roc_auc binary     0.88695     5 0.0014439 pre0_m…
+#&gt; 3   175          5   0.31623  roc_auc binary     0.88678     5 0.0023902 pre0_m…
+#&gt; 4    50          5   0.31623  roc_auc binary     0.88662     5 0.0016082 pre0_m…
+#&gt; 5   175          3   0.31623  roc_auc binary     0.88608     5 0.0021445 pre0_m…</code></pre>
+<div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb287-1"><a href="sec:ensemble.html#cb287-1" tabindex="-1"></a>best_boost   <span class="ot">&lt;-</span> <span class="fu">select_best</span>(boost_tune, <span class="at">metric =</span> <span class="st">&quot;roc_auc&quot;</span>)</span>
+<span id="cb287-2"><a href="sec:ensemble.html#cb287-2" tabindex="-1"></a>final_boost  <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(boost_wf, best_boost) <span class="sc">|&gt;</span></span>
+<span id="cb287-3"><a href="sec:ensemble.html#cb287-3" tabindex="-1"></a>  <span class="fu">last_fit</span>(adopt_split, <span class="at">metrics =</span> <span class="fu">metric_set</span>(accuracy, roc_auc))</span>
+<span id="cb287-4"><a href="sec:ensemble.html#cb287-4" tabindex="-1"></a></span>
+<span id="cb287-5"><a href="sec:ensemble.html#cb287-5" tabindex="-1"></a><span class="fu">collect_metrics</span>(final_boost)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 2 × 4
+#&gt;   .metric  .estimator .estimate .config        
+#&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;          
+#&gt; 1 accuracy binary       0.83536 pre0_mod0_post0
+#&gt; 2 roc_auc  binary       0.88667 pre0_mod0_post0</code></pre>
+<p>Points to note:</p>
+<ul>
+<li><p><code>grid_regular()</code> produces a factorial grid over the three
+hyperparameters. In practice, <code>grid_latin_hypercube()</code> or Bayesian
+optimisation via <code>tune_bayes()</code> are more efficient for larger
+grids.</p></li>
+<li><p><code>last_fit()</code> refits the finalised workflow on the full training set
+and evaluates on the held-out test set in a single call, respecting
+the original split. This is the correct way to report test
+performance.</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="sec:stacking" class="section level2 hasAnchor" number="9.5">
+<h2><span class="header-section-number">9.5</span> Stacking<a href="sec:ensemble.html#sec:stacking" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="stacked-generalisation" class="section level3 hasAnchor" number="9.5.1">
+<h3><span class="header-section-number">9.5.1</span> Stacked generalisation<a href="sec:ensemble.html#stacked-generalisation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Stacking (Wolpert, 1992) – also called <em>blending</em> or <em>stacked
+generalisation</em> – combines predictions from <span class="math inline">\(K\)</span> diverse <em>base learners</em>
+using a <em>meta-learner</em>. The key insight is that different model families
+typically make different errors, and a meta-learner trained on their
+predictions can allocate weight to the model that is most reliable for
+each region of the feature space.</p>
+<p>The naïve approach – train base learners on the full training set,
+generate their predictions on the same training set, and train a
+meta-learner on these predictions – is flawed. The base learners will
+have overfit to the training data, so their training-set predictions
+will be unfairly optimistic, leading the meta-learner to over-weight
+complex models.</p>
+</div>
+<div id="sec:cv-meta" class="section level3 hasAnchor" number="9.5.2">
+<h3><span class="header-section-number">9.5.2</span> Cross-validated meta-features<a href="sec:ensemble.html#sec:cv-meta" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The remedy is to use <em>cross-validated</em> predictions as meta-features.
+With <span class="math inline">\(V\)</span>-fold cross-validation:</p>
+<ol style="list-style-type: decimal">
+<li><p>Partition the training data <span class="math inline">\(\mathcal{D}_{\text{train}}\)</span> into <span class="math inline">\(V\)</span>
+folds <span class="math inline">\(\mathcal{D}_1, \ldots, \mathcal{D}_V\)</span>.</p></li>
+<li><p>For each fold <span class="math inline">\(v = 1, \ldots, V\)</span> and each base learner <span class="math inline">\(k = 1,
+\ldots, K\)</span>:</p>
+<ol style="list-style-type: lower-alpha">
+<li>Train learner <span class="math inline">\(k\)</span> on <span class="math inline">\(\mathcal{D}_{\text{train}} \setminus
+\mathcal{D}_v\)</span>.</li>
+<li>Predict fold <span class="math inline">\(v\)</span>: <span class="math inline">\(\hat{z}_{ik} = \hat{f}_k(x_i)\)</span> for
+<span class="math inline">\(i \in \mathcal{D}_v\)</span>.</li>
+</ol></li>
+<li><p>Collect the out-of-fold predictions into a meta-feature matrix
+<span class="math inline">\(\hat{\mathbf{Z}} \in \mathbb{R}^{n \times K}\)</span> with rows
+<span class="math inline">\((\hat{z}_{i1}, \ldots, \hat{z}_{iK})\)</span>.</p></li>
+<li><p>Train a meta-learner <span class="math inline">\(g\)</span> on
+<span class="math inline">\(\{(\hat{\mathbf{z}}_i, y_i)\}_{i=1}^n\)</span>.</p></li>
+<li><p>To predict a new observation <span class="math inline">\(x^*\)</span>:</p>
+<ol style="list-style-type: lower-alpha">
+<li>Refit each base learner on the entire training set.</li>
+<li>Compute base predictions <span class="math inline">\(\hat{z}_k^* = \hat{f}_k(x^*)\)</span>.</li>
+<li>Output <span class="math inline">\(g(\hat{z}_1^*, \ldots, \hat{z}_K^*)\)</span>.</li>
+</ol></li>
+</ol>
+<p>The meta-learner <span class="math inline">\(g\)</span> is often a regularised linear model (ridge or
+lasso regression for regression tasks, logistic regression for
+classification). Using out-of-fold predictions ensures that the
+meta-learner sees predictions that were computed on held-out data,
+removing the bias that would otherwise favour complex base learners.</p>
+</div>
+<div id="sec:stacking-r" class="section level3 hasAnchor" number="9.5.3">
+<h3><span class="header-section-number">9.5.3</span> Implementation in R<a href="sec:ensemble.html#sec:stacking-r" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The <code>stacks</code> package implements cross-validated stacking within the
+<code>tidymodels</code> framework. Base learners are added to a model <em>stack</em>, which
+then blend their candidate predictions into a final ensemble.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-59" class="example"><strong>Example 9.4  </strong></span><strong>A stacked ensemble for the Long Beach adoption data</strong></p>
+<p>We assemble a stack from three base learners: a logistic regression, a
+random forest, and a boosted tree.</p>
+<div class="sourceCode" id="cb289"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb289-1"><a href="sec:ensemble.html#cb289-1" tabindex="-1"></a><span class="fu">library</span>(stacks)</span>
+<span id="cb289-2"><a href="sec:ensemble.html#cb289-2" tabindex="-1"></a></span>
+<span id="cb289-3"><a href="sec:ensemble.html#cb289-3" tabindex="-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">control_stack_resamples</span>()</span>
+<span id="cb289-4"><a href="sec:ensemble.html#cb289-4" tabindex="-1"></a></span>
+<span id="cb289-5"><a href="sec:ensemble.html#cb289-5" tabindex="-1"></a><span class="co"># Logistic regression candidate</span></span>
+<span id="cb289-6"><a href="sec:ensemble.html#cb289-6" tabindex="-1"></a>lr_spec <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>(<span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb289-7"><a href="sec:ensemble.html#cb289-7" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;glmnet&quot;</span>)</span>
+<span id="cb289-8"><a href="sec:ensemble.html#cb289-8" tabindex="-1"></a>lr_res <span class="ot">&lt;-</span> wf <span class="sc">|&gt;</span></span>
+<span id="cb289-9"><a href="sec:ensemble.html#cb289-9" tabindex="-1"></a>  <span class="fu">add_model</span>(lr_spec) <span class="sc">|&gt;</span></span>
+<span id="cb289-10"><a href="sec:ensemble.html#cb289-10" tabindex="-1"></a>  <span class="fu">tune_grid</span>(<span class="at">resamples =</span> adopt_folds,</span>
+<span id="cb289-11"><a href="sec:ensemble.html#cb289-11" tabindex="-1"></a>            <span class="at">grid      =</span> <span class="dv">5</span>,</span>
+<span id="cb289-12"><a href="sec:ensemble.html#cb289-12" tabindex="-1"></a>            <span class="at">metrics   =</span> <span class="fu">metric_set</span>(roc_auc),</span>
+<span id="cb289-13"><a href="sec:ensemble.html#cb289-13" tabindex="-1"></a>            <span class="at">control   =</span> ctrl)</span>
+<span id="cb289-14"><a href="sec:ensemble.html#cb289-14" tabindex="-1"></a></span>
+<span id="cb289-15"><a href="sec:ensemble.html#cb289-15" tabindex="-1"></a><span class="co"># Random forest candidate (fewer trees for speed)</span></span>
+<span id="cb289-16"><a href="sec:ensemble.html#cb289-16" tabindex="-1"></a>rf_fast_spec <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">mode =</span> <span class="st">&quot;classification&quot;</span>, <span class="at">trees =</span> <span class="dv">200</span>,</span>
+<span id="cb289-17"><a href="sec:ensemble.html#cb289-17" tabindex="-1"></a>                            <span class="at">mtry =</span> <span class="fu">tune</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb289-18"><a href="sec:ensemble.html#cb289-18" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;ranger&quot;</span>)</span>
+<span id="cb289-19"><a href="sec:ensemble.html#cb289-19" tabindex="-1"></a>rf_fast_res <span class="ot">&lt;-</span> wf <span class="sc">|&gt;</span></span>
+<span id="cb289-20"><a href="sec:ensemble.html#cb289-20" tabindex="-1"></a>  <span class="fu">add_model</span>(rf_fast_spec) <span class="sc">|&gt;</span></span>
+<span id="cb289-21"><a href="sec:ensemble.html#cb289-21" tabindex="-1"></a>  <span class="fu">tune_grid</span>(<span class="at">resamples =</span> adopt_folds,</span>
+<span id="cb289-22"><a href="sec:ensemble.html#cb289-22" tabindex="-1"></a>            <span class="at">grid      =</span> <span class="fu">tibble</span>(<span class="at">mtry =</span> <span class="fu">c</span>(<span class="dv">2</span><span class="dt">L</span>, <span class="dv">4</span><span class="dt">L</span>)),</span>
+<span id="cb289-23"><a href="sec:ensemble.html#cb289-23" tabindex="-1"></a>            <span class="at">metrics   =</span> <span class="fu">metric_set</span>(roc_auc),</span>
+<span id="cb289-24"><a href="sec:ensemble.html#cb289-24" tabindex="-1"></a>            <span class="at">control   =</span> ctrl)</span>
+<span id="cb289-25"><a href="sec:ensemble.html#cb289-25" tabindex="-1"></a></span>
+<span id="cb289-26"><a href="sec:ensemble.html#cb289-26" tabindex="-1"></a><span class="co"># Boosted tree candidate</span></span>
+<span id="cb289-27"><a href="sec:ensemble.html#cb289-27" tabindex="-1"></a>bt_spec <span class="ot">&lt;-</span> <span class="fu">boost_tree</span>(<span class="at">mode =</span> <span class="st">&quot;classification&quot;</span>,</span>
+<span id="cb289-28"><a href="sec:ensemble.html#cb289-28" tabindex="-1"></a>                      <span class="at">trees =</span> <span class="dv">200</span>, <span class="at">learn_rate =</span> <span class="fl">0.05</span>,</span>
+<span id="cb289-29"><a href="sec:ensemble.html#cb289-29" tabindex="-1"></a>                      <span class="at">tree_depth =</span> <span class="fu">tune</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb289-30"><a href="sec:ensemble.html#cb289-30" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;xgboost&quot;</span>)</span>
+<span id="cb289-31"><a href="sec:ensemble.html#cb289-31" tabindex="-1"></a>bt_res <span class="ot">&lt;-</span> wf <span class="sc">|&gt;</span></span>
+<span id="cb289-32"><a href="sec:ensemble.html#cb289-32" tabindex="-1"></a>  <span class="fu">add_model</span>(bt_spec) <span class="sc">|&gt;</span></span>
+<span id="cb289-33"><a href="sec:ensemble.html#cb289-33" tabindex="-1"></a>  <span class="fu">tune_grid</span>(<span class="at">resamples =</span> adopt_folds,</span>
+<span id="cb289-34"><a href="sec:ensemble.html#cb289-34" tabindex="-1"></a>            <span class="at">grid      =</span> <span class="fu">tibble</span>(<span class="at">tree_depth =</span> <span class="fu">c</span>(<span class="dv">2</span><span class="dt">L</span>, <span class="dv">4</span><span class="dt">L</span>)),</span>
+<span id="cb289-35"><a href="sec:ensemble.html#cb289-35" tabindex="-1"></a>            <span class="at">metrics   =</span> <span class="fu">metric_set</span>(roc_auc),</span>
+<span id="cb289-36"><a href="sec:ensemble.html#cb289-36" tabindex="-1"></a>            <span class="at">control   =</span> ctrl)</span>
+<span id="cb289-37"><a href="sec:ensemble.html#cb289-37" tabindex="-1"></a></span>
+<span id="cb289-38"><a href="sec:ensemble.html#cb289-38" tabindex="-1"></a><span class="co"># Build and blend</span></span>
+<span id="cb289-39"><a href="sec:ensemble.html#cb289-39" tabindex="-1"></a>adopt_stack <span class="ot">&lt;-</span> <span class="fu">stacks</span>() <span class="sc">|&gt;</span></span>
+<span id="cb289-40"><a href="sec:ensemble.html#cb289-40" tabindex="-1"></a>  <span class="fu">add_candidates</span>(lr_res)      <span class="sc">|&gt;</span></span>
+<span id="cb289-41"><a href="sec:ensemble.html#cb289-41" tabindex="-1"></a>  <span class="fu">add_candidates</span>(rf_fast_res) <span class="sc">|&gt;</span></span>
+<span id="cb289-42"><a href="sec:ensemble.html#cb289-42" tabindex="-1"></a>  <span class="fu">add_candidates</span>(bt_res)      <span class="sc">|&gt;</span></span>
+<span id="cb289-43"><a href="sec:ensemble.html#cb289-43" tabindex="-1"></a>  <span class="fu">blend_predictions</span>(<span class="at">penalty =</span> <span class="dv">10</span><span class="sc">^</span>(<span class="sc">-</span><span class="dv">2</span><span class="sc">:-</span><span class="dv">1</span>))</span>
+<span id="cb289-44"><a href="sec:ensemble.html#cb289-44" tabindex="-1"></a></span>
+<span id="cb289-45"><a href="sec:ensemble.html#cb289-45" tabindex="-1"></a><span class="fu">autoplot</span>(adopt_stack, <span class="at">type =</span> <span class="st">&quot;weights&quot;</span>)</span></code></pre></div>
+<p><img src="09-ensembles_files/figure-html/stacking-fit-1.png" alt="" width="672" /></p>
+<div class="sourceCode" id="cb290"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb290-1"><a href="sec:ensemble.html#cb290-1" tabindex="-1"></a>adopt_ensemble <span class="ot">&lt;-</span> adopt_stack <span class="sc">|&gt;</span> <span class="fu">fit_members</span>()</span>
+<span id="cb290-2"><a href="sec:ensemble.html#cb290-2" tabindex="-1"></a></span>
+<span id="cb290-3"><a href="sec:ensemble.html#cb290-3" tabindex="-1"></a>adopt_test_pred <span class="ot">&lt;-</span> adopt_ensemble <span class="sc">|&gt;</span></span>
+<span id="cb290-4"><a href="sec:ensemble.html#cb290-4" tabindex="-1"></a>  <span class="fu">predict</span>(<span class="at">new_data =</span> adopt_test) <span class="sc">|&gt;</span></span>
+<span id="cb290-5"><a href="sec:ensemble.html#cb290-5" tabindex="-1"></a>  <span class="fu">bind_cols</span>(<span class="fu">predict</span>(adopt_ensemble, adopt_test, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb290-6"><a href="sec:ensemble.html#cb290-6" tabindex="-1"></a>  <span class="fu">bind_cols</span>(adopt_test <span class="sc">|&gt;</span> <span class="fu">select</span>(is_adopted))</span>
+<span id="cb290-7"><a href="sec:ensemble.html#cb290-7" tabindex="-1"></a></span>
+<span id="cb290-8"><a href="sec:ensemble.html#cb290-8" tabindex="-1"></a>adopt_test_pred <span class="sc">|&gt;</span> <span class="fu">roc_auc</span>(<span class="at">truth =</span> is_adopted, .pred_Adopted)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 1 × 3
+#&gt;   .metric .estimator .estimate
+#&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+#&gt; 1 roc_auc binary       0.11546</code></pre>
+<p>Points to note:</p>
+<ul>
+<li><p><code>control_stack_resamples()</code> instructs each tuning call to save the
+out-of-fold predictions needed by <code>stacks</code>.</p></li>
+<li><p><code>blend_predictions()</code> fits a non-negative lasso regression on the
+stacked predictions. The <code>penalty</code> argument controls how many base
+model candidates receive non-zero weight.</p></li>
+<li><p><code>autoplot(type = "weights")</code> shows the blending coefficients, making
+it easy to see which model families contribute most to the stack.</p></li>
+<li><p><code>fit_members()</code> refits only the selected base learners on the full
+training set before deploying.</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="sec:automl" class="section level2 hasAnchor" number="9.6">
+<h2><span class="header-section-number">9.6</span> AutoML: Automated Model Selection<a href="sec:ensemble.html#sec:automl" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>AutoML systems automate the search over model families, preprocessing
+steps, and hyperparameters. Tools such as H2O AutoML, FLAML, AutoGluon,
+and the <code>tidymodels</code> extension <code>agua</code> fit dozens of candidates in a
+structured search and produce a leaderboard ordered by a chosen metric.</p>
+<p>The appeal is clear: AutoML can surface competitive baselines quickly,
+comparing methods that might otherwise require many separate modelling
+pipelines. In competitions and initial exploration it is a useful
+starting point.</p>
+<p>However, AutoML carries important risks that are easy to overlook:</p>
+<ul>
+<li><p><strong>Data leakage.</strong> AutoML systems preprocess and transform data
+internally. If preprocessing uses information from left-out
+validation folds (e.g. target-encoding fitted on the whole dataset),
+the leaderboard scores will be optimistic.</p></li>
+<li><p><strong>Opaque pipelines.</strong> The best AutoML model may involve a
+transformation, an imputation strategy, or a feature interaction
+that is never surfaced to the analyst.</p></li>
+<li><p><strong>Interpretability loss.</strong> An ensemble of stacked and blended models
+may achieve a fraction of a percent better AUC but be impossible
+to explain to a stakeholder or to audit for fairness.</p></li>
+<li><p><strong>Deployment complexity.</strong> A full AutoML pipeline may depend on
+many libraries and have complex serialisation requirements.</p></li>
+</ul>
+<p>AutoML is most useful as an <em>initial benchmark</em> to understand what
+performance is achievable on the task, after which a simpler, more
+interpretable model can be justified if it comes close to matching the
+benchmark.</p>
+</div>
+<div id="summary-6" class="section level2 hasAnchor" number="9.7">
+<h2><span class="header-section-number">9.7</span> Summary<a href="sec:ensemble.html#summary-6" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Ensemble methods improve predictive performance by combining multiple
+learners.</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Bagging</strong> reduces variance by averaging many bootstrap-trained
+learners. The variance of the ensemble is <span class="math inline">\(\rho\sigma^2 +
+(1-\rho)\sigma^2/B\)</span>, so decorrelating the learners is as important
+as increasing <span class="math inline">\(B\)</span>.</p></li>
+<li><p><strong>Random forests</strong> add random feature subsets to bagging, further
+decorrelating the trees and enabling reliable variable importance
+measures.</p></li>
+<li><p><strong>Gradient boosting</strong> reduces bias sequentially by fitting each new
+weak learner to the pseudo-residuals (negative gradient of the loss)
+of the current ensemble.</p></li>
+<li><p><strong>XGBoost</strong> extends gradient boosting with a regularised
+second-order objective, enabling efficient split search and
+protecting against overfitting via leaf-weight shrinkage.</p></li>
+<li><p><strong>Stacking</strong> combines diverse model families using a meta-learner
+trained on cross-validated out-of-fold predictions, avoiding the
+bias that would result from using training-set predictions directly.</p></li>
+<li><p><strong>AutoML</strong> automates the above choices but does not replace
+careful thinking about leakage, interpretability, and deployment.</p></li>
+</ol>
+<p>Looking ahead, the same workflow ideas from Chapter 5 can be used to
+compare these ensembles against simpler baselines, helping us decide
+when the extra complexity is genuinely worthwhile.</p>
+
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="footnotes">
+<hr />
+<ol start="67">
+<li id="fn67"><p>For a sample of size <span class="math inline">\(n\)</span>, the probability that a given
+observation is excluded from a bootstrap sample is
+<span class="math inline">\((1 - 1/n)^n \to e^{-1} \approx 0.368\)</span> as <span class="math inline">\(n \to \infty\)</span>.<a href="sec:ensemble.html#fnref67" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="association-rule-mining.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": "https://github.com/jmarshallnz/161324/edit/main/notes/09-ensembles.Rmd",
+    "text": "Edit"
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": ["_main.pdf", "_main.epub"],
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
