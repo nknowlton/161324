@@ -23,7 +23,7 @@
 <meta name="author" content="Jonathan Marshall, Martin Hazelton, Nick Knowlton" />
 
 
-<meta name="date" content="2026-05-04" />
+<meta name="date" content="2026-05-05" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -1251,22 +1251,34 @@ a sensible choice of <span class="math inline">\(\varepsilon\)</span>.</p>
 <p>DBSCAN is particularly useful when the clusters are curved or ring-like,
 since methods such as <span class="math inline">\(K\)</span>-means would tend to split such shapes into
 artificial convex pieces. A typical workflow is:</p>
-<div class="sourceCode" id="cb249"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb249-1"><a href="cluster-analysis.html#cb249-1" tabindex="-1"></a><span class="fu">library</span>(dbscan)</span>
-<span id="cb249-2"><a href="cluster-analysis.html#cb249-2" tabindex="-1"></a></span>
-<span id="cb249-3"><a href="cluster-analysis.html#cb249-3" tabindex="-1"></a>nonconvex <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb249-4"><a href="cluster-analysis.html#cb249-4" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">c</span>(...),</span>
-<span id="cb249-5"><a href="cluster-analysis.html#cb249-5" tabindex="-1"></a>  <span class="at">y =</span> <span class="fu">c</span>(...)</span>
-<span id="cb249-6"><a href="cluster-analysis.html#cb249-6" tabindex="-1"></a>)</span>
-<span id="cb249-7"><a href="cluster-analysis.html#cb249-7" tabindex="-1"></a></span>
-<span id="cb249-8"><a href="cluster-analysis.html#cb249-8" tabindex="-1"></a>dbscan<span class="sc">::</span><span class="fu">kNNdistplot</span>(<span class="fu">as.matrix</span>(nonconvex), <span class="at">k =</span> <span class="dv">4</span>)</span>
-<span id="cb249-9"><a href="cluster-analysis.html#cb249-9" tabindex="-1"></a>db <span class="ot">&lt;-</span> <span class="fu">dbscan</span>(nonconvex, <span class="at">eps =</span> <span class="fl">0.25</span>, <span class="at">minPts =</span> <span class="dv">5</span>)</span>
-<span id="cb249-10"><a href="cluster-analysis.html#cb249-10" tabindex="-1"></a></span>
-<span id="cb249-11"><a href="cluster-analysis.html#cb249-11" tabindex="-1"></a><span class="fu">bind_cols</span>(nonconvex, <span class="at">cluster =</span> <span class="fu">factor</span>(db<span class="sc">$</span>cluster)) <span class="sc">|&gt;</span></span>
-<span id="cb249-12"><a href="cluster-analysis.html#cb249-12" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb249-13"><a href="cluster-analysis.html#cb249-13" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">colour =</span> cluster))</span></code></pre></div>
+<div class="sourceCode" id="cb249"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb249-1"><a href="cluster-analysis.html#cb249-1" tabindex="-1"></a>dbscan<span class="sc">::</span><span class="fu">kNNdistplot</span>(<span class="fu">as.matrix</span>(<span class="fu">select</span>(nonconvex, x, y)), <span class="at">k =</span> <span class="dv">4</span>)</span>
+<span id="cb249-2"><a href="cluster-analysis.html#cb249-2" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="fl">0.92</span>, <span class="at">col =</span> <span class="st">&quot;firebrick&quot;</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="figure">
+<img src="07-clustering_files/figure-html/dbscan_nonconvex_knn-1.png" alt="Ordered 4-nearest-neighbour distances for the synthetic crescent-ring data. The elbow suggests an $\varepsilon$ value a little below 1." width="672" />
+<p class="caption">
+(#fig:dbscan_nonconvex_knn)Ordered 4-nearest-neighbour distances for the synthetic crescent-ring data. The elbow suggests an <span class="math inline">\(\varepsilon\)</span> value a little below 1.
+</p>
+</div>
+<div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb250-1"><a href="cluster-analysis.html#cb250-1" tabindex="-1"></a>db <span class="ot">&lt;-</span> <span class="fu">dbscan</span>(<span class="fu">select</span>(nonconvex, x, y), <span class="at">eps =</span> <span class="fl">0.92</span>, <span class="at">minPts =</span> <span class="dv">5</span>)</span>
+<span id="cb250-2"><a href="cluster-analysis.html#cb250-2" tabindex="-1"></a></span>
+<span id="cb250-3"><a href="cluster-analysis.html#cb250-3" tabindex="-1"></a><span class="fu">bind_cols</span>(</span>
+<span id="cb250-4"><a href="cluster-analysis.html#cb250-4" tabindex="-1"></a>  nonconvex,</span>
+<span id="cb250-5"><a href="cluster-analysis.html#cb250-5" tabindex="-1"></a>  <span class="at">cluster =</span> <span class="fu">factor</span>(<span class="fu">if_else</span>(db<span class="sc">$</span>cluster <span class="sc">==</span> <span class="dv">0</span><span class="dt">L</span>, <span class="st">&quot;noise&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;cluster &quot;</span>, db<span class="sc">$</span>cluster)))</span>
+<span id="cb250-6"><a href="cluster-analysis.html#cb250-6" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb250-7"><a href="cluster-analysis.html#cb250-7" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">colour =</span> cluster)) <span class="sc">+</span></span>
+<span id="cb250-8"><a href="cluster-analysis.html#cb250-8" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb250-9"><a href="cluster-analysis.html#cb250-9" tabindex="-1"></a>  <span class="fu">coord_equal</span>() <span class="sc">+</span></span>
+<span id="cb250-10"><a href="cluster-analysis.html#cb250-10" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;x&quot;</span>, <span class="at">y =</span> <span class="st">&quot;y&quot;</span>, <span class="at">title =</span> <span class="st">&quot;DBSCAN clusters on non-convex synthetic data&quot;</span>)</span></code></pre></div>
+<div class="figure">
+<img src="07-clustering_files/figure-html/dbscan_nonconvex_clusters-1.png" alt="DBSCAN on the synthetic crescent-ring data using $\varepsilon = 0.92$ and `MinPts = 5`. Dense curved regions are recovered as clusters, while isolated points are labelled as noise." width="672" />
+<p class="caption">
+(#fig:dbscan_nonconvex_clusters)DBSCAN on the synthetic crescent-ring data using <span class="math inline">\(\varepsilon = 0.92\)</span> and <code>MinPts = 5</code>. Dense curved regions are recovered as clusters, while isolated points are labelled as noise.
+</p>
+</div>
 <p>The <code>kNNdistplot()</code> call is used to choose a plausible value of
-<span class="math inline">\(\varepsilon\)</span>. The fitted DBSCAN model then labels dense groups of
-points and leaves isolated observations as noise.</p>
+<span class="math inline">\(\varepsilon\)</span>. Here the elbow occurs around <span class="math inline">\(\varepsilon \approx 0.9\)</span>,
+and the fitted DBSCAN model then labels the crescent and ring as dense
+groups while leaving isolated observations as noise.</p>
 </div>
 <div class="example">
 <p><span id="exm:unlabeled-div-51" class="example"><strong>Example 7.8  </strong></span><strong>A multivariate clustering workflow for penguins</strong></p>
@@ -1275,11 +1287,11 @@ still provide a useful illustration of the workflow. We can cluster
 using the four numeric measurements <code>bill_length_mm</code>, <code>bill_depth_mm</code>,
 <code>flipper_length_mm</code>, and <code>body_mass_g</code>, while retaining <code>species</code> and
 <code>island</code> only for interpretation after fitting. A simple workflow is:</p>
-<div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb250-1"><a href="cluster-analysis.html#cb250-1" tabindex="-1"></a>penguins <span class="sc">|&gt;</span></span>
-<span id="cb250-2"><a href="cluster-analysis.html#cb250-2" tabindex="-1"></a>  <span class="fu">select</span>(species, island, bill_length_mm, bill_depth_mm,</span>
-<span id="cb250-3"><a href="cluster-analysis.html#cb250-3" tabindex="-1"></a>         flipper_length_mm, body_mass_g) <span class="sc">|&gt;</span></span>
-<span id="cb250-4"><a href="cluster-analysis.html#cb250-4" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">|&gt;</span></span>
-<span id="cb250-5"><a href="cluster-analysis.html#cb250-5" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(bill_length_mm<span class="sc">:</span>body_mass_g, <span class="sc">~</span> <span class="fu">as.numeric</span>(<span class="fu">scale</span>(.x))))</span></code></pre></div>
+<div class="sourceCode" id="cb251"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb251-1"><a href="cluster-analysis.html#cb251-1" tabindex="-1"></a>penguins <span class="sc">|&gt;</span></span>
+<span id="cb251-2"><a href="cluster-analysis.html#cb251-2" tabindex="-1"></a>  <span class="fu">select</span>(species, island, bill_length_mm, bill_depth_mm,</span>
+<span id="cb251-3"><a href="cluster-analysis.html#cb251-3" tabindex="-1"></a>         flipper_length_mm, body_mass_g) <span class="sc">|&gt;</span></span>
+<span id="cb251-4"><a href="cluster-analysis.html#cb251-4" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">|&gt;</span></span>
+<span id="cb251-5"><a href="cluster-analysis.html#cb251-5" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(bill_length_mm<span class="sc">:</span>body_mass_g, <span class="sc">~</span> <span class="fu">as.numeric</span>(<span class="fu">scale</span>(.x))))</span></code></pre></div>
 <p>The key point is that the clustering is fit only on the numeric
 variables that define similarity; the categorical labels are retained
 for interpretation, not for training the clustering itself.</p>
@@ -1318,31 +1330,60 @@ absorbed into their parent. This self-tuning avoids the need to choose
 densities vary across the dataset.</p>
 <div class="example">
 <p><span id="exm:unlabeled-div-52" class="example"><strong>Example 7.9  </strong></span><strong>HDBSCAN on the penguins data</strong></p>
-<div class="sourceCode" id="cb251"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb251-1"><a href="cluster-analysis.html#cb251-1" tabindex="-1"></a><span class="fu">library</span>(dbscan)</span>
-<span id="cb251-2"><a href="cluster-analysis.html#cb251-2" tabindex="-1"></a></span>
-<span id="cb251-3"><a href="cluster-analysis.html#cb251-3" tabindex="-1"></a>penguins_density <span class="ot">&lt;-</span> penguins <span class="sc">|&gt;</span></span>
-<span id="cb251-4"><a href="cluster-analysis.html#cb251-4" tabindex="-1"></a>  <span class="fu">select</span>(species, island, bill_length_mm, bill_depth_mm,</span>
-<span id="cb251-5"><a href="cluster-analysis.html#cb251-5" tabindex="-1"></a>         flipper_length_mm, body_mass_g) <span class="sc">|&gt;</span></span>
-<span id="cb251-6"><a href="cluster-analysis.html#cb251-6" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">|&gt;</span></span>
-<span id="cb251-7"><a href="cluster-analysis.html#cb251-7" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(bill_length_mm<span class="sc">:</span>body_mass_g, <span class="sc">~</span> <span class="fu">as.numeric</span>(<span class="fu">scale</span>(.x))))</span>
-<span id="cb251-8"><a href="cluster-analysis.html#cb251-8" tabindex="-1"></a></span>
-<span id="cb251-9"><a href="cluster-analysis.html#cb251-9" tabindex="-1"></a>hdb <span class="ot">&lt;-</span> <span class="fu">hdbscan</span>(</span>
-<span id="cb251-10"><a href="cluster-analysis.html#cb251-10" tabindex="-1"></a>  <span class="fu">as.matrix</span>(<span class="fu">select</span>(penguins_density, bill_length_mm<span class="sc">:</span>body_mass_g)),</span>
-<span id="cb251-11"><a href="cluster-analysis.html#cb251-11" tabindex="-1"></a>  <span class="at">minPts =</span> <span class="dv">8</span></span>
-<span id="cb251-12"><a href="cluster-analysis.html#cb251-12" tabindex="-1"></a>)</span>
-<span id="cb251-13"><a href="cluster-analysis.html#cb251-13" tabindex="-1"></a></span>
-<span id="cb251-14"><a href="cluster-analysis.html#cb251-14" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb251-15"><a href="cluster-analysis.html#cb251-15" tabindex="-1"></a>  <span class="at">cluster =</span> <span class="fu">factor</span>(<span class="fu">if_else</span>(hdb<span class="sc">$</span>cluster <span class="sc">==</span> <span class="dv">0</span><span class="dt">L</span>, <span class="st">&quot;noise&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;cluster &quot;</span>, hdb<span class="sc">$</span>cluster))),</span>
-<span id="cb251-16"><a href="cluster-analysis.html#cb251-16" tabindex="-1"></a>  <span class="at">species =</span> penguins_density<span class="sc">$</span>species</span>
-<span id="cb251-17"><a href="cluster-analysis.html#cb251-17" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb251-18"><a href="cluster-analysis.html#cb251-18" tabindex="-1"></a>  <span class="fu">count</span>(cluster, species) <span class="sc">|&gt;</span></span>
-<span id="cb251-19"><a href="cluster-analysis.html#cb251-19" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> species, <span class="at">values_from =</span> n, <span class="at">values_fill =</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb252"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb252-1"><a href="cluster-analysis.html#cb252-1" tabindex="-1"></a><span class="fu">library</span>(dbscan)</span>
+<span id="cb252-2"><a href="cluster-analysis.html#cb252-2" tabindex="-1"></a></span>
+<span id="cb252-3"><a href="cluster-analysis.html#cb252-3" tabindex="-1"></a>penguins_density <span class="ot">&lt;-</span> palmerpenguins<span class="sc">::</span>penguins <span class="sc">|&gt;</span></span>
+<span id="cb252-4"><a href="cluster-analysis.html#cb252-4" tabindex="-1"></a>  <span class="fu">select</span>(species, island, bill_length_mm, bill_depth_mm,</span>
+<span id="cb252-5"><a href="cluster-analysis.html#cb252-5" tabindex="-1"></a>         flipper_length_mm, body_mass_g) <span class="sc">|&gt;</span></span>
+<span id="cb252-6"><a href="cluster-analysis.html#cb252-6" tabindex="-1"></a>  <span class="fu">drop_na</span>()</span>
+<span id="cb252-7"><a href="cluster-analysis.html#cb252-7" tabindex="-1"></a></span>
+<span id="cb252-8"><a href="cluster-analysis.html#cb252-8" tabindex="-1"></a>penguins_scaled <span class="ot">&lt;-</span> penguins_density <span class="sc">|&gt;</span></span>
+<span id="cb252-9"><a href="cluster-analysis.html#cb252-9" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(bill_length_mm<span class="sc">:</span>body_mass_g, <span class="sc">~</span> <span class="fu">as.numeric</span>(<span class="fu">scale</span>(.x))))</span>
+<span id="cb252-10"><a href="cluster-analysis.html#cb252-10" tabindex="-1"></a></span>
+<span id="cb252-11"><a href="cluster-analysis.html#cb252-11" tabindex="-1"></a>penguins_matrix <span class="ot">&lt;-</span> penguins_scaled <span class="sc">|&gt;</span></span>
+<span id="cb252-12"><a href="cluster-analysis.html#cb252-12" tabindex="-1"></a>  <span class="fu">select</span>(bill_length_mm<span class="sc">:</span>body_mass_g) <span class="sc">|&gt;</span></span>
+<span id="cb252-13"><a href="cluster-analysis.html#cb252-13" tabindex="-1"></a>  <span class="fu">as.matrix</span>()</span>
+<span id="cb252-14"><a href="cluster-analysis.html#cb252-14" tabindex="-1"></a></span>
+<span id="cb252-15"><a href="cluster-analysis.html#cb252-15" tabindex="-1"></a>hdb <span class="ot">&lt;-</span> <span class="fu">hdbscan</span>(</span>
+<span id="cb252-16"><a href="cluster-analysis.html#cb252-16" tabindex="-1"></a>  penguins_matrix,</span>
+<span id="cb252-17"><a href="cluster-analysis.html#cb252-17" tabindex="-1"></a>  <span class="at">minPts =</span> <span class="dv">8</span></span>
+<span id="cb252-18"><a href="cluster-analysis.html#cb252-18" tabindex="-1"></a>)</span>
+<span id="cb252-19"><a href="cluster-analysis.html#cb252-19" tabindex="-1"></a></span>
+<span id="cb252-20"><a href="cluster-analysis.html#cb252-20" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb252-21"><a href="cluster-analysis.html#cb252-21" tabindex="-1"></a>  <span class="at">cluster =</span> <span class="fu">factor</span>(<span class="fu">if_else</span>(hdb<span class="sc">$</span>cluster <span class="sc">==</span> <span class="dv">0</span><span class="dt">L</span>, <span class="st">&quot;noise&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;cluster &quot;</span>, hdb<span class="sc">$</span>cluster))),</span>
+<span id="cb252-22"><a href="cluster-analysis.html#cb252-22" tabindex="-1"></a>  <span class="at">species =</span> penguins_density<span class="sc">$</span>species</span>
+<span id="cb252-23"><a href="cluster-analysis.html#cb252-23" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb252-24"><a href="cluster-analysis.html#cb252-24" tabindex="-1"></a>  <span class="fu">count</span>(cluster, species) <span class="sc">|&gt;</span></span>
+<span id="cb252-25"><a href="cluster-analysis.html#cb252-25" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> species, <span class="at">values_from =</span> n, <span class="at">values_fill =</span> <span class="dv">0</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 3 × 4
 #&gt;   cluster   Gentoo Adelie Chinstrap
 #&gt;   &lt;fct&gt;      &lt;int&gt;  &lt;int&gt;     &lt;int&gt;
-#&gt; 1 cluster 1    118      0         0
-#&gt; 2 cluster 2      0    146        67
+#&gt; 1 cluster 1    122      0         0
+#&gt; 2 cluster 2      0    151        67
 #&gt; 3 noise          1      0         1</code></pre>
+<p>A PCA display of the fitted labels is shown below. The clustering is
+still fit in the full scaled four-variable space; PCA is only used here
+to give a simple 2D view of the result.</p>
+<div class="sourceCode" id="cb254"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb254-1"><a href="cluster-analysis.html#cb254-1" tabindex="-1"></a>penguin_pca <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(penguins_matrix)</span>
+<span id="cb254-2"><a href="cluster-analysis.html#cb254-2" tabindex="-1"></a></span>
+<span id="cb254-3"><a href="cluster-analysis.html#cb254-3" tabindex="-1"></a>penguin_hdbscan_pca <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(</span>
+<span id="cb254-4"><a href="cluster-analysis.html#cb254-4" tabindex="-1"></a>  penguin_pca<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>],</span>
+<span id="cb254-5"><a href="cluster-analysis.html#cb254-5" tabindex="-1"></a>  <span class="at">.name_repair =</span> <span class="sc">~</span> <span class="fu">c</span>(<span class="st">&quot;PC1&quot;</span>, <span class="st">&quot;PC2&quot;</span>)</span>
+<span id="cb254-6"><a href="cluster-analysis.html#cb254-6" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb254-7"><a href="cluster-analysis.html#cb254-7" tabindex="-1"></a>  <span class="fu">bind_cols</span>(</span>
+<span id="cb254-8"><a href="cluster-analysis.html#cb254-8" tabindex="-1"></a>    <span class="at">cluster =</span> <span class="fu">factor</span>(<span class="fu">if_else</span>(hdb<span class="sc">$</span>cluster <span class="sc">==</span> <span class="dv">0</span><span class="dt">L</span>, <span class="st">&quot;noise&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;cluster &quot;</span>, hdb<span class="sc">$</span>cluster))),</span>
+<span id="cb254-9"><a href="cluster-analysis.html#cb254-9" tabindex="-1"></a>    <span class="at">species =</span> penguins_density<span class="sc">$</span>species</span>
+<span id="cb254-10"><a href="cluster-analysis.html#cb254-10" tabindex="-1"></a>  )</span>
+<span id="cb254-11"><a href="cluster-analysis.html#cb254-11" tabindex="-1"></a></span>
+<span id="cb254-12"><a href="cluster-analysis.html#cb254-12" tabindex="-1"></a><span class="fu">ggplot</span>(penguin_hdbscan_pca, <span class="fu">aes</span>(<span class="at">x =</span> PC1, <span class="at">y =</span> PC2, <span class="at">colour =</span> cluster, <span class="at">shape =</span> species)) <span class="sc">+</span></span>
+<span id="cb254-13"><a href="cluster-analysis.html#cb254-13" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb254-14"><a href="cluster-analysis.html#cb254-14" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;HDBSCAN clusters on Palmer Penguins&quot;</span>)</span></code></pre></div>
+<div class="figure">
+<img src="07-clustering_files/figure-html/hdbscanpeng_pca-1.png" alt="PCA display of the scaled penguin measurements, coloured by HDBSCAN cluster and shaped by species." width="672" />
+<p class="caption">
+(#fig:hdbscanpeng_pca)PCA display of the scaled penguin measurements, coloured by HDBSCAN cluster and shaped by species.
+</p>
+</div>
 <p>Points to note:</p>
 <ul>
 <li><p>Only the <code>minPts</code> parameter need be chosen. We use <code>minPts = 8</code>
@@ -1431,27 +1472,27 @@ feature space unless dimension reduction is itself part of the model.</em>
 UMAP is used to display clustering results, not to determine them.</p>
 <div class="example">
 <p><span id="exm:unlabeled-div-53" class="example"><strong>Example 7.10  </strong></span><strong>UMAP visualisation of a clustering solution</strong></p>
-<div class="sourceCode" id="cb253"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb253-1"><a href="cluster-analysis.html#cb253-1" tabindex="-1"></a><span class="fu">library</span>(uwot)</span>
-<span id="cb253-2"><a href="cluster-analysis.html#cb253-2" tabindex="-1"></a></span>
-<span id="cb253-3"><a href="cluster-analysis.html#cb253-3" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">161324</span>)</span>
-<span id="cb253-4"><a href="cluster-analysis.html#cb253-4" tabindex="-1"></a>umap_coords <span class="ot">&lt;-</span> <span class="fu">umap</span>(</span>
-<span id="cb253-5"><a href="cluster-analysis.html#cb253-5" tabindex="-1"></a>  <span class="fu">as.matrix</span>(<span class="fu">select</span>(penguins_density, bill_length_mm<span class="sc">:</span>body_mass_g)),</span>
-<span id="cb253-6"><a href="cluster-analysis.html#cb253-6" tabindex="-1"></a>  <span class="at">n_neighbors =</span> <span class="dv">15</span>,</span>
-<span id="cb253-7"><a href="cluster-analysis.html#cb253-7" tabindex="-1"></a>  <span class="at">min_dist =</span> <span class="fl">0.1</span>,</span>
-<span id="cb253-8"><a href="cluster-analysis.html#cb253-8" tabindex="-1"></a>  <span class="at">n_components =</span> <span class="dv">2</span>,</span>
-<span id="cb253-9"><a href="cluster-analysis.html#cb253-9" tabindex="-1"></a>  <span class="at">n_threads =</span> <span class="dv">1</span></span>
-<span id="cb253-10"><a href="cluster-analysis.html#cb253-10" tabindex="-1"></a>)</span>
-<span id="cb253-11"><a href="cluster-analysis.html#cb253-11" tabindex="-1"></a></span>
-<span id="cb253-12"><a href="cluster-analysis.html#cb253-12" tabindex="-1"></a>penguin_umap <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(umap_coords, <span class="at">.name_repair =</span> <span class="sc">~</span> <span class="fu">c</span>(<span class="st">&quot;UMAP1&quot;</span>, <span class="st">&quot;UMAP2&quot;</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb253-13"><a href="cluster-analysis.html#cb253-13" tabindex="-1"></a>  <span class="fu">bind_cols</span>(</span>
-<span id="cb253-14"><a href="cluster-analysis.html#cb253-14" tabindex="-1"></a>    <span class="at">cluster =</span> <span class="fu">factor</span>(<span class="fu">if_else</span>(hdb<span class="sc">$</span>cluster <span class="sc">==</span> <span class="dv">0</span><span class="dt">L</span>, <span class="st">&quot;noise&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;cluster &quot;</span>, hdb<span class="sc">$</span>cluster))),</span>
-<span id="cb253-15"><a href="cluster-analysis.html#cb253-15" tabindex="-1"></a>    <span class="at">species =</span> penguins_density<span class="sc">$</span>species</span>
-<span id="cb253-16"><a href="cluster-analysis.html#cb253-16" tabindex="-1"></a>  )</span>
-<span id="cb253-17"><a href="cluster-analysis.html#cb253-17" tabindex="-1"></a></span>
-<span id="cb253-18"><a href="cluster-analysis.html#cb253-18" tabindex="-1"></a><span class="fu">ggplot</span>(penguin_umap, <span class="fu">aes</span>(<span class="at">x =</span> UMAP1, <span class="at">y =</span> UMAP2, <span class="at">colour =</span> cluster,</span>
-<span id="cb253-19"><a href="cluster-analysis.html#cb253-19" tabindex="-1"></a>                     <span class="at">shape =</span> species)) <span class="sc">+</span></span>
-<span id="cb253-20"><a href="cluster-analysis.html#cb253-20" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
-<span id="cb253-21"><a href="cluster-analysis.html#cb253-21" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;UMAP view of Palmer Penguins -- HDBSCAN clusters&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb255"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb255-1"><a href="cluster-analysis.html#cb255-1" tabindex="-1"></a><span class="fu">library</span>(uwot)</span>
+<span id="cb255-2"><a href="cluster-analysis.html#cb255-2" tabindex="-1"></a></span>
+<span id="cb255-3"><a href="cluster-analysis.html#cb255-3" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">161324</span>)</span>
+<span id="cb255-4"><a href="cluster-analysis.html#cb255-4" tabindex="-1"></a>umap_coords <span class="ot">&lt;-</span> <span class="fu">umap</span>(</span>
+<span id="cb255-5"><a href="cluster-analysis.html#cb255-5" tabindex="-1"></a>  penguins_matrix,</span>
+<span id="cb255-6"><a href="cluster-analysis.html#cb255-6" tabindex="-1"></a>  <span class="at">n_neighbors =</span> <span class="dv">15</span>,</span>
+<span id="cb255-7"><a href="cluster-analysis.html#cb255-7" tabindex="-1"></a>  <span class="at">min_dist =</span> <span class="fl">0.1</span>,</span>
+<span id="cb255-8"><a href="cluster-analysis.html#cb255-8" tabindex="-1"></a>  <span class="at">n_components =</span> <span class="dv">2</span>,</span>
+<span id="cb255-9"><a href="cluster-analysis.html#cb255-9" tabindex="-1"></a>  <span class="at">n_threads =</span> <span class="dv">1</span></span>
+<span id="cb255-10"><a href="cluster-analysis.html#cb255-10" tabindex="-1"></a>)</span>
+<span id="cb255-11"><a href="cluster-analysis.html#cb255-11" tabindex="-1"></a></span>
+<span id="cb255-12"><a href="cluster-analysis.html#cb255-12" tabindex="-1"></a>penguin_umap <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(umap_coords, <span class="at">.name_repair =</span> <span class="sc">~</span> <span class="fu">c</span>(<span class="st">&quot;UMAP1&quot;</span>, <span class="st">&quot;UMAP2&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb255-13"><a href="cluster-analysis.html#cb255-13" tabindex="-1"></a>  <span class="fu">bind_cols</span>(</span>
+<span id="cb255-14"><a href="cluster-analysis.html#cb255-14" tabindex="-1"></a>    <span class="at">cluster =</span> <span class="fu">factor</span>(<span class="fu">if_else</span>(hdb<span class="sc">$</span>cluster <span class="sc">==</span> <span class="dv">0</span><span class="dt">L</span>, <span class="st">&quot;noise&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;cluster &quot;</span>, hdb<span class="sc">$</span>cluster))),</span>
+<span id="cb255-15"><a href="cluster-analysis.html#cb255-15" tabindex="-1"></a>    <span class="at">species =</span> penguins_density<span class="sc">$</span>species</span>
+<span id="cb255-16"><a href="cluster-analysis.html#cb255-16" tabindex="-1"></a>  )</span>
+<span id="cb255-17"><a href="cluster-analysis.html#cb255-17" tabindex="-1"></a></span>
+<span id="cb255-18"><a href="cluster-analysis.html#cb255-18" tabindex="-1"></a><span class="fu">ggplot</span>(penguin_umap, <span class="fu">aes</span>(<span class="at">x =</span> UMAP1, <span class="at">y =</span> UMAP2, <span class="at">colour =</span> cluster,</span>
+<span id="cb255-19"><a href="cluster-analysis.html#cb255-19" tabindex="-1"></a>                     <span class="at">shape =</span> species)) <span class="sc">+</span></span>
+<span id="cb255-20"><a href="cluster-analysis.html#cb255-20" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb255-21"><a href="cluster-analysis.html#cb255-21" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;UMAP view of Palmer Penguins -- HDBSCAN clusters&quot;</span>)</span></code></pre></div>
 <div class="figure"><span style="display:block;" id="fig:umappeng"></span>
 <img src="07-clustering_files/figure-html/umappeng-1.png" alt="UMAP display of the scaled penguin measurements, coloured by HDBSCAN cluster and shaped by species." width="672" />
 <p class="caption">

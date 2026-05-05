@@ -1,7 +1,7 @@
 --- 
 title: "Data mining"
 author: "Jonathan Marshall, Martin Hazelton, Nick Knowlton"
-date: "2026-05-04"
+date: "2026-05-05"
 site: bookdown::bookdown_site
 documentclass: book
 #bibliography: [packages.bib]

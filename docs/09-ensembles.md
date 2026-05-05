@@ -35,7 +35,7 @@ source("../common/longbeach.R")
 longbeach <- read_csv("../data/longbeach.csv", show_col_types = FALSE)
 adoption_data <- prepare_longbeach_adoption_data(longbeach)
 
-set.seed(2024)
+set.seed(67)
 adopt_split  <- initial_split(adoption_data, prop = 0.75, strata = is_adopted)
 adopt_train  <- training(adopt_split)
 adopt_test   <- testing(adopt_split)
@@ -188,10 +188,10 @@ bind_rows(
 #> # A tibble: 4 × 3
 #>   model        .metric     mean
 #>   <chr>        <chr>      <dbl>
-#> 1 single tree  accuracy 0.81498
-#> 2 single tree  roc_auc  0.83029
-#> 3 bagged trees accuracy 0.83004
-#> 4 bagged trees roc_auc  0.87429
+#> 1 single tree  accuracy 0.81818
+#> 2 single tree  roc_auc  0.83150
+#> 3 bagged trees accuracy 0.83425
+#> 4 bagged trees roc_auc  0.87423
 ```
 
 Points to note:
@@ -273,9 +273,9 @@ show_best(rf_tune, metric = "roc_auc")
 #> # A tibble: 3 × 7
 #>    mtry .metric .estimator    mean     n   std_err .config        
 #>   <int> <chr>   <chr>        <dbl> <int>     <dbl> <chr>          
-#> 1     6 roc_auc binary     0.87559     5 0.0050256 pre0_mod3_post0
-#> 2     4 roc_auc binary     0.86620     5 0.0052735 pre0_mod2_post0
-#> 3     2 roc_auc binary     0.84867     5 0.0043212 pre0_mod1_post0
+#> 1     6 roc_auc binary     0.87405     5 0.0023920 pre0_mod3_post0
+#> 2     4 roc_auc binary     0.86500     5 0.0025043 pre0_mod2_post0
+#> 3     2 roc_auc binary     0.84820     5 0.0025612 pre0_mod1_post0
 ```
 
 
@@ -489,11 +489,11 @@ show_best(boost_tune, metric = "roc_auc", n = 5)
 #> # A tibble: 5 × 9
 #>   trees tree_depth learn_rate .metric .estimator    mean     n   std_err .config
 #>   <int>      <int>      <dbl> <chr>   <chr>        <dbl> <int>     <dbl> <chr>  
-#> 1   300          3   0.31623  roc_auc binary     0.88856     5 0.0040826 pre0_m…
-#> 2   175          3   0.31623  roc_auc binary     0.88835     5 0.0046091 pre0_m…
-#> 3   175          5   0.31623  roc_auc binary     0.88802     5 0.0038951 pre0_m…
-#> 4   300          5   0.056234 roc_auc binary     0.88782     5 0.0044307 pre0_m…
-#> 5    50          5   0.31623  roc_auc binary     0.88722     5 0.0042618 pre0_m…
+#> 1   300          3   0.31623  roc_auc binary     0.88729     5 0.0022825 pre0_m…
+#> 2   300          5   0.056234 roc_auc binary     0.88695     5 0.0014439 pre0_m…
+#> 3   175          5   0.31623  roc_auc binary     0.88678     5 0.0023902 pre0_m…
+#> 4    50          5   0.31623  roc_auc binary     0.88662     5 0.0016082 pre0_m…
+#> 5   175          3   0.31623  roc_auc binary     0.88608     5 0.0021445 pre0_m…
 ```
 
 
@@ -509,8 +509,8 @@ collect_metrics(final_boost)
 #> # A tibble: 2 × 4
 #>   .metric  .estimator .estimate .config        
 #>   <chr>    <chr>          <dbl> <chr>          
-#> 1 accuracy binary       0.83738 pre0_mod0_post0
-#> 2 roc_auc  binary       0.88793 pre0_mod0_post0
+#> 1 accuracy binary       0.83536 pre0_mod0_post0
+#> 2 roc_auc  binary       0.88667 pre0_mod0_post0
 ```
 
 Points to note:
@@ -656,7 +656,7 @@ adopt_test_pred |> roc_auc(truth = is_adopted, .pred_Adopted)
 #> # A tibble: 1 × 3
 #>   .metric .estimator .estimate
 #>   <chr>   <chr>          <dbl>
-#> 1 roc_auc binary       0.11680
+#> 1 roc_auc binary       0.11546
 ```
 
 Points to note:

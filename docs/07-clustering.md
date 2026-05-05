@@ -1090,25 +1090,41 @@ since methods such as $K$-means would tend to split such shapes into
 artificial convex pieces. A typical workflow is:
 
 
+
+
 ``` r
-library(dbscan)
-
-nonconvex <- tibble(
-  x = c(...),
-  y = c(...)
-)
-
-dbscan::kNNdistplot(as.matrix(nonconvex), k = 4)
-db <- dbscan(nonconvex, eps = 0.25, minPts = 5)
-
-bind_cols(nonconvex, cluster = factor(db$cluster)) |>
-  ggplot() +
-  geom_point(mapping = aes(x = x, y = y, colour = cluster))
+dbscan::kNNdistplot(as.matrix(select(nonconvex, x, y)), k = 4)
+abline(h = 0.92, col = "firebrick", lty = 2)
 ```
 
+<div class="figure">
+<img src="07-clustering_files/figure-html/dbscan_nonconvex_knn-1.png" alt="Ordered 4-nearest-neighbour distances for the synthetic crescent-ring data. The elbow suggests an $\varepsilon$ value a little below 1." width="672" />
+<p class="caption">(\#fig:dbscan_nonconvex_knn)Ordered 4-nearest-neighbour distances for the synthetic crescent-ring data. The elbow suggests an $\varepsilon$ value a little below 1.</p>
+</div>
+
+
+``` r
+db <- dbscan(select(nonconvex, x, y), eps = 0.92, minPts = 5)
+
+bind_cols(
+  nonconvex,
+  cluster = factor(if_else(db$cluster == 0L, "noise", paste0("cluster ", db$cluster)))
+) |>
+  ggplot(aes(x = x, y = y, colour = cluster)) +
+  geom_point(alpha = 0.8) +
+  coord_equal() +
+  labs(x = "x", y = "y", title = "DBSCAN clusters on non-convex synthetic data")
+```
+
+<div class="figure">
+<img src="07-clustering_files/figure-html/dbscan_nonconvex_clusters-1.png" alt="DBSCAN on the synthetic crescent-ring data using $\varepsilon = 0.92$ and `MinPts = 5`. Dense curved regions are recovered as clusters, while isolated points are labelled as noise." width="672" />
+<p class="caption">(\#fig:dbscan_nonconvex_clusters)DBSCAN on the synthetic crescent-ring data using $\varepsilon = 0.92$ and `MinPts = 5`. Dense curved regions are recovered as clusters, while isolated points are labelled as noise.</p>
+</div>
+
 The `kNNdistplot()` call is used to choose a plausible value of
-$\varepsilon$. The fitted DBSCAN model then labels dense groups of
-points and leaves isolated observations as noise.
+$\varepsilon$. Here the elbow occurs around $\varepsilon \approx 0.9$,
+and the fitted DBSCAN model then labels the crescent and ring as dense
+groups while leaving isolated observations as noise.
 :::
 
 ::: {.example}
@@ -1175,14 +1191,20 @@ densities vary across the dataset.
 ``` r
 library(dbscan)
 
-penguins_density <- penguins |>
+penguins_density <- palmerpenguins::penguins |>
   select(species, island, bill_length_mm, bill_depth_mm,
          flipper_length_mm, body_mass_g) |>
-  drop_na() |>
+  drop_na()
+
+penguins_scaled <- penguins_density |>
   mutate(across(bill_length_mm:body_mass_g, ~ as.numeric(scale(.x))))
 
+penguins_matrix <- penguins_scaled |>
+  select(bill_length_mm:body_mass_g) |>
+  as.matrix()
+
 hdb <- hdbscan(
-  as.matrix(select(penguins_density, bill_length_mm:body_mass_g)),
+  penguins_matrix,
   minPts = 8
 )
 
@@ -1198,10 +1220,37 @@ tibble(
 #> # A tibble: 3 × 4
 #>   cluster   Gentoo Adelie Chinstrap
 #>   <fct>      <int>  <int>     <int>
-#> 1 cluster 1    118      0         0
-#> 2 cluster 2      0    146        67
+#> 1 cluster 1    122      0         0
+#> 2 cluster 2      0    151        67
 #> 3 noise          1      0         1
 ```
+
+A PCA display of the fitted labels is shown below. The clustering is
+still fit in the full scaled four-variable space; PCA is only used here
+to give a simple 2D view of the result.
+
+
+``` r
+penguin_pca <- prcomp(penguins_matrix)
+
+penguin_hdbscan_pca <- as_tibble(
+  penguin_pca$x[, 1:2],
+  .name_repair = ~ c("PC1", "PC2")
+) |>
+  bind_cols(
+    cluster = factor(if_else(hdb$cluster == 0L, "noise", paste0("cluster ", hdb$cluster))),
+    species = penguins_density$species
+  )
+
+ggplot(penguin_hdbscan_pca, aes(x = PC1, y = PC2, colour = cluster, shape = species)) +
+  geom_point(alpha = 0.7) +
+  labs(title = "HDBSCAN clusters on Palmer Penguins")
+```
+
+<div class="figure">
+<img src="07-clustering_files/figure-html/hdbscanpeng_pca-1.png" alt="PCA display of the scaled penguin measurements, coloured by HDBSCAN cluster and shaped by species." width="672" />
+<p class="caption">(\#fig:hdbscanpeng_pca)PCA display of the scaled penguin measurements, coloured by HDBSCAN cluster and shaped by species.</p>
+</div>
 
 Points to note:
 
@@ -1305,7 +1354,7 @@ library(uwot)
 
 set.seed(161324)
 umap_coords <- umap(
-  as.matrix(select(penguins_density, bill_length_mm:body_mass_g)),
+  penguins_matrix,
   n_neighbors = 15,
   min_dist = 0.1,
   n_components = 2,
