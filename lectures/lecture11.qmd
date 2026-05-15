@@ -561,7 +561,9 @@ viewof techComparison = techniqueComparisonWidget()
 :::
 ::::
 
-. . .
+---
+
+## Practical Tips (Continued)
 
 ### Choosing Thresholds
 
