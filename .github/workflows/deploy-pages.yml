@@ -5,7 +5,15 @@ on:
     branches:
       - main
     paths:
-      - 'docs/**'
+      - 'notes/**/*.Rmd'
+      - 'notes/_bookdown.yml'
+      - 'notes/_output.yml'
+      - 'notes/style.css'
+      - 'notes/install_packages.R'
+      - 'notes/helpers/**'
+      - 'notes/graphics/**'
+      - 'notes/data/**'
+      - 'notes/preamble.tex'
       - 'lectures/lecture10.qmd'
       - 'lectures/lecture11.qmd'
       - 'lectures/lecture12.qmd'
@@ -37,6 +45,8 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      - uses: r-lib/actions/setup-pandoc@v2
+
       - name: Setup Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
@@ -49,11 +59,15 @@ jobs:
       - name: Install system libraries
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends libglpk40
+          sudo apt-get install -y --no-install-recommends libglpk40 libcurl4-openssl-dev libssl-dev libxml2-dev libfontconfig1-dev
 
       - name: Install R packages
         shell: Rscript {0}
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          install.packages("remotes")
+          source("notes/install_packages.R")
           pkgs <- c(
             "tidyverse", "tidymodels", "baguette", "ranger", "xgboost",
             "stacks", "arules", "arulesViz", "cluster", "dbscan", "uwot",
@@ -61,6 +75,12 @@ jobs:
             "patchwork", "skimr", "rsample"
           )
           install.packages(pkgs)
+
+      - name: Render notes
+        shell: Rscript {0}
+        run: |
+          setwd("notes")
+          bookdown::render_book("index.Rmd", output_format = "bookdown::gitbook")
 
       - name: Render reveal lectures
         run: |
@@ -73,7 +93,7 @@ jobs:
           rm -rf _site
           mkdir -p _site/notes _site/lectures _site/data _site/labs
 
-          cp -r docs/. _site/notes/
+          cp -r notes/_book/. _site/notes/
           cp lectures/lecture10.html _site/lectures/lecture10.html
           cp lectures/lecture11.html _site/lectures/lecture11.html
           cp lectures/lecture12.html _site/lectures/lecture12.html
