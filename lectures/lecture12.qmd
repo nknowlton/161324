@@ -4,7 +4,7 @@ subtitle: "Ensemble Learning"
 author: "Data Mining"
 format:
   revealjs:
-    theme: [default, custom_quarto.css]
+    theme: [default, lecture11.scss]
     slide-number: true
     progress: true
     chalkboard: false

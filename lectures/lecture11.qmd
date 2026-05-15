@@ -3,7 +3,7 @@ title: "Lecture 11"
 subtitle: "Association Rule Mining"
 format:
   revealjs:
-    theme: [default, custom_quarto.css]
+    theme: [default, lecture11.scss]
     slide-number: true
     progress: true
     hash: true
