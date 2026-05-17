@@ -507,7 +507,7 @@ categorical data where co-occurrence is the main object of interest.
     usually in summarising behaviour, supporting recommendation, or
     surfacing patterns worth following up.
 
-Looking ahead, Section \@ref(sec:ensemble) returns to supervised
+Looking ahead, Section \@ref(sec-ensemble) returns to supervised
 learning and shows how multiple models can be combined to improve
 prediction and classification performance.
 

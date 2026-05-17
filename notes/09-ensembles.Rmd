@@ -1,7 +1,7 @@
 ---
 always_allow_html: true
 ---
-# Ensemble Learning {#sec:ensemble}
+# Ensemble Learning {#sec-ensemble}
 
 ```{r, include=FALSE}
 library(tidyverse)

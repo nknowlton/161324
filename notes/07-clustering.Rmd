@@ -122,6 +122,9 @@ important relationships in the data are non-linear, PCA may flatten or
 hide them. It remains a good first display because it is stable,
 transparent, and relatively easy to explain.
 
+Section \@ref(sec:pca) gives a fuller optional treatment of PCA as a
+clustering display map.
+
 The figure below uses the built-in `iris` data. We fit $K$-means using
 the four scaled measurements, then project the same scaled matrix onto
 its first two principal components. Colour shows the fitted cluster, and
@@ -156,6 +159,9 @@ values of `min_dist` tend to pack points more tightly, while larger
 values spread the display out. In this chapter we use UMAP mainly as an
 illustrative visualisation tool, rather than as a modelling method.
 
+Section \@ref(sec:umap) gives a fuller optional treatment of UMAP and
+its tuning parameters.
+
 The UMAP display below uses the same scaled iris matrix as the
 $K$-means fit, with the same fitted cluster labels and the known species
 shown only as an external check.
@@ -182,6 +188,9 @@ plot can suggest separation, overlap, outliers or ambiguous boundary
 points, but it should be read alongside more formal summaries such as
 within-cluster variation, silhouette width, bootstrap stability, and
 substantive knowledge of the data.
+
+Further optional background on both methods is collected in the
+supplementary PCA and UMAP sections at the end of the chapter.
 
 | Method | Type | What it tries to preserve | Axis interpretation | Main use here |
 |:---|:---|:---|:---|:---|
@@ -1343,7 +1352,7 @@ variables that define similarity; the categorical labels are retained
 for interpretation, not for training the clustering itself.
 :::
 
-## HDBSCAN and UMAP
+## HDBSCAN
 
 ### HDBSCAN {#sec:hdbscan}
 
@@ -1444,14 +1453,108 @@ Points to note:
     belong to any stable cluster.
 :::
 
-Before turning to UMAP, it helps to separate clustering from
-visualisation. PCA is the simplest linear display map for scaled numeric
-data, while UMAP is a nonlinear display map that emphasises local
-neighbourhood structure. In either case, the clustering itself should be
-fit in the original feature space; the lower-dimensional map is there to
-help us interpret the result.
+PCA and UMAP remain useful display maps for density-based methods too.
+For optional fuller treatments of these projections, see Sections
+\@ref(sec:pca) and \@ref(sec:umap).
 
-### UMAP {#sec:umap}
+### Practical method comparison {#sec:cluster-compare}
+
+The table below summarises the practical trade-offs between the
+clustering methods covered in this chapter.
+
+| Method          | Key idea                        | Handles non-convex? | Scales to $n$? | Needs $K$? | Handles noise? |
+|:----------------|:--------------------------------|:-------------------:|:--------------:|:----------:|:--------------:|
+| Hierarchical    | Merge/split by dissimilarity    | Depends on linkage  | Poor ($O(n^2)$)| No (cut tree)| No           |
+| K-means         | Minimise within-SS              | No (convex only)    | Good           | Yes        | No             |
+| K-medoids (PAM) | Minimise to actual centre       | No (convex only)    | Moderate       | Yes        | Partial        |
+| DBSCAN          | Density connected regions       | Yes                 | Good           | No         | Yes            |
+| HDBSCAN         | Hierarchical density extraction | Yes                 | Good           | No         | Yes            |
+
+A few practical guidelines:
+
+-   Use **hierarchical clustering** when the data are small enough to
+    inspect the full dendrogram, or when the number of clusters is
+    genuinely unknown and you want an overview at multiple scales.
+
+-   Use **K-means or K-medoids** when the clusters are roughly
+    spherical and the number of clusters can be chosen via the silhouette
+    width or elbow plot. K-medoids is more robust to outliers because
+    the cluster centre is a real observation.
+
+-   Use **DBSCAN** when the clusters are non-convex or irregularly
+    shaped, and when identifying noise points is important. Choose
+    $\varepsilon$ via a $k$-distance plot.
+
+-   Use **HDBSCAN** as the default when cluster densities vary across
+    the dataset, or when you do not want to commit to a single
+    $\varepsilon$. It is the most general-purpose density method.
+
+-   Use **UMAP** for visualisation after fitting any of the above
+    methods, particularly when the data are high-dimensional. Always
+    fit the clustering in the original feature space.
+
+The same dataset can look quite different under different clustering
+assumptions, so the method choice is part of the analysis rather than a
+software default.
+
+## Summary
+
+Clustering is the main unsupervised grouping tool in these notes.
+
+-   The choice of dissimilarity measure matters as much as the choice of
+    clustering algorithm.
+
+-   Methods such as $K$-means and PAM work best for compact,
+    centre-based clusters, while DBSCAN and HDBSCAN are better suited to
+    irregular shapes and noisy data.
+
+-   Preprocessing is especially important in clustering because the
+    algorithm sees only the features we give it; scaling, missing-value
+    handling, and outlier review therefore directly affect the clusters.
+
+Looking ahead, Section \@ref(sec:association-fit) studies another
+unsupervised task, association rule mining, which focuses on
+co-occurrence patterns rather than grouping observations.
+
+## Supplementary: PCA and UMAP for visualisation
+
+### PCA (Supplementary) {#sec:pca}
+
+Principal component analysis (PCA) is the standard linear projection
+tool for multivariate numeric data. If the observations are stored as
+rows of a centred data matrix $X$, PCA finds orthogonal directions
+$v_1, v_2, \ldots$ that successively maximise the projected variance.
+The projected coordinates $Xv_j$ are the *scores* on principal
+component $j$, while the entries of $v_j$ are the *loadings* that show
+how strongly each original variable contributes to that component.
+
+For clustering displays, PCA is most useful when the main structure is
+approximately linear and when we want axes that still connect back to
+the original variables. The first two principal components usually
+capture the broadest variation in the scaled feature space, so plotting
+their scores gives a stable two-dimensional summary. Figure
+\@ref(fig:hdbscanpeng_pca) illustrates this for the penguin HDBSCAN
+example: the clustering is still fit in the full scaled four-variable
+space, and PCA is used only to display the fitted result.
+
+Variance explained is an important part of PCA interpretation. If the
+first two components explain a large proportion of the total variance,
+then the PCA plot gives a relatively faithful broad summary. If they
+explain only a modest proportion, then the two-dimensional display is
+more of a rough sketch and should be interpreted cautiously. This is one
+reason PCA is best treated here as a visual aid rather than as evidence
+that a clustering is correct.
+
+Scaling also matters. PCA on raw variables is dominated by whichever
+measurements have the largest units or variability, so when the
+clustering itself is based on Euclidean distances it is usually natural
+to run PCA on the same scaled matrix used by the clustering algorithm.
+That keeps the display aligned with what the method actually saw. In
+other words, if clustering is fit to standardised features, then PCA
+should usually be fit to those same standardised features when used as a
+display map.
+
+### UMAP (Supplementary) {#sec:umap}
 
 UMAP (Uniform Manifold Approximation and Projection, McInnes et al.
 2018) is a dimensionality reduction technique used to produce
@@ -1562,65 +1665,6 @@ Points to note:
     independent check on the clustering. This is a useful validity
     check because the species information was not used during fitting.
 :::
-
-### Practical method comparison {#sec:cluster-compare}
-
-The table below summarises the practical trade-offs between the
-clustering methods covered in this chapter.
-
-| Method          | Key idea                        | Handles non-convex? | Scales to $n$? | Needs $K$? | Handles noise? |
-|:----------------|:--------------------------------|:-------------------:|:--------------:|:----------:|:--------------:|
-| Hierarchical    | Merge/split by dissimilarity    | Depends on linkage  | Poor ($O(n^2)$)| No (cut tree)| No           |
-| K-means         | Minimise within-SS              | No (convex only)    | Good           | Yes        | No             |
-| K-medoids (PAM) | Minimise to actual centre       | No (convex only)    | Moderate       | Yes        | Partial        |
-| DBSCAN          | Density connected regions       | Yes                 | Good           | No         | Yes            |
-| HDBSCAN         | Hierarchical density extraction | Yes                 | Good           | No         | Yes            |
-
-A few practical guidelines:
-
--   Use **hierarchical clustering** when the data are small enough to
-    inspect the full dendrogram, or when the number of clusters is
-    genuinely unknown and you want an overview at multiple scales.
-
--   Use **K-means or K-medoids** when the clusters are roughly
-    spherical and the number of clusters can be chosen via the silhouette
-    width or elbow plot. K-medoids is more robust to outliers because
-    the cluster centre is a real observation.
-
--   Use **DBSCAN** when the clusters are non-convex or irregularly
-    shaped, and when identifying noise points is important. Choose
-    $\varepsilon$ via a $k$-distance plot.
-
--   Use **HDBSCAN** as the default when cluster densities vary across
-    the dataset, or when you do not want to commit to a single
-    $\varepsilon$. It is the most general-purpose density method.
-
--   Use **UMAP** for visualisation after fitting any of the above
-    methods, particularly when the data are high-dimensional. Always
-    fit the clustering in the original feature space.
-
-The same dataset can look quite different under different clustering
-assumptions, so the method choice is part of the analysis rather than a
-software default.
-
-## Summary
-
-Clustering is the main unsupervised grouping tool in these notes.
-
--   The choice of dissimilarity measure matters as much as the choice of
-    clustering algorithm.
-
--   Methods such as $K$-means and PAM work best for compact,
-    centre-based clusters, while DBSCAN and HDBSCAN are better suited to
-    irregular shapes and noisy data.
-
--   Preprocessing is especially important in clustering because the
-    algorithm sees only the features we give it; scaling, missing-value
-    handling, and outlier review therefore directly affect the clusters.
-
-Looking ahead, Section \@ref(sec:association-fit) studies another
-unsupervised task, association rule mining, which focuses on
-co-occurrence patterns rather than grouping observations.
 
 [^supervised]: In fields such as computer science and image analysis, cluster
     analysis is referred to as *unsupervised learning* and discriminant

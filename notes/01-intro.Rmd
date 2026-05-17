@@ -213,7 +213,7 @@ workflows, resampling, and tuning. Classification methods are covered
 in Section \@ref(sec:lda), clustering methods in
 Section \@ref(sec:cluster-compare), and association rules in
 Section \@ref(sec:association-fit). Ensemble methods in
-Section \@ref(sec:ensemble) then return to supervised learning and show
+Section \@ref(sec-ensemble) then return to supervised learning and show
 how combining many models can improve predictive performance.
 
 The order of the chapters reflects both ideas and practice. We first

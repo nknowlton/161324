@@ -1452,7 +1452,7 @@ average of many such trees is considerably more stable than any single
 tree. Random forests add one further step -- random predictor subsets at
 each split -- which makes the individual trees less correlated with each
 other and thereby improves the benefit of averaging (the formal
-variance-reduction argument is given in Section \@ref(sec:ensemble)).
+variance-reduction argument is given in Section \@ref(sec-ensemble)).
 Other ensemble strategies, including boosting and stacking, are also
 covered in that chapter.
 

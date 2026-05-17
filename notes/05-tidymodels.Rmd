@@ -526,7 +526,7 @@ modelling pipeline.
 
 Looking ahead, the same workflow ideas support the classification
 methods in Section \@ref(sec:roc) and the ensemble methods in
-Section \@ref(sec:ensemble).
+Section \@ref(sec-ensemble).
 
 [^bootstraprows]: In the case of a bootstrap resample, rows may appear multiple times in the analysis set, as they are sampled with replacement. The rows in the assessment set are rows that don't appear in the analysis set.
 
