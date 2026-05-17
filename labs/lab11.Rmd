@@ -3,7 +3,7 @@ title: "Workshop 11: Association Rule Mining"
 output: html_document
 ---
 
-In this workshop we build association rules from a TidyTuesday recipe
+In this workshop we build association rules from a Recipe
 dataset, then finish with a shorter extension on the local bank-service
 data. The main goals are to:
 
@@ -13,54 +13,16 @@ data. The main goals are to:
 - interpret support, confidence, and lift
 - filter rules using `subset()`
 
-We will use the `tidytuesdayR` package to pull the recipe data directly
-from TidyTuesday. If RStudio prompts you to install `tidytuesdayR`, let
-it do so before you continue.
+We will use the same recipe dataset as in the lecture, but we will do more cleaning to make the rules more interpretable. 
+The code for that cleaning is a bit long, but it is mostly just a series of string manipulations. 
+You can skim it if you like, or even skip. The main thing to notice is that we are trying to remove any words that are not really part of the ingredient name, 
+such as quantities, units, and preparation instructions. We also standardize some common ingredients to avoid having multiple variants of the same item.
 
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(arules)
 
 theme_set(theme_minimal())
-
-load_tidytuesday_dataset <- function(tt_date, dataset_name, backup_url) {
-  if (requireNamespace("tidytuesdayR", quietly = TRUE)) {
-    tt_data <- tryCatch(
-      suppressMessages(tidytuesdayR::tt_load(tt_date)),
-      error = function(e) NULL
-    )
-
-    if (!is.null(tt_data) &&
-        dataset_name %in% names(tt_data) &&
-        !is.null(tt_data[[dataset_name]])) {
-      return(tt_data[[dataset_name]] |> tibble::as_tibble())
-    }
-  }
-
-  backup <- tryCatch(
-    readr::read_csv(backup_url, show_col_types = FALSE),
-    error = function(e) NULL
-  )
-
-  if (!is.null(backup)) {
-    return(backup |> tibble::as_tibble())
-  }
-
-  stop(
-    "Could not load the dataset from TidyTuesday or the course backup CSV file.",
-    call. = FALSE
-  )
-}
-
-compose_ggplot <- function(plot, ...) {
-  layers <- list(...)
-
-  for (i in seq_along(layers)) {
-    plot <- ggplot2:::add_ggplot(plot, layers[[i]], paste0("layer_", i))
-  }
-
-  plot
-}
 ```
 
 ## 1. Recipe ingredients as transactions
@@ -70,11 +32,8 @@ Each recipe will be treated as one transaction, and each ingredient as
 an item.
 
 ```{r}
-cuisines_raw <- load_tidytuesday_dataset(
-  tt_date = "2025-09-16",
-  dataset_name = "cuisines",
-  backup_url = "https://knowlton.co.nz/161324/data/cuisines.csv.gz"
-)
+cuisines_raw <- read_csv("https://knowlton.co.nz/161324/data/cuisines.csv.gz",
+                          show_col_types = FALSE)
 
 cuisines_raw |> glimpse()
 ```
@@ -93,12 +52,7 @@ not_ingredients <- c(
   "finely", "coarsely", "thinly",
   "to taste", "as needed", "or to taste", "or as needed",
   "or more", "or more to taste", "or more as needed",
-  "salt to taste", "salt and pepper to taste",
-  "salt and ground black pepper to taste",
-  "salt and ground black pepper",
-  "salt and pepper", "if desired", "for garnish",
-  "salt", "pepper", "kosher salt", "ground black pepper",
-  "freshly ground black pepper",
+  "if desired", "for garnish",
   "skinless", "cooking spray", "room temperature", "needed", "taste"
 )
 
@@ -128,6 +82,7 @@ recipe_items <- cuisines_raw |>
       str_remove(regex(",\\s*(divided|optional|drained|thawed|softened|melted|beaten)$",
                        ignore_case = TRUE)) |>
       str_trim() |>
+      str_replace_all("^salt$", "salt") |>
       str_replace_all("^unsalted butter$", "butter") |>
       str_replace_all("^garlic powder$", "garlic") |>
       str_replace_all("^minced garlic$", "garlic") |>
@@ -178,17 +133,22 @@ top_ingredients <- recipe_items |>
 recipe_items_filtered <- recipe_items |>
   filter(ingredient %in% top_ingredients)
 
-recipe_trans <- recipe_items_filtered |>
-  select(recipe_id, ingredient) |>
-  distinct() |>
-  mutate(present = TRUE) |>
-  pivot_wider(
-    names_from = ingredient,
-    values_from = present,
-    values_fill = FALSE
-  ) |>
-  select(-recipe_id) |>
-  as.matrix() |>
+recipe_trans <- recipe_items |>
+  filter(ingredient %in% top_ingredients) |>
+  
+  # Remove duplicate ingredient entries within the same recipe.
+  # This ensures each recipe contributes each ingredient at most once.
+  distinct(recipe_id, ingredient) |>
+  
+  # For each recipe, collapse its ingredients into a list-column.
+  # Each row now represents one recipe and contains a vector of its ingredients.
+  summarise(items = list(ingredient), .by = recipe_id) |>
+  
+  # Extract the list-column, giving a plain list where each element is
+  # the ingredient vector for one recipe.
+  pull(items) |>
+  
+  # Convert the list of ingredient vectors into an arules transactions object.
   as("transactions")
 
 recipe_trans
@@ -200,12 +160,6 @@ recipe_trans
 
 2. Compare `inspect()` with `DATAFRAME()`. Which would you use for
    exploratory work?
-
-```{r}
-recipe_trans |>
-  head(n = 10) |>
-  inspect()
-```
 
 ## 3. Item frequencies
 
@@ -220,19 +174,6 @@ itemFrequencyPlot(recipe_trans, topN = 25, type = "relative")
 2. Which ingredients are common enough that a high-confidence rule with
    that ingredient on the right-hand side might still be uninteresting?
 
-```{r}
-recipe_freq <- recipe_trans |>
-  itemFrequency() |>
-  enframe(name = "ingredient", value = "support") |>
-  arrange(desc(support)) |>
-  slice_head(n = 25)
-
-compose_ggplot(
-  ggplot(recipe_freq, aes(x = support, y = fct_reorder(ingredient, support))),
-  geom_col()
-)
-```
-
 ## 4. Mining rules with Apriori
 
 We now mine rules with moderate support and confidence thresholds.
@@ -240,12 +181,10 @@ We now mine rules with moderate support and confidence thresholds.
 ```{r}
 recipe_rules <- apriori(
   recipe_trans,
-  parameter = list(support = 0.05, confidence = 0.40, minlen = 2, maxlen = 4),
+  parameter = list(support = 0.02, confidence = 0.20, minlen = 1, maxlen = 4),
   control = list(verbose = FALSE)
 )
 
-recipe_rules
-summary(recipe_rules)
 ```
 
 ### Try yourself
@@ -257,44 +196,20 @@ summary(recipe_rules)
 3. Which ranking would you use first if the goal is to find genuinely
    informative associations rather than merely common ones?
 
-```{r}
-recipe_rules |>
-  sort(by = "support") |>
-  head(n = 10) |>
-  inspect()
-
-recipe_rules |>
-  sort(by = "confidence") |>
-  head(n = 10) |>
-  inspect()
-
-recipe_rules |>
-  sort(by = "lift") |>
-  head(n = 10) |>
-  inspect()
-```
 
 ## 5. Misleading high-confidence rules
 
-High confidence on its own can be misleading when the consequent is very
-common. The code below looks for rules with high confidence but lift
-close to one.
+High confidence, which we define as more than 50% of recipes, on its own can be misleading when the consequent is very
+common. The code below looks for rules with high confidence but lift close to one.
 
 ```{r}
 recipe_rules |>
-  subset(confidence >= 0.75 & lift <= 1.05) |>
+  subset(confidence >= 0.5 & lift < 1.2) |>
   sort(by = "confidence") |>
-  head(n = 10) |>
   inspect()
 ```
 
-### Try yourself
-
-1. Pick one rule from the output above and explain why it is not very
-   interesting despite its high confidence.
-
-2. Compare it with a rule that has slightly lower confidence but much
-   higher lift.
+These rules are not necessarily wrong, but they are not especially informative. In the table above only `salt` appears on the RHS of the rules, and it is present in >40% of recipes. So any rule that has `salt` on the RHS is likely to have high confidence, but that does not necessarily indicate a strong association between the LHS and `salt`. The lift values close to 1 suggest that the presence of the LHS ingredients does not significantly increase the likelihood of `salt` being present compared to its overall frequency in the dataset.
 
 ## 6. Filtering rules
 
@@ -310,10 +225,34 @@ garlic_rules |>
   head(n = 10) |>
   inspect()
 ```
+Use the '%pin%' operator to find rules that contain a particular ingredient as
+part of a longer item name. For example, the code below finds rules that contain 'pepper' as part of an ingredient name, which could include 'black pepper', 'red pepper', 'green pepper', etc. This allows us to capture a broader range of rules that involve any type of pepper, rather than just those that match 'pepper' exactly.
+
+```{r}
+
+pepper_rules <- recipe_rules |>
+  subset(lhs %pin% "pepper" & lift > 1.1)
+
+pepper_rules |>
+  sort(by = "lift") |>
+  head(n = 10) |>
+  inspect()
+
+```
+Use the '%ain%' operator to find rules that contain all of a specified set of ingredients on the left-hand side. For example, the code below finds rules where both 'garlic' and 'onion' appear on the left-hand side, regardless of what other ingredients may also be present. This allows us to focus on associations that involve the combination of garlic and onion together.
+
+```{r}
+garlic_onion_rules <- recipe_rules |>
+  subset(lhs %ain% c("garlic", "olive oil") & lift > 1.1)
+
+garlic_onion_rules |>
+  sort(by = "lift") |>
+  inspect()
+```
 
 ### Try yourself
 
-1. Find rules with `olive oil` on the left-hand side.
+1. Find rules with `salt` on the left-hand side.
 
 2. Find rules where both `garlic` and `onion` appear on the left-hand
    side.
@@ -323,8 +262,7 @@ garlic_rules |>
 
 ## 7. Optional interactive inspection
 
-If you have `arulesViz` available, interactive inspection is useful once
-you have reduced the rule set to something manageable.
+Install `arulesViz` so that you can use an interactive inspection of your rule set.
 
 ```{r, eval=FALSE}
 library(arulesViz)
@@ -335,13 +273,14 @@ recipe_rules |>
   inspectDT()
 ```
 
-## 8. Extension: bank-service rules
+## 8. More Practice: bank-service rules
 
-The bank dataset is already stored locally in `../data/bank-rules.csv`.
-Each row is one account-service combination.
+The following bank dataset contains a set of abbreviated service labels that indicate the types of financial products or services associated with each customer. The label `ATM` refers to ATM access or an ATM card service, while `AUTO` indicates an auto loan. The label `CCRD` represents a credit card, and `CD` refers to a certificate of deposit, also known in some banking systems as a term deposit or fixed deposit. The label `CKCRD` most plausibly refers to a cheque card or debit card linked to a chequing account, while `CKING` indicates a chequing account. The label `HMEQLC` refers to a home equity line of credit, and `IRA` indicates an individual retirement account. The label `MMDA` represents a money market deposit account, while `MTG` refers to a mortgage. The label `PLOAN` indicates a personal loan, `SVG` refers to a savings account, and `TRUST` represents a trust account or trust-related banking service.
+
+These labels can be interpreted as indicators of customer engagement with different banking products. Deposit-related products include chequing accounts, savings accounts, money market deposit accounts, certificates of deposit, and retirement accounts. Lending products include auto loans, mortgages, home equity lines of credit, personal loans, and credit cards. Card and transaction access services include ATM access and cheque or debit cards. Trust services are distinct from ordinary deposit and lending products because they generally involve fiduciary, estate, or asset-management arrangements rather than standard retail banking activity.
 
 ```{r}
-bank <- read_csv("../data/bank-rules.csv", show_col_types = FALSE) |>
+bank <- read_csv("https://knowlton.co.nz/161324/data/bank-rules.csv.gz", show_col_types = FALSE) |>
   transactions(format = "long", cols = c("ACCOUNT", "SERVICE"))
 
 bank_rules <- apriori(
@@ -361,13 +300,6 @@ bank_rules <- apriori(
 3. Compare the bank rules with the recipe rules. Which dataset gives
    more obviously actionable associations?
 
-```{r}
-bank_rules |>
-  subset(rhs %in% "CCRD") |>
-  sort(by = "lift") |>
-  head(n = 10) |>
-  inspect()
-```
 
 ### Final questions
 

@@ -59,8 +59,7 @@ dexterity, HP, challenge rating, and speed. We cluster on the numeric features
 and use `type` afterward to interpret the clusters.
 
 ```{r load-monsters}
-monsters <- tidytuesdayR::tt_load("2025-05-27")$monsters |>
-  tibble::as_tibble()
+monsters <- read_csv("https://knowlton.co.nz/161324/data/monsters.csv.gz", show_col_types = FALSE)
 
 monster_vars <- c(
   "str", "dex", "con", "int", "wis", "cha",
@@ -114,11 +113,7 @@ electorate structure before clustering.
 party_pca <- prcomp(party_scaled, center = TRUE, scale. = TRUE)
 party_pca_points <- as_tibble(party_pca$x) |>
   select(pc1 = PC1, pc2 = PC2) |>
-  (
-    function(scores) {
-      bind_cols(party |> transmute(Electorate), scores)
-    }
-  )()
+  bind_cols(party |> transmute(Electorate))
 set.seed(8675309)
 party_umap_points <- uwot::umap(
   party_scaled,
@@ -129,11 +124,7 @@ party_umap_points <- uwot::umap(
 ) |>
   as_tibble() |>
   set_names(c("umap1", "umap2")) |>
-  (
-    function(embedding) {
-      bind_cols(party |> transmute(Electorate), embedding)
-    }
-  )()
+  bind_cols(party |> transmute(Electorate))
 
 p_pca <- ggplot(
   party_pca_points,

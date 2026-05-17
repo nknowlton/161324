@@ -30,6 +30,164 @@ different assumptions about the group structure: hierarchical methods
 build nested trees, centre-based methods look for compact groups, and
 density methods look for concentrated regions separated by sparse space.
 
+## Visualising multivariate clusters in two dimensions {#sec:cluster-visualisation}
+
+Clustering methods often use several variables at once. For example, we
+might cluster flowers using sepal length, sepal width, petal length, and
+petal width, or cluster voting patterns using results from many
+elections. The clustering algorithm sees all of those variables
+together. The problem is that a page or screen can only show two
+plotting dimensions at a time.
+
+Projection methods give us a practical compromise. They take a
+multivariate cloud of observations and produce a two-dimensional display
+that preserves some aspect of the original structure. The clustering is
+still fitted using the selected variables in the original feature space,
+often after scaling. The projection is then used as a display layer so
+that we can inspect how the fitted clusters appear in two dimensions.
+
+A useful way to think about projection is as a shadow. Imagine a
+three-dimensional object in a dark room. If we shine a light on the
+object, it casts a two-dimensional shadow on the wall or floor. Moving
+the light changes the shadow, even though the object itself has not
+changed. PCA and UMAP do something similar for multivariate data. The
+object is now an $n$-dimensional cloud of observations, and the
+projection is the two-dimensional shadow that we draw in a figure.
+
+This analogy is helpful because it also captures the limitation. A
+shadow can reveal structure, but it is not the full object. Some points
+that are separated in the full feature space may appear close together
+in the projection, and some points that look far apart in the projection
+may not be as separated in the original data. Projection plots are
+therefore useful for interpretation, but they are not evidence by
+themselves that a clustering solution is correct.
+
+```{r iris_cluster_projection_prep, include=FALSE}
+iris_cluster_data <- datasets::iris
+
+iris_cluster_matrix <- iris_cluster_data |>
+  select(Sepal.Length, Sepal.Width, Petal.Length, Petal.Width) |>
+  scale()
+
+set.seed(161324)
+iris_kmeans <- kmeans(iris_cluster_matrix, centers = 3, nstart = 20)
+
+iris_pca <- prcomp(iris_cluster_matrix)
+
+set.seed(161324)
+iris_umap <- uwot::umap(
+  iris_cluster_matrix,
+  n_neighbors = 15,
+  min_dist = 0.1,
+  n_components = 2,
+  n_threads = 1
+)
+
+iris_cluster_labels <- tibble(
+  cluster = factor(paste0("cluster ", iris_kmeans$cluster)),
+  Species = iris_cluster_data$Species
+)
+
+iris_cluster_pca <- as_tibble(
+  iris_pca$x[, 1:2],
+  .name_repair = ~ c("PC1", "PC2")
+) |>
+  bind_cols(iris_cluster_labels)
+
+iris_cluster_umap <- as_tibble(
+  iris_umap,
+  .name_repair = ~ c("UMAP1", "UMAP2")
+) |>
+  bind_cols(iris_cluster_labels)
+```
+
+### PCA as a linear projection
+
+Principal component analysis (PCA) is a linear projection method. It
+rotates the data to find directions along which the observations vary
+the most. The first principal component is the direction of greatest
+variation, the second principal component is the next direction of
+greatest variation subject to being uncorrelated with the first, and so
+on.
+
+For visualisation, we usually plot the first two principal components.
+This gives a two-dimensional view that captures the largest linear
+patterns in the data. The axes have an interpretation: each principal
+component is a weighted combination of the original variables. This
+makes PCA useful when we want a simple, reproducible display of broad
+multivariate structure.
+
+PCA is not designed to find curved or irregular structure. If the
+important relationships in the data are non-linear, PCA may flatten or
+hide them. It remains a good first display because it is stable,
+transparent, and relatively easy to explain.
+
+The figure below uses the built-in `iris` data. We fit $K$-means using
+the four scaled measurements, then project the same scaled matrix onto
+its first two principal components. Colour shows the fitted cluster, and
+shape shows `Species` for interpretation only.
+
+```{r iris_cluster_pca, fig.cap="PCA projection of the scaled iris measurements, coloured by fitted $K$-means cluster and shaped by species. The clustering was fit in the scaled four-variable feature space; PCA is used here only for display."}
+ggplot(iris_cluster_pca, aes(x = PC1, y = PC2, colour = cluster, shape = Species)) +
+  geom_point(alpha = 0.75) +
+  labs(x = "PC1", y = "PC2")
+```
+
+### UMAP as a non-linear neighbourhood projection
+
+UMAP is a non-linear projection method. Instead of finding straight-line
+axes of maximum variation, it builds a neighbourhood graph in the
+original feature space and then tries to place observations in two
+dimensions so that nearby observations remain nearby. This makes UMAP
+useful when the data have curved, irregular or locally structured
+patterns.
+
+The axes in a UMAP plot are display coordinates. Unlike PCA axes, they
+are not weighted combinations of the original variables and should not
+be interpreted directly. UMAP is usually most reliable for judging local
+neighbourhood structure: which observations are near one another, and
+whether a fitted cluster appears internally coherent. Distances between
+widely separated groups in a UMAP plot should be interpreted cautiously.
+
+UMAP has tuning parameters, especially `n_neighbors` and `min_dist`.
+Smaller neighbourhoods emphasise fine local structure, while larger
+neighbourhoods produce a smoother and more global display. Smaller
+values of `min_dist` tend to pack points more tightly, while larger
+values spread the display out. In this chapter we use UMAP mainly as an
+illustrative visualisation tool, rather than as a modelling method.
+
+The UMAP display below uses the same scaled iris matrix as the
+$K$-means fit, with the same fitted cluster labels and the known species
+shown only as an external check.
+
+```{r iris_cluster_umap, fig.cap="UMAP projection of the scaled iris measurements, coloured by fitted $K$-means cluster and shaped by species. The clustering was fit in the scaled four-variable feature space; UMAP is used here only as a non-linear display map."}
+ggplot(iris_cluster_umap, aes(x = UMAP1, y = UMAP2, colour = cluster, shape = Species)) +
+  geom_point(alpha = 0.75) +
+  labs(x = "UMAP1", y = "UMAP2")
+```
+
+### How to read projection plots in this chapter
+
+In the examples that follow, PCA and UMAP plots are used to help us see
+how observations and fitted clusters relate to one another. Colours will
+often show cluster labels from methods such as $K$-means, PAM, DBSCAN or
+HDBSCAN. Shapes or facets may show known labels, when available, so that
+we can interpret the fitted clusters after the model has been fitted.
+Those known labels are not used to train the clustering model.
+
+The important distinction is this: clustering is fitted in the feature
+space defined by the variables we choose, while PCA and UMAP provide a
+simplified two-dimensional display of that fitted result. A projection
+plot can suggest separation, overlap, outliers or ambiguous boundary
+points, but it should be read alongside more formal summaries such as
+within-cluster variation, silhouette width, bootstrap stability, and
+substantive knowledge of the data.
+
+| Method | Type | What it tries to preserve | Axis interpretation | Main use here |
+|:---|:---|:---|:---|:---|
+| PCA | Linear | Large-scale variation | Yes, as combinations of variables | Simple 2D display |
+| UMAP | Non-linear | Local neighbourhood structure | No, axes are display coordinates | Visualising complex structure |
+
 ## Dissimilarity Matrices for Multivariate Data
 
 Let $x_{ij}$ be the observed value of the $j$th variable for the $i$th
