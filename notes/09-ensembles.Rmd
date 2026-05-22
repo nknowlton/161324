@@ -540,7 +540,9 @@ removing the bias that would otherwise favour complex base learners.
 
 The `stacks` package implements cross-validated stacking within the
 `tidymodels` framework. Base learners are added to a model *stack*, which
-then blend their candidate predictions into a final ensemble.
+then blends their candidate predictions into a final ensemble. Because
+the blending step is regularised, it is perfectly normal for some
+candidate models to receive zero weight in the final stack.
 
 ::: {.example}
 **A stacked ensemble for the Long Beach adoption data**
@@ -586,12 +588,17 @@ bt_res <- wf |>
             metrics   = metric_set(roc_auc),
             control   = ctrl)
 
-# Build and blend
-adopt_stack <- stacks() |>
+# Build the candidate stack first
+adopt_data_stack <- stacks() |>
   add_candidates(lr_res)      |>
   add_candidates(rf_fast_res) |>
-  add_candidates(bt_res)      |>
-  blend_predictions(penalty = 10^(-2:-1))
+  add_candidates(bt_res)
+
+# Blend over a wider penalty path
+adopt_stack <- adopt_data_stack |>
+  blend_predictions(
+    penalty = 10^seq(-6, -0.5, length.out = 30)
+  )
 
 autoplot(adopt_stack, type = "weights")
 ```
@@ -614,10 +621,13 @@ Points to note:
 
 -   `blend_predictions()` fits a non-negative lasso regression on the
     stacked predictions. The `penalty` argument controls how many base
-    model candidates receive non-zero weight.
+    model candidates receive non-zero weight, so a stack that retains
+    only one learner is not necessarily a mistake.
 
 -   `autoplot(type = "weights")` shows the blending coefficients, making
     it easy to see which model families contribute most to the stack.
+    If only one weight remains, that usually means the other candidates
+    added little extra signal after regularisation.
 
 -   `fit_members()` refits only the selected base learners on the full
     training set before deploying.
