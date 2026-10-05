@@ -123,7 +123,11 @@ jobs:
           <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>161.324 Data Mining - Lectures</title>
+            <title>161.324 Data Mining - Lectures | Dr Nicholas Knowlton</title>
+            <meta name="description" content="Lecture materials for 161.324 Data Mining at Massey University, taught by Dr Nicholas Knowlton.">
+            <meta name="author" content="Dr Nicholas Knowlton">
+            <link rel="canonical" href="https://knowlton.co.nz/161324/lectures/">
+            <link rel="author" href="https://knowlton.co.nz/">
             <style>
               body { font-family: system-ui, sans-serif; max-width: 680px; margin: 3rem auto; padding: 0 1.5rem; color: #222; }
               h1 { font-size: 1.6rem; margin-bottom: 0.25rem; }
@@ -153,7 +157,11 @@ jobs:
           <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>161.324 Data Mining</title>
+            <title>161.324 Data Mining | Dr Nicholas Knowlton</title>
+            <meta name="description" content="Notes, lectures, labs and data for 161.324 Data Mining at Massey University, taught by Dr Nicholas Knowlton.">
+            <meta name="author" content="Dr Nicholas Knowlton">
+            <link rel="canonical" href="https://knowlton.co.nz/161324/">
+            <link rel="author" href="https://knowlton.co.nz/">
             <style>
               body {
                 font-family: system-ui, sans-serif;
@@ -189,6 +197,32 @@ jobs:
           </body>
           </html>
           EOF
+
+      - name: Generate sitemap
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.parse import quote
+
+          root = Path("_site")
+          urls = []
+          for page in sorted(root.rglob("*.html")):
+              rel = page.relative_to(root).as_posix()
+              if any(token in rel.lower() for token in ("_guide", "-sols", "/solutions/", "/answers/")):
+                  continue
+              if rel.endswith("index.html"):
+                  rel = rel[:-10]
+              urls.append("https://knowlton.co.nz/161324/" + quote(rel, safe="/"))
+
+          lines = [
+              '<?xml version="1.0" encoding="UTF-8"?>',
+              '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+              *[f"  <url><loc>{url}</loc></url>" for url in urls],
+              "</urlset>",
+              "",
+          ]
+          (root / "sitemap.xml").write_text("\n".join(lines), encoding="utf-8")
+          PY
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
