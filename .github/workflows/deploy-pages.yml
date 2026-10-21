@@ -221,7 +221,7 @@ jobs:
           urls = []
           for page in sorted(root.rglob("*.html")):
               rel = page.relative_to(root).as_posix()
-              if any(token in rel.lower() for token in ("_guide", "-sols", "/solutions/", "/answers/")):
+              if any(token in rel.lower() for token in ("_guide", "-sols", "/solutions/", "/answers/", "/libs/", "/site_libs/")) or rel.lower().endswith(("404.html", "speaker-view.html")):
                   continue
               if rel.endswith("index.html"):
                   rel = rel[:-10]
